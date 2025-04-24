@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import http from 'http';
+import fs from 'fs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,50 +15,92 @@ const NEXT_PORT = 3000;
 console.log(`Render expects port: ${RENDER_PORT}`);
 console.log(`Next.js is using port: ${NEXT_PORT}`);
 
-// Function to check if Next.js is ready
-const waitForNextJsReady = (retries = 30, delay = 1000) => {
-  return new Promise((resolve, reject) => {
-    let attempts = 0;
-    
-    const checkServer = () => {
-      console.log(`Checking if Next.js is ready (attempt ${attempts + 1}/${retries})...`);
-      
-      const req = http.get(`http://localhost:${NEXT_PORT}`, res => {
-        console.log(`Next.js responded with status: ${res.statusCode}`);
-        if (res.statusCode === 200) {
-          resolve();
-        } else {
-          retry();
-        }
-      });
-      
-      req.on('error', (err) => {
-        console.log(`Next.js check failed: ${err.message}`);
-        retry();
-      });
-      
-      req.setTimeout(2000, () => {
-        req.destroy();
-        console.log('Next.js check timed out');
-        retry();
-      });
-    };
-    
-    const retry = () => {
-      attempts++;
-      if (attempts >= retries) {
-        reject(new Error(`Next.js did not become ready after ${retries} attempts`));
-        return;
-      }
-      
-      setTimeout(checkServer, delay);
-    };
-    
-    checkServer();
+// Create a simple middleware to route requests
+const createServer = () => {
+  const app = express();
+  
+  // Simple middleware to log requests
+  app.use((req, res, next) => {
+    console.log(`Request received: ${req.method} ${req.url}`);
+    next();
   });
+
+  // Serve static files from the .next directory
+  app.use('/_next', express.static(path.join(__dirname, '.next/static'), {
+    maxAge: '1y'
+  }));
+  
+  // Serve public files
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  // Create your own handler for the home page
+  app.get('/', (req, res) => {
+    try {
+      const htmlPath = path.join(__dirname, '.next/server/pages/index.html');
+      if (fs.existsSync(htmlPath)) {
+        const html = fs.readFileSync(htmlPath, 'utf8');
+        res.setHeader('Content-Type', 'text/html');
+        res.send(html);
+      } else {
+        // If the static HTML file doesn't exist, try to proxy to Next.js
+        proxyToNext(req, res);
+      }
+    } catch (error) {
+      console.error('Error serving homepage:', error);
+      res.status(500).send('Error serving homepage. Please try again in a moment.');
+    }
+  });
+
+  // Proxy all other requests to Next.js
+  function proxyToNext(req, res) {
+    // Create a proxy for this specific request
+    const proxy = createProxyMiddleware({
+      target: `http://localhost:${NEXT_PORT}`,
+      changeOrigin: true,
+      ws: true,
+      proxyTimeout: 30000,
+      onError: (err, req, res) => {
+        console.error(`Proxy error: ${err.message}`);
+        res.writeHead(503, {
+          'Content-Type': 'text/html'
+        });
+        res.end(`
+          <html>
+            <head><title>Site Loading</title></head>
+            <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+              <h1>Site is starting up</h1>
+              <p>The application is still warming up. Please try refreshing in a few seconds.</p>
+              <script>
+                // Auto refresh after 5 seconds
+                setTimeout(() => { window.location.reload(); }, 5000);
+              </script>
+            </body>
+          </html>
+        `);
+      }
+    });
+    
+    proxy(req, res);
+  }
+
+  // Use the proxy for all other routes
+  app.use('*', (req, res) => {
+    proxyToNext(req, res);
+  });
+
+  // Start listening on the Render port
+  const server = app.listen(RENDER_PORT, '0.0.0.0', () => {
+    console.log(`Express server listening on port ${RENDER_PORT} -> forwarding to ${NEXT_PORT}`);
+  });
+
+  server.on('error', (error) => {
+    console.error(`Server error: ${error.message}`);
+  });
+
+  return server;
 };
 
-// Start the Next.js standalone server with a different port
+// Start the Next.js standalone server
 const startNextServer = () => {
   console.log(`Starting Next.js standalone server on internal port: ${NEXT_PORT}`);
 
@@ -76,60 +118,6 @@ const startNextServer = () => {
 
   server.on('close', (code) => {
     console.log(`Next.js server process exited with code ${code}`);
-    process.exit(code);
-  });
-
-  return server;
-};
-
-// Create a proxy server to forward requests
-const createProxyServer = () => {
-  const app = express();
-  
-  // Log all requests
-  app.use((req, res, next) => {
-    console.log(`Request received: ${req.method} ${req.url}`);
-    next();
-  });
-
-  // Add a health check endpoint
-  app.get('/health', (req, res) => {
-    res.status(200).send('OK');
-  });
-
-  // Add a fallback for when Next.js is not responding
-  app.use((req, res, next) => {
-    // Continue to proxy if path exists
-    next();
-  }, (req, res) => {
-    // This will only be reached if the proxy middleware doesn't handle the request
-    res.status(500).send('The application is currently starting up. Please try again in a moment.');
-  });
-
-  // Set up the proxy to forward to the Next.js server
-  app.use('/', createProxyMiddleware({
-    target: `http://localhost:${NEXT_PORT}`,
-    changeOrigin: true,
-    ws: true,
-    logLevel: 'debug',
-    proxyTimeout: 10000,
-    timeout: 10000,
-    onError: (err, req, res) => {
-      console.error(`Proxy error: ${err.message}`);
-      res.writeHead(500, {
-        'Content-Type': 'text/plain'
-      });
-      res.end('The application server is currently unavailable. Please try again in a few moments.');
-    }
-  }));
-
-  // Start listening on the Render port
-  const server = app.listen(RENDER_PORT, '0.0.0.0', () => {
-    console.log(`Proxy server listening on port ${RENDER_PORT} -> forwarding to ${NEXT_PORT}`);
-  });
-
-  server.on('error', (error) => {
-    console.error(`Server error: ${error.message}`);
   });
 
   return server;
@@ -139,19 +127,14 @@ const createProxyServer = () => {
 const main = async () => {
   try {
     // Start Next.js server
-    const nextServer = startNextServer();
+    startNextServer();
     
-    // Wait for Next.js to be ready (with timeout)
-    try {
-      console.log('Waiting for Next.js to be ready...');
-      await waitForNextJsReady();
-      console.log('Next.js is ready, starting proxy server');
-    } catch (error) {
-      console.warn(`Warning: ${error.message}. Starting proxy anyway.`);
-    }
+    // Give Next.js a moment to start before creating our proxy server
+    setTimeout(() => {
+      console.log('Setting up Express server to handle requests...');
+      createServer();
+    }, 5000);
     
-    // Create proxy server
-    createProxyServer();
   } catch (error) {
     console.error('Fatal error:', error);
     process.exit(1);
