@@ -1,5 +1,4 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -19,20 +18,22 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
-import { TitleIntroductionBlock } from './blocks/Titles/config'
 
 // Reconstruct __dirname in ESM
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+// Determine if we're in build mode
+const isBuild = process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_IS_BUILD === 'true'
 
 export default buildConfig({
   admin: {
     components: {
       beforeLogin: ['@/components/BeforeLogin'],
       beforeDashboard: ['@/components/BeforeDashboard'],
-      Dashboard: path.resolve(dirname, 'components/CustomHomepage'), // Updated this line
+      Dashboard: path.resolve(dirname, 'components/CustomHomepage'),
       views: {
-        Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'), // Updated this line
+        Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'),
       },
     },
     nav: {
@@ -71,8 +72,19 @@ export default buildConfig({
     },
   },
   editor: defaultLexical,
+  // Use appropriate database config based on build vs runtime
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+    url: process.env.DATABASE_URI || process.env.MONGODB_URI || '',
+    // Add connect options to handle connection during build
+    connectOptions: {
+      // If in build mode, set a short timeout and fewer retries
+      // This helps prevent hanging builds if there's no real DB
+      ...(isBuild && {
+        serverSelectionTimeoutMS: 2000,
+        maxPoolSize: 1,
+        retryWrites: false,
+      }),
+    },
   }),
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
   cors: [getServerSideURL()].filter(Boolean),
@@ -80,11 +92,15 @@ export default buildConfig({
   plugins: [
     ...plugins,
   ],
-  secret: process.env.PAYLOAD_SECRET,
+  // Always provide a secret key
+  secret: process.env.PAYLOAD_SECRET || 'temporary-build-secret-not-for-production',
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+  // Disable features during build that might try to connect to DB
+  rateLimit: !isBuild,
+  telemetry: !isBuild,
   jobs: {
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {

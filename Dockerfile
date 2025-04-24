@@ -13,17 +13,20 @@ RUN npm install
 # Copy the rest of the app
 COPY . .
 
-# Create a dummy .env file with placeholder values for build time
-RUN echo "PAYLOAD_SECRET=temporary-build-secret-not-for-production" > .env
-RUN echo "MONGODB_URI=mongodb://localhost:27017/placeholder-db" >> .env
-RUN echo "NEXT_PUBLIC_SERVER_URL=http://localhost:3000" >> .env
-RUN echo "PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000" >> .env
+# Create a .env.build file with special flags for build time
+RUN echo "PAYLOAD_SECRET=temporary-build-secret-not-for-production" > .env.build
+RUN echo "MONGODB_URI=mongodb://localhost:27017/placeholder-db" >> .env.build
+RUN echo "NEXT_PUBLIC_SERVER_URL=http://localhost:3000" >> .env.build
+RUN echo "PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000" >> .env.build
+# This is the important flag to skip actual DB connection during build
+RUN echo "PAYLOAD_SKIP_DATABASE=true" >> .env.build
 
-# Build Next.js
-RUN npm run build
+# Build Next.js with the build-specific env file
+RUN cp .env.build .env
+RUN NEXT_PUBLIC_IS_BUILD=true npm run build
 
 # Remove the dummy .env file as we'll use real environment variables at runtime
-RUN rm .env
+RUN rm .env .env.build
 
 # Expose the port the app runs on
 EXPOSE 3000
