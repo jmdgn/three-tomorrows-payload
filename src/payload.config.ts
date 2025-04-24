@@ -1,4 +1,5 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
+
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -18,42 +19,21 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { TitleIntroductionBlock } from './blocks/Titles/config'
 
 // Reconstruct __dirname in ESM
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Check if we're in build mode
-const isBuild = process.env.NEXT_PUBLIC_IS_BUILD === 'true'
-
-// Create a mock DB adapter for build time
-const createMockDBAdapter = () => {
-  return {
-    connect: async () => {
-      console.log('Using mock database adapter for build');
-      return Promise.resolve();
-    },
-    find: async () => ({ docs: [], hasNextPage: false, hasPrevPage: false, limit: 10, nextPage: null, page: 1, pagingCounter: 1, prevPage: null, totalDocs: 0, totalPages: 0 }),
-    findOne: async () => null,
-    create: async () => ({}),
-    update: async () => ({}),
-    delete: async () => ({}),
-    // Add other required methods as needed
-  };
-};
-
 export default buildConfig({
   admin: {
     components: {
-      // During build, use simplified components
-      ...(isBuild ? {} : {
-        beforeLogin: ['@/components/BeforeLogin'],
-        beforeDashboard: ['@/components/BeforeDashboard'],
-        Dashboard: path.resolve(dirname, 'components/CustomHomepage'),
-        views: {
-          Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'),
-        }
-      })
+      beforeLogin: ['@/components/BeforeLogin'],
+      beforeDashboard: ['@/components/BeforeDashboard'],
+      Dashboard: path.resolve(dirname, 'components/CustomHomepage'), // Updated this line
+      views: {
+        Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'), // Updated this line
+      },
     },
     nav: {
       views: [
@@ -67,7 +47,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     user: Users.slug,
-    livePreview: isBuild ? undefined : {
+    livePreview: {
       breakpoints: [
         {
           label: 'Mobile',
@@ -91,34 +71,21 @@ export default buildConfig({
     },
   },
   editor: defaultLexical,
-  // Decide which DB adapter to use based on build vs runtime
-  db: isBuild 
-    ? {
-        // During build, use an in-memory mock to avoid any real connections
-        mongodb: {
-          url: 'mongodb://mock:27017/mock-db',
-        }
-      }
-    : mongooseAdapter({
-        url: process.env.DATABASE_URI || process.env.MONGODB_URI || '',
-      }),
+  db: mongooseAdapter({
+    url: process.env.DATABASE_URI || '',
+  }),
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
-  cors: isBuild ? ['*'] : [getServerSideURL()].filter(Boolean),
+  cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
-  // During build, use minimal plugins
-  plugins: isBuild ? [] : [...plugins],
-  secret: process.env.PAYLOAD_SECRET || 'temp-secret-for-build-only',
-  // Only use sharp at runtime to avoid unnecessary processing during build
-  ...(isBuild ? {} : { sharp }),
+  plugins: [
+    ...plugins,
+  ],
+  secret: process.env.PAYLOAD_SECRET,
+  sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // Disable all optional features during build
-  rateLimit: !isBuild,
-  csrf: !isBuild,
-  telemetry: false,
-  // Only enable jobs at runtime
-  jobs: isBuild ? undefined : {
+  jobs: {
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {
         if (req.user) return true

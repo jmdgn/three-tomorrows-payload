@@ -1,17 +1,27 @@
-// app/(frontend)/landing/page.tsx
-export const dynamic = 'force-static';
+import React from 'react'
+import { AdminBar } from '@/components/AdminBar'
+import { Footer } from '@/Footer/Component'
+import { NewHeader as Header } from '@/components/Header/NewHeader'
+import { draftMode } from 'next/headers'
 
-export default function LandingPage() {
-  // This simplified page will only be used during build
-  // At runtime, your actual page logic will execute
+const LandingPageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
-      <header>Header Placeholder</header>
-      <main>
-        <h1>Landing Page</h1>
-        <p>This is a build-time placeholder.</p>
-      </main>
-      <footer>Footer Placeholder</footer>
-    </div>
-  );
+    <>
+      {children}
+      <Footer />
+    </>
+  )
+}
+
+export default async function LandingPage() {
+  const { isEnabled } = await draftMode()
+
+  return (
+    <>
+      <AdminBar adminBarProps={{ preview: isEnabled }} />
+      <Header />
+      <LandingPageLayout>
+      </LandingPageLayout>
+    </>
+  )
 }

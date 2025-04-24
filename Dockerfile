@@ -1,30 +1,29 @@
-# Use Node.js LTS
-FROM node:20-alpine
+# Use an official Node LTS base image
+FROM node:18
 
-# Set working directory
+# Create app directory
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache python3 make g++
-
-# Copy package and build override files first
-COPY package*.json build-override.js ./
+# Copy package files
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application
+# Copy the rest of the app
 COPY . .
 
-# Set environment for build
-ENV NODE_ENV=production
-ENV NEXT_PUBLIC_IS_BUILD=true
+# Set ENV VARS for build
+ARG PAYLOAD_SECRET
+ARG MONGODB_URI
+ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
+ENV MONGODB_URI=$MONGODB_URI
 
-# Build using our override script
+# Build Next.js
 RUN npm run build
 
-# Expose port
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Start the application
+# Start your custom Express server or Next.js
 CMD ["npm", "start"]

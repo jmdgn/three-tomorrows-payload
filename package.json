@@ -5,8 +5,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "node build-override.js",
-    "postbuild": "echo 'Skipping sitemap generation'",
+    "build": "next build",
+    "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "next dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
@@ -17,7 +17,7 @@
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "prepare": "echo 'Skipping type generation in production'",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
-    "start": "cross-env NODE_ENV=production node server.js"
+    "start": "next start"
   },
   "dependencies": {
     "@lexical/code": "^0.28.0",
