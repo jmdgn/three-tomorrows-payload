@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: payload-nextjs
+    env: docker
+    plan: starter # Choose an appropriate plan
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PAYLOAD_SECRET
+        generateValue: true # Render will generate a secure random value
+      - key: MONGODB_URI
+        sync: false # Add this manually in the Render dashboard
+      - key: NEXT_PUBLIC_SERVER_URL
+        value: https://${RENDER_SERVICE_NAME}.onrender.com
+      - key: PAYLOAD_PUBLIC_SERVER_URL
+        value: https://${RENDER_SERVICE_NAME}.onrender.com
