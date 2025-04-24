@@ -7,39 +7,23 @@ WORKDIR /app
 # Install build dependencies
 RUN apk add --no-cache python3 make g++
 
-# Copy package files
-COPY package*.json ./
+# Copy package and build override files first
+COPY package*.json build-override.js ./
 
 # Install dependencies
 RUN npm install
 
-# Copy source code
+# Copy the rest of the application
 COPY . .
 
-# Set build environment variables
+# Set environment for build
 ENV NODE_ENV=production
 ENV NEXT_PUBLIC_IS_BUILD=true
-ENV PAYLOAD_SECRET=temporary-secret-for-build-only
-ENV DATABASE_URI=mongodb://localhost:27017/temp-db
-ENV MONGODB_URI=mongodb://localhost:27017/temp-db
-ENV NEXT_PUBLIC_SERVER_URL=http://localhost:3000
-ENV PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
 
-# Create dummy .env file for build
-RUN echo "PAYLOAD_SECRET=temporary-secret-for-build-only" > .env
-RUN echo "DATABASE_URI=mongodb://localhost:27017/temp-db" >> .env
-RUN echo "MONGODB_URI=mongodb://localhost:27017/temp-db" >> .env
-RUN echo "NEXT_PUBLIC_SERVER_URL=http://localhost:3000" >> .env
-RUN echo "PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000" >> .env
-RUN echo "NEXT_PUBLIC_IS_BUILD=true" >> .env
+# Build using our override script
+RUN npm run build
 
-# Build the application
-RUN NODE_OPTIONS="--max_old_space_size=4096" npm run build
-
-# Remove the build-specific environment file
-RUN rm -f .env
-
-# Expose the application port
+# Expose port
 EXPOSE 3000
 
 # Start the application
