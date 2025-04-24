@@ -21,6 +21,7 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { TitleIntroductionBlock } from './blocks/Titles/config'
 
+// Reconstruct __dirname in ESM
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -29,9 +30,9 @@ export default buildConfig({
     components: {
       beforeLogin: ['@/components/BeforeLogin'],
       beforeDashboard: ['@/components/BeforeDashboard'],
-      Dashboard: path.resolve(__dirname, 'components/CustomHomepage'),
+      Dashboard: path.resolve(dirname, 'components/CustomHomepage'), // Updated this line
       views: {
-        Subscribers: path.resolve(__dirname, 'components/Subscribers/SubscribersDashboard'),
+        Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'), // Updated this line
       },
     },
     nav: {

@@ -14,7 +14,6 @@ const nextConfig = {
         .map((item) => {
           try {
             const url = new URL(item)
-            // Defensive check to avoid invalid patterns
             if (!url.hostname) {
               console.warn(`Missing hostname in URL: ${item}`)
               return null
@@ -33,7 +32,6 @@ const nextConfig = {
   },
   reactStrictMode: true,
   redirects,
-  // Prevents build errors from non-critical warnings
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -41,7 +39,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   output: 'standalone',
-  // Add environment variables to be available at runtime
   env: {
     PORT: process.env.PORT || '3000',
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
@@ -49,18 +46,11 @@ const nextConfig = {
     MONGODB_URI: process.env.MONGODB_URI || process.env.DATABASE_URI,
     NEXT_PUBLIC_SERVER_URL
   },
-  // Explicitly set the port for Render compatibility
-  experimental: {
-    // This helps with compatibility on hosting platforms
-    instrumentationHook: true
-  }
 }
 
 export default withPayload(nextConfig, { 
   devBundleServerPackages: false,
-  // Ensure Payload can access environment variables correctly
   payloadConfig: {
-    // This ensures environment variables are properly passed to Payload
     env: process.env
   }
 })
