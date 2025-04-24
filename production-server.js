@@ -3,7 +3,9 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import dotenv from 'dotenv';
+import { execSync } from 'child_process';
 
 dotenv.config();
 
@@ -58,8 +60,6 @@ const startNextJsApp = () => {
 
 // Create a proxy to the Next.js app
 const setupProxy = () => {
-  const { createProxyMiddleware } = require('http-proxy-middleware');
-  
   // Proxy all requests to the Next.js app
   app.use('/', createProxyMiddleware({
     target: 'http://localhost:3000',
@@ -92,33 +92,36 @@ const setupProxy = () => {
   }));
 };
 
-// Install the proxy middleware if it's not already installed
 try {
-  require('http-proxy-middleware');
-} catch (e) {
-  console.log('Installing http-proxy-middleware...');
-  const { execSync } = require('child_process');
-  execSync('npm install http-proxy-middleware', { stdio: 'inherit' });
-}
-
-// Start the Next.js app
-const nextApp = startNextJsApp();
-
-// Set up the proxy
-setupProxy();
-
-// Start the main server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Main server running on port ${PORT}`);
-  console.log(`Proxying requests to Next.js app on port 3000`);
-  console.log(`View your site at: http://localhost:${PORT}`);
-});
-
-// Handle cleanup when the main process exits
-process.on('SIGINT', () => {
-  console.log('Shutting down...');
-  if (nextApp) {
-    nextApp.kill();
+  // Make sure http-proxy-middleware is installed
+  console.log('Setting up proxy...');
+  setupProxy();
+  
+  // Start the Next.js app
+  const nextApp = startNextJsApp();
+  
+  // Start the main server
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Main server running on port ${PORT}`);
+    console.log(`Proxying requests to Next.js app on port 3000`);
+    console.log(`View your site at: http://localhost:${PORT}`);
+  });
+  
+  // Handle cleanup when the main process exits
+  process.on('SIGINT', () => {
+    console.log('Shutting down...');
+    if (nextApp) {
+      nextApp.kill();
+    }
+    process.exit();
+  });
+} catch (error) {
+  console.error('Error setting up server:', error);
+  console.log('Installing missing dependencies...');
+  try {
+    execSync('npm install http-proxy-middleware', { stdio: 'inherit' });
+    console.log('Dependency installed. Please restart the server.');
+  } catch (installError) {
+    console.error('Failed to install dependency:', installError);
   }
-  process.exit();
-});
+}
