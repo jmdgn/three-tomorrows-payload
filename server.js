@@ -1,4 +1,3 @@
-// server.ts
 import express from 'express';
 import payload from 'payload';
 import next from 'next';
@@ -12,16 +11,19 @@ const server = express();
 (async () => {
   await app.prepare();
 
-  await payload.init({
-    secret: process.env.PAYLOAD_SECRET,
-    express: server,
-  });
+  // Only initialize Payload if we're NOT building, or explicitly allowed
+  if (process.env.NODE_ENV !== 'production' || process.env.PAYLOAD_BUILD === 'true') {
+    await payload.init({
+      secret: process.env.PAYLOAD_SECRET,
+      express: server,
+    });
+  }
 
   // Let Next.js handle all other routes
   server.all('*', (req, res) => handle(req, res));
 
   const port = process.env.PORT || 3000;
   server.listen(port, () => {
-    console.log(`Server running at http://0.0.0.0:${PORT}`);
+    console.log(`Server running at http://0.0.0.0:${port}`);
   });
 })();
