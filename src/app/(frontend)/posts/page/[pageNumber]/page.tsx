@@ -66,15 +66,9 @@ export default async function Page({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { pageNumber } = await paramsPromise
 
-  // 👇 Guard for Render build
-  if (process.env.NODE_ENV === 'production' && process.env.PAYLOAD_BUILD !== 'true') {
-    return {
-      title: `Posts - Page ${pageNumber}`,
-    }
-  }
-
   return {
-    title: `Payload Website Template Posts Page ${pageNumber || ''}`,
+    title: `Posts - Page ${pageNumber}`,
+    description: `Browse through our blog posts. Currently viewing page ${pageNumber}`,
   }
 }
 

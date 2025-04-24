@@ -9,7 +9,7 @@ import React from 'react'
 import PageClient from './page.client'
 import '@/styles/blog-styles.css'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 export const revalidate = 600
 
 export default async function Page() {
