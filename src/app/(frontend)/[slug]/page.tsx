@@ -14,7 +14,12 @@ import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
 export async function generateStaticParams() {
+  if (process.env.NODE_ENV === 'production' && process.env.PAYLOAD_BUILD !== 'true') {
+    return [] // Skip generating params during build if Payload isn't initialized
+  }
+
   const payload = await getPayload({ config: configPromise })
+
   const pages = await payload.find({
     collection: 'pages',
     draft: false,
@@ -27,12 +32,8 @@ export async function generateStaticParams() {
   })
 
   const params = pages.docs
-    ?.filter((doc) => {
-      return doc.slug !== 'home'
-    })
-    .map(({ slug }) => {
-      return { slug }
-    })
+    ?.filter((doc) => doc.slug !== 'home')
+    .map(({ slug }) => ({ slug }))
 
   return params
 }
@@ -82,9 +83,16 @@ export default async function Page({ params: paramsPromise }: Args) {
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = 'home' } = await paramsPromise
-  const page = await queryPageBySlug({
-    slug,
-  })
+
+  // Safe fallback if Payload isn't available at build time
+  if (process.env.NODE_ENV === 'production' && process.env.PAYLOAD_BUILD !== 'true') {
+    return {
+      title: slug,
+      description: 'Page preview',
+    }
+  }
+
+  const page = await queryPageBySlug({ slug })
 
   return generateMeta({ doc: page })
 }
