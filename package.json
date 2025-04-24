@@ -15,6 +15,7 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation next lint --fix",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "prepare": "payload generate:types",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "start": "node server.js"
   },
@@ -59,7 +60,6 @@
     "next-sitemap": "^4.2.3",
     "payload": "^3.35.0",
     "picomatch": "^4.0.2",
-    "prepare": "payload generate:types",
     "prism-react-renderer": "^2.3.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
