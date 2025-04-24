@@ -4,6 +4,8 @@ import { Footer } from '@/Footer/Component'
 import { NewHeader as Header } from '@/components/Header/NewHeader'
 import { draftMode } from 'next/headers'
 
+export const dynamic = 'force-dynamic'
+
 const LandingPageLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
@@ -21,6 +23,7 @@ export default async function LandingPage() {
       <AdminBar adminBarProps={{ preview: isEnabled }} />
       <Header />
       <LandingPageLayout>
+
       </LandingPageLayout>
     </>
   )
