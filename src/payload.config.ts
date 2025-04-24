@@ -1,5 +1,4 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -30,9 +29,9 @@ export default buildConfig({
     components: {
       beforeLogin: ['@/components/BeforeLogin'],
       beforeDashboard: ['@/components/BeforeDashboard'],
-      Dashboard: path.resolve(dirname, 'components/CustomHomepage'), // Updated this line
+      Dashboard: path.resolve(dirname, 'components/CustomHomepage'),
       views: {
-        Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'), // Updated this line
+        Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'),
       },
     },
     nav: {
@@ -71,11 +70,14 @@ export default buildConfig({
     },
   },
   editor: defaultLexical,
+  
+  // MongoDB Atlas Connection (Replace with actual URI or ensure it's in .env file)
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+    url: process.env.DATABASE_URI || 'mongodb+srv://jamesmills:AGKAt5Jis97CPwGY@cluster0.uhcdpi9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
   }),
+
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
-  cors: [getServerSideURL()].filter(Boolean),
+  cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean),  // Ensure correct production URL
   globals: [Header, Footer],
   plugins: [
     ...plugins,
