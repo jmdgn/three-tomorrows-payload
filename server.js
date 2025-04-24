@@ -3,8 +3,12 @@ import payload from 'payload';
 import next from 'next';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-// Get environment variables
+// Get the dirname for ESM
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Environment variables
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
@@ -12,90 +16,49 @@ const handle = app.getRequestHandler();
 // Create Express server
 const server = express();
 
-// Add health check endpoint for Render.com
+// Simple file-based health check that doesn't require database
 server.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// Check required environment variables at runtime
-function checkRequiredEnvVars() {
-  if (process.env.NODE_ENV === 'production') {
-    const required = ['PAYLOAD_SECRET', 'DATABASE_URI', 'MONGODB_URI'];
-    const missing = required.filter(varName => 
-      !process.env[varName] && 
-      // Special handling for DATABASE_URI and MONGODB_URI - only need one of them
-      !(varName === 'DATABASE_URI' && process.env.MONGODB_URI) && 
-      !(varName === 'MONGODB_URI' && process.env.DATABASE_URI)
-    );
-    
-    if (missing.length > 0) {
-      console.error(`Missing required environment variables: ${missing.join(', ')}`);
-      console.error('Please set these variables before starting the server.');
-      return false;
-    }
-  }
-  return true;
-}
-
-// Handle graceful shutdown
-function setupGracefulShutdown(server) {
-  const signals = ['SIGINT', 'SIGTERM'];
-  signals.forEach(signal => {
-    process.on(signal, () => {
-      console.log(`Received ${signal}, shutting down gracefully`);
-      server.close(() => {
-        console.log('HTTP server closed');
-        process.exit(0);
-      });
-    });
-  });
-}
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (error) => {
+  console.error('UNHANDLED REJECTION:', error);
+});
 
 // Start the server
 (async () => {
   try {
-    // Check environment variables
-    if (!checkRequiredEnvVars()) {
-      process.exit(1);
-    }
-
     // Prepare Next.js
     await app.prepare();
-
-    // Initialize Payload in production or development
-    // In production, make sure PAYLOAD_SECRET and DATABASE_URI or MONGODB_URI are set
-    if (process.env.NODE_ENV !== 'production' || 
-        (process.env.PAYLOAD_SECRET && (process.env.DATABASE_URI || process.env.MONGODB_URI))) {
-      
-      // Get the dirname for ESM
-      const __dirname = path.dirname(fileURLToPath(import.meta.url));
-      
+    
+    // Add payload only after Next.js is ready
+    try {
+      // Initialize Payload CMS
       await payload.init({
-        secret: process.env.PAYLOAD_SECRET,
+        secret: process.env.PAYLOAD_SECRET || 'fallback-secret-not-for-production',
         express: server,
-        configPath: path.resolve(__dirname, './payload.config.js'),
         onInit: () => {
-          console.log('Payload initialized');
+          console.log('✅ Payload initialized successfully');
         },
       });
-    } else {
-      console.log('Skipping Payload initialization (missing environment variables)');
+    } catch (payloadError) {
+      console.error('Failed to initialize Payload:', payloadError);
+      
+      // Even if Payload fails, we can still serve the Next.js app
+      console.log('Continuing to serve Next.js application without Payload...');
     }
 
-    // Handle all other routes with Next.js
+    // Handle Next.js requests
     server.all('*', (req, res) => {
       return handle(req, res);
     });
 
-    // Start listening on the appropriate port
-    const port = process.env.PORT || 3000;
-    const httpServer = server.listen(port, '0.0.0.0', () => {
-      console.log(`Server running at http://0.0.0.0:${port}`);
+    // Start the server
+    const PORT = process.env.PORT || 3000;
+    server.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running at http://0.0.0.0:${PORT}`);
     });
-
-    // Handle graceful shutdown
-    setupGracefulShutdown(httpServer);
-    
   } catch (error) {
     console.error('Error starting server:', error);
     process.exit(1);

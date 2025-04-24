@@ -1,8 +1,11 @@
-# Use an official Node LTS base image
-FROM node:18
+# Use Node.js LTS
+FROM node:20-alpine
 
-# Create app directory
+# Set working directory
 WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
 
 # Copy package files
 COPY package*.json ./
@@ -10,27 +13,34 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the app
+# Copy source code
 COPY . .
 
-# Create a .env.build file with special flags for build time
-RUN echo "PAYLOAD_SECRET=temporary-build-secret-not-for-production" > .env.build
-RUN echo "MONGODB_URI=mongodb://localhost:27017/placeholder-db" >> .env.build
-RUN echo "NEXT_PUBLIC_SERVER_URL=http://localhost:3000" >> .env.build
-RUN echo "PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000" >> .env.build
-# This is the important flag to skip actual DB connection during build
-RUN echo "PAYLOAD_SKIP_DATABASE=true" >> .env.build
+# Set build environment variables
+ENV NODE_ENV=production
+ENV NEXT_PUBLIC_IS_BUILD=true
+ENV PAYLOAD_SECRET=temporary-secret-for-build-only
+ENV DATABASE_URI=mongodb://localhost:27017/temp-db
+ENV MONGODB_URI=mongodb://localhost:27017/temp-db
+ENV NEXT_PUBLIC_SERVER_URL=http://localhost:3000
+ENV PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000
 
-# Build Next.js with the build-specific env file
-RUN cp .env.build .env
-RUN NEXT_PUBLIC_IS_BUILD=true npm run build
+# Create dummy .env file for build
+RUN echo "PAYLOAD_SECRET=temporary-secret-for-build-only" > .env
+RUN echo "DATABASE_URI=mongodb://localhost:27017/temp-db" >> .env
+RUN echo "MONGODB_URI=mongodb://localhost:27017/temp-db" >> .env
+RUN echo "NEXT_PUBLIC_SERVER_URL=http://localhost:3000" >> .env
+RUN echo "PAYLOAD_PUBLIC_SERVER_URL=http://localhost:3000" >> .env
+RUN echo "NEXT_PUBLIC_IS_BUILD=true" >> .env
 
-# Remove the dummy .env file as we'll use real environment variables at runtime
-RUN rm .env .env.build
+# Build the application
+RUN NODE_OPTIONS="--max_old_space_size=4096" npm run build
 
-# Expose the port the app runs on
+# Remove the build-specific environment file
+RUN rm -f .env
+
+# Expose the application port
 EXPOSE 3000
 
-# Start your custom Express server or Next.js
-# This will use the environment variables provided by Render at runtime
+# Start the application
 CMD ["npm", "start"]

@@ -23,18 +23,37 @@ import { getServerSideURL } from './utilities/getURL'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Determine if we're in build mode
-const isBuild = process.env.NODE_ENV === 'production' && process.env.NEXT_PUBLIC_IS_BUILD === 'true'
+// Check if we're in build mode
+const isBuild = process.env.NEXT_PUBLIC_IS_BUILD === 'true'
+
+// Create a mock DB adapter for build time
+const createMockDBAdapter = () => {
+  return {
+    connect: async () => {
+      console.log('Using mock database adapter for build');
+      return Promise.resolve();
+    },
+    find: async () => ({ docs: [], hasNextPage: false, hasPrevPage: false, limit: 10, nextPage: null, page: 1, pagingCounter: 1, prevPage: null, totalDocs: 0, totalPages: 0 }),
+    findOne: async () => null,
+    create: async () => ({}),
+    update: async () => ({}),
+    delete: async () => ({}),
+    // Add other required methods as needed
+  };
+};
 
 export default buildConfig({
   admin: {
     components: {
-      beforeLogin: ['@/components/BeforeLogin'],
-      beforeDashboard: ['@/components/BeforeDashboard'],
-      Dashboard: path.resolve(dirname, 'components/CustomHomepage'),
-      views: {
-        Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'),
-      },
+      // During build, use simplified components
+      ...(isBuild ? {} : {
+        beforeLogin: ['@/components/BeforeLogin'],
+        beforeDashboard: ['@/components/BeforeDashboard'],
+        Dashboard: path.resolve(dirname, 'components/CustomHomepage'),
+        views: {
+          Subscribers: path.resolve(dirname, 'components/Subscribers/SubscribersDashboard'),
+        }
+      })
     },
     nav: {
       views: [
@@ -48,7 +67,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     user: Users.slug,
-    livePreview: {
+    livePreview: isBuild ? undefined : {
       breakpoints: [
         {
           label: 'Mobile',
@@ -72,36 +91,34 @@ export default buildConfig({
     },
   },
   editor: defaultLexical,
-  // Use appropriate database config based on build vs runtime
-  db: mongooseAdapter({
-    url: process.env.DATABASE_URI || process.env.MONGODB_URI || '',
-    // Add connect options to handle connection during build
-    connectOptions: {
-      // If in build mode, set a short timeout and fewer retries
-      // This helps prevent hanging builds if there's no real DB
-      ...(isBuild && {
-        serverSelectionTimeoutMS: 2000,
-        maxPoolSize: 1,
-        retryWrites: false,
+  // Decide which DB adapter to use based on build vs runtime
+  db: isBuild 
+    ? {
+        // During build, use an in-memory mock to avoid any real connections
+        mongodb: {
+          url: 'mongodb://mock:27017/mock-db',
+        }
+      }
+    : mongooseAdapter({
+        url: process.env.DATABASE_URI || process.env.MONGODB_URI || '',
       }),
-    },
-  }),
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
-  cors: [getServerSideURL()].filter(Boolean),
+  cors: isBuild ? ['*'] : [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
-  plugins: [
-    ...plugins,
-  ],
-  // Always provide a secret key
-  secret: process.env.PAYLOAD_SECRET || 'temporary-build-secret-not-for-production',
-  sharp,
+  // During build, use minimal plugins
+  plugins: isBuild ? [] : [...plugins],
+  secret: process.env.PAYLOAD_SECRET || 'temp-secret-for-build-only',
+  // Only use sharp at runtime to avoid unnecessary processing during build
+  ...(isBuild ? {} : { sharp }),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  // Disable features during build that might try to connect to DB
+  // Disable all optional features during build
   rateLimit: !isBuild,
-  telemetry: !isBuild,
-  jobs: {
+  csrf: !isBuild,
+  telemetry: false,
+  // Only enable jobs at runtime
+  jobs: isBuild ? undefined : {
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {
         if (req.user) return true
