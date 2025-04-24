@@ -40,7 +40,7 @@ const start = async () => {
     server.all('*', (req, res) => handle(req, res));
 
     server.listen(PORT, () => {
-      console.log(`✅ Server is ready at http://localhost:${PORT}`);
+      console.log(`✅ Server is ready at http://0.0.0.0:${PORT}`);
     });
   } catch (error) {
     console.error('Server startup error:', error);
