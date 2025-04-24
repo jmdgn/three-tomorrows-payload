@@ -5,8 +5,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "next build && payload build",
+    "build": "next build && NODE_OPTIONS=--no-deprecation payload build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
+    "prepare": "echo 'Skipping type generation in production' || cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "dev": "next dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
@@ -15,7 +16,6 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation next lint --fix",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
-    "prepare": "payload generate:types",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "start": "node server.js"
   },
