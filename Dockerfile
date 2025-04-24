@@ -1,20 +1,23 @@
-FROM node:18-alpine
+# Use an official Node LTS base image
+FROM node:18
 
+# Create app directory
 WORKDIR /app
 
-# Install dependencies first
-COPY package.json package-lock.json* ./
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
 RUN npm install
 
-# Copy all files
+# Copy rest of the app
 COPY . .
 
-# Try to build the Next.js application (but continue even if it fails)
-RUN npm run build || echo "Build failed, will use simple server instead"
+# Build Next.js
+RUN npm run build
 
-# Expose port
+# Expose the port the app runs on
 EXPOSE 3000
-ENV PORT=3000
 
-# Try to use server.js, but fall back to simple-server.js if .next doesn't exist
-CMD if [ -d ".next" ]; then node server.js; else node simple-server.js; fi
+# Start your custom Express server
+CMD ["npm", "start"]
