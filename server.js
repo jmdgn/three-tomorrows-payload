@@ -9,7 +9,7 @@ dotenv.config();
 
 // Debug environmental variables
 console.log('Environment check:');
-console.log('PAYLOAD_SECRET exists:', Boolean(process.env.PAYLOAD_SECRET));
+console.log('PAYLOAD_SECRET:', process.env.PAYLOAD_SECRET); // Print actual value for debugging
 console.log('DATABASE_URI exists:', Boolean(process.env.DATABASE_URI));
 console.log('Current directory:', process.cwd());
 
@@ -19,15 +19,18 @@ const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 const PORT = process.env.PORT || 3000;
 
+// Set a fallback secret if environment variable is missing
+const PAYLOAD_SECRET = process.env.PAYLOAD_SECRET || 'a-temporary-fallback-secret-for-render-deployment';
+
 const start = async () => {
   try {
     const server = express();
 
     await nextApp.prepare();
 
-    // Initialize Payload with hard-coded fallback for testing
+    // Initialize Payload with explicit secret
     await payload.init({
-      secret: process.env.PAYLOAD_SECRET || 'temporary_fallback_secret_key_for_testing',
+      secret: PAYLOAD_SECRET,
       mongoURL: process.env.DATABASE_URI,
       express: server,
       config: path.resolve(__dirname, './src/payload.config.ts'),
