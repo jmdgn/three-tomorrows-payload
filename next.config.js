@@ -5,7 +5,7 @@ const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://loc
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost', 'threetomorrows.co'],
+    domains: ['localhost', 'threetomorrows.co', 'three-tomorrows-payload.vercel.app'],
     remotePatterns: [
       ...[NEXT_PUBLIC_SERVER_URL]
         .filter(Boolean)
@@ -36,6 +36,21 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Add these settings to fix build issues
+  experimental: {
+    // More permissive settings for complex builds
+    esmExternals: 'loose',
+    // Skip potential problematic checks
+    skipTrailingSlashRedirect: true,
+    // Allow more time for builds
+    serverComponentsExternalPackages: [],
+  },
+  onDemandEntries: {
+    // Make the build more permissive
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 5,
+  },
+  // Keep this setting
   output: 'standalone',
   env: {
     PORT: process.env.PORT || '3000',
@@ -43,6 +58,19 @@ const nextConfig = {
     DATABASE_URI: process.env.DATABASE_URI,
     MONGODB_URI: process.env.MONGODB_URI || process.env.DATABASE_URI,
     NEXT_PUBLIC_SERVER_URL,
+  },
+  // Add this to suppress certain build warnings
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't resolve 'fs' module on the client to prevent this error
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+        os: false,
+      }
+    }
+    return config
   },
 }
 
