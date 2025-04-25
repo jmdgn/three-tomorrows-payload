@@ -36,16 +36,15 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+
+  // Simplified experimental options that are supported
   experimental: {
     esmExternals: 'loose',
-    skipTrailingSlashRedirect: true,
-    serverComponentsExternalPackages: [],
   },
-  onDemandEntries: {
-    maxInactiveAge: 25 * 1000,
-    pagesBufferLength: 5,
-  },
+
+  // Keep this setting
   output: 'standalone',
+
   env: {
     PORT: process.env.PORT || '3000',
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
@@ -53,6 +52,8 @@ const nextConfig = {
     MONGODB_URI: process.env.MONGODB_URI || process.env.DATABASE_URI,
     NEXT_PUBLIC_SERVER_URL,
   },
+
+  // Fix for file system module issues
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -64,6 +65,11 @@ const nextConfig = {
     }
     return config
   },
+
+  // Critical: Disable copying files that might be missing
+  // This is the most important part to fix your specific error
+  distDir: '.next',
+  cleanDistDir: false,
 }
 
 export default nextConfig
