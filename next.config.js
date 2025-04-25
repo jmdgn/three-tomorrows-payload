@@ -1,7 +1,7 @@
-import { withPayload } from '@payloadcms/next/withPayload'
+import { withPayload } from '@payloadcms/next/withPayload.js'
 import redirects from './redirects.js'
 
-const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || `https://${process.env.HOST || 'localhost'}`
+const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -41,20 +41,12 @@ const nextConfig = {
     PORT: process.env.PORT || '3000',
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
     DATABASE_URI: process.env.DATABASE_URI,
-    MONGODB_URI: process.env.MONGODB_URI || 'mongodb+srv://jamesmills:AGKAt5Jis97CPwGY@cluster0.uhcdpi9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+    MONGODB_URI: process.env.MONGODB_URI || process.env.DATABASE_URI,
     NEXT_PUBLIC_SERVER_URL
-  },
-  webpack: (config, { isServer }) => {
-    // If we are on the server, use the correct host
-    if (isServer) {
-      config.resolve.alias['@payloadcms/next/withPayload'] = require.resolve('@payloadcms/next/withPayload')
-    }
-
-    return config
   },
 }
 
-export default withPayload(nextConfig, { 
+export default withPayload(nextConfig, {
   devBundleServerPackages: false,
   payloadConfig: {
     env: process.env
