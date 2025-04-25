@@ -1,10 +1,11 @@
-// src/app/(site)/page.tsx
 import React from 'react'
 import { Post } from '../../../payload-types'
 
 async function getHomePageData() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/posts?limit=6&sort=-publishedAt`)
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SERVER_URL}/api/posts?limit=6&sort=-publishedAt`,
+    )
     if (!res.ok) throw new Error('Failed to fetch posts')
     const response = await res.json()
     return response
@@ -16,14 +17,14 @@ async function getHomePageData() {
 
 export default async function HomePage() {
   const { docs: posts } = await getHomePageData()
-  
+
   return (
     <div className="home-page">
       <section className="welcome">
         <h1>Welcome to Our Site</h1>
         <p>This is the main site area with the standard layout.</p>
       </section>
-      
+
       <section className="recent-posts">
         <h2>Recent Posts</h2>
         <div className="posts-grid">

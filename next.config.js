@@ -36,21 +36,15 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Add these settings to fix build issues
   experimental: {
-    // More permissive settings for complex builds
     esmExternals: 'loose',
-    // Skip potential problematic checks
     skipTrailingSlashRedirect: true,
-    // Allow more time for builds
     serverComponentsExternalPackages: [],
   },
   onDemandEntries: {
-    // Make the build more permissive
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 5,
   },
-  // Keep this setting
   output: 'standalone',
   env: {
     PORT: process.env.PORT || '3000',
@@ -59,10 +53,8 @@ const nextConfig = {
     MONGODB_URI: process.env.MONGODB_URI || process.env.DATABASE_URI,
     NEXT_PUBLIC_SERVER_URL,
   },
-  // Add this to suppress certain build warnings
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Don't resolve 'fs' module on the client to prevent this error
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
