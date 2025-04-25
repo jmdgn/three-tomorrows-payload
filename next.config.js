@@ -1,4 +1,4 @@
-import { withPayload } from '@payloadcms/next/withPayload.js'
+import { withPayload } from '@payloadcms/next'
 import redirects from './redirects.js'
 
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
