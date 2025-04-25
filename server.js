@@ -24,7 +24,7 @@ const server = express()
   server.all('*', (req, res) => handle(req, res))
 
   const port = process.env.PORT || 3000
-  server.listen(port, () => {
-    console.log(`Server running at http://0.0.0.0:${port}`) // Fixed the variable name here (PORT → port)
+  server.listen(port, '0.0.0.0', () => {
+    console.log(`Server running at http://0.0.0.0:${port}`)
   })
 })()
