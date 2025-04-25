@@ -37,11 +37,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Simplified experimental options that are supported
-  experimental: {
-    esmExternals: 'loose',
-  },
-
   // Keep this setting
   output: 'standalone',
 
