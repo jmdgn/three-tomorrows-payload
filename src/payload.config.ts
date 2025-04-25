@@ -70,18 +70,16 @@ export default buildConfig({
     },
   },
   editor: defaultLexical,
-  
+
   // MongoDB Atlas Connection (Replace with actual URI or ensure it's in .env file)
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI || 'mongodb+srv://jamesmills:AGKAt5Jis97CPwGY@cluster0.uhcdpi9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+    url: process.env.DATABASE_URI,
   }),
 
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
-  cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean),  // Ensure correct production URL
+  cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean), // Ensure correct production URL
   globals: [Header, Footer],
-  plugins: [
-    ...plugins,
-  ],
+  plugins: [...plugins],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
