@@ -37,9 +37,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Remove the standalone output option entirely
-  // output: 'standalone',
-
   env: {
     PORT: process.env.PORT || '3000',
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
