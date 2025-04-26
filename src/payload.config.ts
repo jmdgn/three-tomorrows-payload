@@ -20,60 +20,9 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { TitleIntroductionBlock } from './blocks/Titles/config'
 
+// Reconstruct __dirname in ESM
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
-
-// Create a custom media storage plugin
-const customMediaStoragePlugin = {
-  hooks: {
-    beforeOperation: [
-      async ({ operation, collection, req, context }) => {
-        // Only handle media uploads
-        if (collection.slug === 'media' && operation === 'create') {
-          try {
-            // Only run if file exists
-            if (req.files?.file) {
-              const { put } = await import('@vercel/blob')
-              const file = req.files.file
-
-              // Upload to Vercel Blob
-              const blob = await put(file.name, file.data, {
-                contentType: file.mimetype,
-                access: 'public',
-              })
-
-              // Add the URL to the data
-              context.data = context.data || {}
-              context.data.url = blob.url
-            }
-          } catch (error) {
-            console.error('Vercel Blob upload error:', error)
-          }
-        }
-
-        // Handle delete for media
-        if (collection.slug === 'media' && operation === 'delete') {
-          try {
-            const { del } = await import('@vercel/blob')
-
-            // Get the filename from the document being deleted
-            const docToDelete = await req.payload.findByID({
-              collection: 'media',
-              id: req.params.id,
-            })
-
-            // If the doc has a filename, delete from Blob
-            if (docToDelete && docToDelete.filename) {
-              await del(docToDelete.filename)
-            }
-          } catch (error) {
-            console.error('Vercel Blob delete error:', error)
-          }
-        }
-      },
-    ],
-  },
-}
 
 export default buildConfig({
   admin: {
@@ -122,18 +71,15 @@ export default buildConfig({
   },
   editor: defaultLexical,
 
+  // MongoDB Atlas Connection (Replace with actual URI or ensure it's in .env file)
   db: mongooseAdapter({
     url: process.env.DATABASE_URI,
   }),
 
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
-  cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean),
+  cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean), // Ensure correct production URL
   globals: [Header, Footer],
-  plugins: [
-    ...plugins,
-    // Add our custom media storage plugin
-    customMediaStoragePlugin,
-  ],
+  plugins: [...plugins],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
