@@ -21,9 +21,7 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { TitleIntroductionBlock } from './blocks/Titles/config'
 
-// ✅ Cloud storage plugin and S3 adapter
-import cloudStorage from '@payloadcms/plugin-cloud-storage'
-import { s3Adapter } from '@payloadcms/plugin-cloud-storage/s3'
+import { s3Adapter } from '@payloadcms/plugin-cloud-storage'
 
 // ✅ Get __dirname
 const filename = fileURLToPath(import.meta.url)
@@ -36,12 +34,13 @@ const storage = cloudStorage({
       adapter: s3Adapter({
         config: {
           credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+            accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
           },
-          region: process.env.AWS_REGION,
+          region: process.env.AWS_REGION!,
         },
-        bucket: process.env.AWS_S3_BUCKET_NAME,
+        bucket: process.env.AWS_BUCKET_NAME!,
+        prefix: 'media',
       }),
     },
   },
