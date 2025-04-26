@@ -85,7 +85,7 @@ export default buildConfig({
     cloudStorage({
       collections: {
         media: {
-          adapter: 'memory', // For production, use 'memory' as a temporary solution
+          adapter: 'vercel',
         },
       },
     }),

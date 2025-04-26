@@ -45,10 +45,6 @@ const nextConfig = {
     NEXT_PUBLIC_SERVER_URL,
   },
 
-  experimental: {
-    serverComponentsExternalPackages: ['mongoose'],
-  },
-
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -58,18 +54,8 @@ const nextConfig = {
         os: false,
       }
     }
-
-    // Add topLevelAwait support
-    config.experiments = {
-      ...config.experiments,
-      topLevelAwait: true,
-    }
-
     return config
   },
-
-  // Help prevent "clientModules" errors in Vercel deployment
-  output: 'standalone',
 }
 
 export default nextConfig

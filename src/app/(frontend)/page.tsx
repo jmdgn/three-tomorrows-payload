@@ -1,40 +1,30 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
 import CustomHomepage from '@/components/CustomHomepage'
 import { getServerSideURL } from '@/utilities/getURL'
 
-export default function HomePage() {
-  const [homepageData, setHomepageData] = useState({})
-  const [loading, setLoading] = useState(true)
+// Mark this route as dynamic (SSR)
+export const dynamic = 'force-dynamic'
 
-  useEffect(() => {
-    async function fetchHomepageData() {
-      try {
-        const baseUrl = getServerSideURL()
+export default async function HomePage() {
+  let homepageData = {}
 
-        const response = await fetch(`${baseUrl}/api/homepage?limit=1`, {
-          cache: 'no-store',
-        })
+  try {
+    const baseUrl = getServerSideURL()
 
-        if (response.ok) {
-          const data = await response.json()
-          setHomepageData(data.docs?.[0] || {})
-        } else {
-          console.error('Failed to fetch homepage data:', response.status, response.statusText)
-        }
-      } catch (error) {
-        console.error('Failed to fetch homepage data:', error)
-      } finally {
-        setLoading(false)
-      }
+    // Removed timestamp since we're forcing dynamic render anyway
+    const response = await fetch(`${baseUrl}/api/homepage?limit=1`, {
+      cache: 'no-store', // prevent any caching
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      homepageData = data.docs?.[0] || {}
+    } else {
+      console.error('Failed to fetch homepage data:', response.status, response.statusText)
     }
-
-    fetchHomepageData()
-  }, [])
-
-  if (loading) {
-    return <div>Loading...</div>
+  } catch (error) {
+    console.error('Failed to fetch homepage data:', error)
   }
 
   return <CustomHomepage {...homepageData} />
