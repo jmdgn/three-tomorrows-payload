@@ -1,6 +1,5 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { cloudStorage } from '@payloadcms/plugin-cloud'
-import { vercelAdapter } from '@payloadcms/plugin-cloud/adapters/vercel'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -86,7 +85,7 @@ export default buildConfig({
     cloudStorage({
       collections: {
         media: {
-          adapter: vercelAdapter(),
+          adapter: 'vercel',
         },
       },
     }),
