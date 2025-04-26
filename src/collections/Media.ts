@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
@@ -18,46 +17,21 @@ export const Media: CollectionConfig = {
     update: authenticated,
   },
   upload: {
-    // ✅ Using cloud storage – no staticDir
     adminThumbnail: 'thumbnail',
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
     imageSizes: [
-      {
-        name: 'thumbnail',
-        width: 300,
-      },
-      {
-        name: 'square',
-        width: 500,
-        height: 500,
-      },
-      {
-        name: 'small',
-        width: 600,
-      },
-      {
-        name: 'medium',
-        width: 900,
-      },
-      {
-        name: 'large',
-        width: 1400,
-      },
-      {
-        name: 'xlarge',
-        width: 1920,
-      },
-      {
-        name: 'og',
-        width: 1200,
-        height: 630,
-        crop: 'center',
-      },
+      { name: 'thumbnail', width: 300 },
+      { name: 'square', width: 500, height: 500 },
+      { name: 'small', width: 600 },
+      { name: 'medium', width: 900 },
+      { name: 'large', width: 1400 },
+      { name: 'xlarge', width: 1920 },
+      { name: 'og', width: 1200, height: 630, crop: 'center' },
     ],
     focalPoint: true,
 
-    // ✅ NEW: Required to use cloud storage with this collection
-    disableLocalStorage: true,
+    disableLocalStorage: true, // ✅ Correct for cloud storage
+    staticURL: '/media', // ✅ Add this line
   },
   fields: [
     {
@@ -68,9 +42,11 @@ export const Media: CollectionConfig = {
       name: 'caption',
       type: 'richText',
       editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
-        },
+        features: ({ rootFeatures }) => [
+          ...rootFeatures,
+          FixedToolbarFeature(),
+          InlineToolbarFeature(),
+        ],
       }),
     },
   ],

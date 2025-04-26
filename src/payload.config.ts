@@ -21,27 +21,26 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { TitleIntroductionBlock } from './blocks/Titles/config'
 
-import { s3Adapter } from '@payloadcms/plugin-cloud-storage'
+// ✏️ UPDATED: use new storage plugin
+import { s3Storage } from '@payloadcms/storage-s3'
 
 // ✅ Get __dirname
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// ✅ Configure cloud storage plugin for AWS S3
-const storage = cloudStorage({
+// ✅ Configure storage for AWS S3
+const storage = s3Storage({
   collections: {
     media: {
-      adapter: s3Adapter({
-        config: {
-          credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-          },
-          region: process.env.AWS_REGION!,
+      bucket: process.env.AWS_BUCKET_NAME!,
+      config: {
+        region: process.env.AWS_REGION!,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
         },
-        bucket: process.env.AWS_BUCKET_NAME!,
-        prefix: 'media',
-      }),
+      },
+      prefix: 'media', // Optional: keep your 'media' prefix if you want
     },
   },
 })
@@ -70,27 +69,13 @@ export default buildConfig({
     user: Users.slug,
     livePreview: {
       breakpoints: [
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1440,
-          height: 900,
-        },
+        { label: 'Mobile', name: 'mobile', width: 375, height: 667 },
+        { label: 'Tablet', name: 'tablet', width: 768, height: 1024 },
+        { label: 'Desktop', name: 'desktop', width: 1440, height: 900 },
       ],
     },
   },
+
   editor: defaultLexical,
 
   db: mongooseAdapter({
@@ -101,7 +86,7 @@ export default buildConfig({
   cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
 
-  // ✅ Include cloud storage plugin
+  // ✅ Include new S3 storage plugin
   plugins: [storage, ...plugins],
 
   secret: process.env.PAYLOAD_SECRET,
@@ -114,7 +99,6 @@ export default buildConfig({
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {
         if (req.user) return true
-
         const authHeader = req.headers.get('authorization')
         return authHeader === `Bearer ${process.env.CRON_SECRET}`
       },
