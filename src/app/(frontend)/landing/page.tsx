@@ -1,7 +1,7 @@
 import React from 'react'
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/Footer/Component'
-import { NewHeader as Header } from '@/components/Header/NewHeader'
+import { NewHeader as Header } from '@/Header/Nav/dynamic'
 import { draftMode } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
@@ -22,9 +22,7 @@ export default async function LandingPage() {
     <>
       <AdminBar adminBarProps={{ preview: isEnabled }} />
       <Header />
-      <LandingPageLayout>
-
-      </LandingPageLayout>
+      <LandingPageLayout></LandingPageLayout>
     </>
   )
 }
