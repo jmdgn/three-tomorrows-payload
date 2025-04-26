@@ -18,7 +18,7 @@ export const Media: CollectionConfig = {
     update: authenticated,
   },
   upload: {
-    // Do NOT include staticDir when using cloud storage
+    // ✅ Using cloud storage – no staticDir
     adminThumbnail: 'thumbnail',
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
     imageSizes: [
@@ -55,6 +55,9 @@ export const Media: CollectionConfig = {
       },
     ],
     focalPoint: true,
+
+    // ✅ NEW: Required to use cloud storage with this collection
+    disableLocalStorage: true,
   },
   fields: [
     {

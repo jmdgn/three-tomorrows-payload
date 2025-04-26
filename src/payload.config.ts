@@ -20,21 +20,21 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { TitleIntroductionBlock } from './blocks/Titles/config'
 
-// NEW: Import the cloudStorage plugin
+// ✅ Import cloud storage plugin and adapter
 import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
+import { vercelBlobAdapter } from '@payloadcms/plugin-cloud-storage/adapters/vercel-blob'
 
-// Reconstruct __dirname in ESM
+// ✅ Get __dirname
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// NEW: Set up the Vercel Blob Storage plugin
+// ✅ Configure cloud storage plugin
 const storage = cloudStorage({
   collections: {
     media: {
-      adapter: 'vercel-blob',
-      options: {
+      adapter: vercelBlobAdapter({
         token: process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
-      },
+      }),
     },
   },
 })
@@ -93,13 +93,16 @@ export default buildConfig({
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
   cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
-  // ✅ Inject the cloudStorage plugin before any other
+
+  // ✅ Use cloud storage plugin before others
   plugins: [storage, ...plugins],
+
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
+
   jobs: {
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {
