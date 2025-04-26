@@ -14,60 +14,47 @@ import ClientNavigationHandler from '../../components/HomeScripts/ClientNavigati
 import DynamicHeaderWrapper from '../../components/Header/DynamicHeaderWrapper.client'
 
 interface HeaderData {
-  navItems?: {
-    id: string;
-    link?: {
-      type?: string;
-      label?: string;
-      url?: string;
-      newTab?: boolean;
-    }
-  }[] | null;
+  navItems?:
+    | {
+        id: string
+        link?: {
+          type?: string
+          label?: string
+          url?: string
+          newTab?: boolean
+        }
+      }[]
+    | null
 }
 
 function adaptHeaderToHeaderData(header: Header | null): HeaderData | null {
-  if (!header) return null;
-  
+  if (!header) return null
+
   return {
-    navItems: header.navItems?.map(item => ({
-      id: item.id || String(Math.random()),
-      link: {
-        type: item.link.type || undefined,
-        label: item.link.label,
-        url: item.link.url || undefined,
-        newTab: item.link.newTab || undefined
-      }
-    })) || null,
-  };
+    navItems:
+      header.navItems?.map((item) => ({
+        id: item.id || String(Math.random()),
+        link: {
+          type: item.link.type || undefined,
+          label: item.link.label,
+          url: item.link.url || undefined,
+          newTab: item.link.newTab || undefined,
+        },
+      })) || null,
+  }
 }
 
-export default async function RootLayout({ 
-  children,
-}: { 
-  children: React.ReactNode,
-}) {
-  let headerData = null;
-  let useStaticHeader = true;
-  
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  let headerData = null
+
   try {
-    const canAccessHeader = await testHeaderAccess();
-    
+    // Still try to fetch the header data in case it works
+    const canAccessHeader = await testHeaderAccess()
     if (canAccessHeader) {
-      headerData = await fetchHeader();
-      
-      if (headerData && headerData.navItems && headerData.navItems.length > 0) {
-        const hasValidNavItems = headerData.navItems.some(item => 
-          item.link?.label && (item.link?.url || item.link?.type === 'custom' ||
-          (item.link?.type === 'reference' && item.link?.reference?.value))
-        );
-                
-        if (hasValidNavItems) {
-          useStaticHeader = false;
-        }
-      }
+      headerData = await fetchHeader()
     }
   } catch (error) {
-    console.error('Error in header access/fetching:', error);
+    console.error('Error in header access/fetching:', error)
   }
 
   return (
@@ -77,14 +64,11 @@ export default async function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <ClientNavigationHandler />
-        
+
         <PostHeaderProvider>
           {/* Client component wrapper that determines which header to show */}
-          <DynamicHeaderWrapper 
-            headerData={headerData} 
-            useStaticHeader={useStaticHeader}
-          />
-          
+          <DynamicHeaderWrapper headerData={headerData} useStaticHeader={false} />
+
           <Providers>{children}</Providers>
           <FooterProvider />
           <NewFooter />
