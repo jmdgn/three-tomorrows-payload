@@ -46,7 +46,7 @@ const nextConfig = {
   },
 
   experimental: {
-    serverExternalPackages: ['payload'],
+    serverComponentsExternalPackages: ['mongoose'],
   },
 
   webpack: (config, { isServer }) => {
@@ -59,6 +59,7 @@ const nextConfig = {
       }
     }
 
+    // Add topLevelAwait support
     config.experiments = {
       ...config.experiments,
       topLevelAwait: true,
@@ -67,6 +68,7 @@ const nextConfig = {
     return config
   },
 
+  // Help prevent "clientModules" errors in Vercel deployment
   output: 'standalone',
 }
 
