@@ -46,7 +46,7 @@ const nextConfig = {
   },
 
   experimental: {
-    serverExternalPackages: ['mongoose'],
+    esmExternals: true,
   },
 
   webpack: (config, { isServer }) => {
