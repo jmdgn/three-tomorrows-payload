@@ -1,6 +1,5 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
-import { vercelBlobAdapter } from '@payloadcms/plugin-cloud-storage/vercel-blob'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -21,6 +20,9 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { TitleIntroductionBlock } from './blocks/Titles/config'
+
+// Import your custom adapter
+import { vercelBlobAdapter } from './adapters/vercelBlobAdapter'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -84,9 +86,7 @@ export default buildConfig({
     cloudStorage({
       collections: {
         media: {
-          adapter: vercelBlobAdapter({
-            token: process.env.BLOB_READ_WRITE_TOKEN,
-          }),
+          adapter: vercelBlobAdapter(),
         },
       },
     }),
