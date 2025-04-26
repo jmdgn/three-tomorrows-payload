@@ -7,7 +7,7 @@ import { DynamicHeaderNav } from '../../Header/Nav/dynamic'
 import { BlogHeaderNav } from '@/components/Header/BlogHeaderNav'
 import { HeaderShareButton } from '@/components/Header/HeaderShareButton.client'
 
-// Fallback data to use only when dynamic content is unavailable
+// Fallback data to use only when all else fails
 const FALLBACK_HEADER_DATA = {
   navItems: [
     {
@@ -67,31 +67,21 @@ export default function DynamicHeaderWrapper({
   const pathname = usePathname()
   const isBlogPostPage = pathname?.startsWith('/posts/') && pathname !== '/posts'
 
-  // Function to validate server data with detailed logging
-  const validateServerData = () => {
-    console.log('Server data received:', serverHeaderData ? 'yes' : 'no')
+  // State for client-side fetched data
+  const [clientData, setClientData] = useState(null)
+  const [isClientLoading, setIsClientLoading] = useState(false)
+  const [clientFetchAttempted, setClientFetchAttempted] = useState(false)
 
-    if (!serverHeaderData) {
-      console.log('Server data is null or undefined')
-      return false
-    }
+  // Function to validate header data
+  const isValidHeaderData = (data) => {
+    if (!data) return false
 
-    console.log(
-      'Server data navItems:',
-      serverHeaderData.navItems ? `${serverHeaderData.navItems.length} items` : 'missing',
-    )
-
-    if (
-      !serverHeaderData.navItems ||
-      !Array.isArray(serverHeaderData.navItems) ||
-      serverHeaderData.navItems.length === 0
-    ) {
-      console.log('Server data has no valid navItems array')
+    if (!data.navItems || !Array.isArray(data.navItems) || data.navItems.length === 0) {
       return false
     }
 
     // Check for at least one valid navigation item
-    const hasValidItem = serverHeaderData.navItems.some((item) => {
+    return data.navItems.some((item) => {
       if (!item || !item.link || !item.link.label) {
         return false
       }
@@ -103,32 +93,87 @@ export default function DynamicHeaderWrapper({
 
       return hasValidUrl || isCustomType || hasValidReference
     })
-
-    console.log('Server data has at least one valid nav item:', hasValidItem)
-    return hasValidItem
   }
 
   // Validate server data
-  const isServerDataValid = validateServerData()
+  const isServerDataValid = isValidHeaderData(serverHeaderData)
 
-  // Prioritize server data if valid, otherwise use fallback
-  const headerData = isServerDataValid ? serverHeaderData : FALLBACK_HEADER_DATA
+  // Client-side data fetching
+  useEffect(() => {
+    // Only attempt client fetch if server data is invalid and we haven't tried yet
+    if (!isServerDataValid && !clientFetchAttempted && !isClientLoading) {
+      const fetchHeaderData = async () => {
+        setIsClientLoading(true)
+        console.log('Attempting client-side header data fetch')
+
+        try {
+          // Attempt to fetch from your API endpoint
+          const response = await fetch('/api/header')
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch header data: ${response.status}`)
+          }
+
+          const data = await response.json()
+          console.log('Client-side fetched header data:', data)
+
+          if (isValidHeaderData(data)) {
+            console.log('Client-side data is valid')
+            setClientData(data)
+          } else {
+            console.log('Client-side data is invalid')
+          }
+        } catch (error) {
+          console.error('Error fetching header data:', error)
+        } finally {
+          setIsClientLoading(false)
+          setClientFetchAttempted(true)
+        }
+      }
+
+      fetchHeaderData()
+    }
+  }, [isServerDataValid, clientFetchAttempted, isClientLoading])
+
+  // Prioritize data sources:
+  // 1. Server data if valid
+  // 2. Client-fetched data if valid
+  // 3. Fallback data as a last resort
+  const headerData = isServerDataValid
+    ? serverHeaderData
+    : isValidHeaderData(clientData)
+      ? clientData
+      : FALLBACK_HEADER_DATA
 
   // Always use dynamic header in production or when we have valid data
-  const useStaticHeader = isServerDataValid
-    ? false
-    : process.env.NODE_ENV === 'production'
+  const useStaticHeader =
+    isServerDataValid || isValidHeaderData(clientData)
       ? false
-      : initialStaticHeaderValue
+      : process.env.NODE_ENV === 'production'
+        ? false
+        : initialStaticHeaderValue
+
+  // Determine if we're using fallback data
+  const usingFallbackData = !isServerDataValid && !isValidHeaderData(clientData)
 
   useEffect(() => {
     console.log('Current pathname:', pathname)
     console.log('Is blog post page:', isBlogPostPage)
     console.log('Environment:', process.env.NODE_ENV)
     console.log('Server data valid:', isServerDataValid)
+    console.log('Client data valid:', isValidHeaderData(clientData))
+    console.log('Client fetch attempted:', clientFetchAttempted)
     console.log('Using static header:', useStaticHeader)
-    console.log('Using fallback data:', !isServerDataValid)
-  }, [pathname, isBlogPostPage, isServerDataValid, useStaticHeader])
+    console.log('Using fallback data:', usingFallbackData)
+  }, [
+    pathname,
+    isBlogPostPage,
+    isServerDataValid,
+    clientData,
+    clientFetchAttempted,
+    useStaticHeader,
+    usingFallbackData,
+  ])
 
   // For blog post pages, use the blog header
   if (isBlogPostPage) {
