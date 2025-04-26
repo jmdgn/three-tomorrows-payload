@@ -37,8 +37,8 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Keep this setting
-  output: 'standalone',
+  // Remove the standalone output option entirely
+  // output: 'standalone',
 
   env: {
     PORT: process.env.PORT || '3000',
@@ -48,7 +48,6 @@ const nextConfig = {
     NEXT_PUBLIC_SERVER_URL,
   },
 
-  // Fix for file system module issues
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -60,11 +59,6 @@ const nextConfig = {
     }
     return config
   },
-
-  // Critical: Disable copying files that might be missing
-  // This is the most important part to fix your specific error
-  distDir: '.next',
-  cleanDistDir: false,
 }
 
 export default nextConfig
