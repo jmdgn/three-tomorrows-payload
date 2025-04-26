@@ -18,7 +18,7 @@ export const Media: CollectionConfig = {
   },
   upload: {
     adminThumbnail: 'thumbnail',
-    mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'],
     imageSizes: [
       { name: 'thumbnail', width: 300 },
       { name: 'square', width: 500, height: 500 },
@@ -30,8 +30,8 @@ export const Media: CollectionConfig = {
     ],
     focalPoint: true,
 
-    disableLocalStorage: true, // ✅ Correct for cloud storage
-    staticURL: '/media', // ✅ Add this line
+    disableLocalStorage: true,
+    staticURL: '/media',
   },
   fields: [
     {
