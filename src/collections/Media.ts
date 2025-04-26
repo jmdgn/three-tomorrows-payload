@@ -5,14 +5,9 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -22,27 +17,10 @@ export const Media: CollectionConfig = {
     read: anyone,
     update: authenticated,
   },
-  fields: [
-    {
-      name: 'alt',
-      type: 'text',
-      //required: true,
-    },
-    {
-      name: 'caption',
-      type: 'richText',
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
-        },
-      }),
-    },
-  ],
   upload: {
-    // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
-    staticDir: path.resolve(dirname, '../../public/media'),
+    // Do NOT include staticDir when using cloud storage
     adminThumbnail: 'thumbnail',
-    focalPoint: true,
+    mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
     imageSizes: [
       {
         name: 'thumbnail',
@@ -76,5 +54,21 @@ export const Media: CollectionConfig = {
         crop: 'center',
       },
     ],
+    focalPoint: true,
   },
+  fields: [
+    {
+      name: 'alt',
+      type: 'text',
+    },
+    {
+      name: 'caption',
+      type: 'richText',
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
+        },
+      }),
+    },
+  ],
 }

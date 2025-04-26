@@ -20,9 +20,24 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { TitleIntroductionBlock } from './blocks/Titles/config'
 
+// NEW: Import the cloudStorage plugin
+import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
+
 // Reconstruct __dirname in ESM
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+
+// NEW: Set up the Vercel Blob Storage plugin
+const storage = cloudStorage({
+  collections: {
+    media: {
+      adapter: 'vercel-blob',
+      options: {
+        token: process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
+      },
+    },
+  },
+})
 
 export default buildConfig({
   admin: {
@@ -71,15 +86,15 @@ export default buildConfig({
   },
   editor: defaultLexical,
 
-  // MongoDB Atlas Connection (Replace with actual URI or ensure it's in .env file)
   db: mongooseAdapter({
     url: process.env.DATABASE_URI,
   }),
 
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
-  cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean), // Ensure correct production URL
+  cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
-  plugins: [...plugins],
+  // ✅ Inject the cloudStorage plugin before any other
+  plugins: [storage, ...plugins],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
