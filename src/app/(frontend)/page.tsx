@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import CustomHomepage from '@/components/CustomHomepage'
-import { getServerSideURL } from '@/utilities/getURL'
 
 export default function HomePage() {
   const [homepageData, setHomepageData] = useState({})
@@ -11,7 +10,10 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchHomepageData() {
       try {
-        const baseUrl = getServerSideURL()
+        // Use the environment variable directly in the client
+        const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL || window.location.origin
+
+        console.log('Fetching homepage data from:', `${baseUrl}/api/homepage?limit=1`)
 
         const response = await fetch(`${baseUrl}/api/homepage?limit=1`, {
           cache: 'no-store',
