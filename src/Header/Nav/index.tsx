@@ -3,8 +3,24 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
+import DynamicHeaderNav from './dynamic'
+
+const FALLBACK_NAV_ITEMS = [
+  { label: 'Services', url: '/services' },
+  { label: 'Approach', url: '/our-approach' },
+  { label: 'Why This Matters', url: '/why-this-matters' },
+  { label: 'Expertise', url: '/expertise' },
+  { label: 'Blog', url: '/posts' },
+]
 
 export const HeaderNav: React.FC = () => {
+  const pathname = usePathname()
+
+  if (pathname === '/') {
+    return <DynamicHeaderNav data={null} />
+  }
+
   return (
     <header className="main-nav">
       <nav className="mainNav">
@@ -27,17 +43,11 @@ export const HeaderNav: React.FC = () => {
             <nav>
               <div className="nav-menu">
                 <ul className="menu-ribbon">
-                  {navItems.map((item, index) => (
+                  {FALLBACK_NAV_ITEMS.map((item, index) => (
                     <li key={`nav-${index}`}>
-                      {item.newTab ? (
-                        <a href={item.url} target="_blank" rel="noopener noreferrer">
-                          {item.label}
-                        </a>
-                      ) : (
-                        <Link href={item.url}>
-                          {item.label}
-                        </Link>
-                      )}
+                      <Link href={item.url}>
+                        {item.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -56,3 +66,5 @@ export const HeaderNav: React.FC = () => {
     </header>
   )
 }
+
+export default HeaderNav
