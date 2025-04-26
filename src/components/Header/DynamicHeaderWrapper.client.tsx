@@ -7,7 +7,6 @@ import { DynamicHeaderNav } from '../../Header/Nav/dynamic'
 import { BlogHeaderNav } from '@/components/Header/BlogHeaderNav'
 import { HeaderShareButton } from '@/components/Header/HeaderShareButton.client'
 
-// Mock data that will always work
 const FALLBACK_HEADER_DATA = {
   navItems: [
     {
@@ -67,13 +66,14 @@ export default function DynamicHeaderWrapper({
   const pathname = usePathname()
   const isBlogPostPage = pathname?.startsWith('/posts/') && pathname !== '/posts'
 
-  // Always use our fallback data in production
-  const headerData =
-    process.env.NODE_ENV === 'production' || !serverHeaderData
-      ? FALLBACK_HEADER_DATA
-      : serverHeaderData
+  const shouldUseFallback =
+    !serverHeaderData ||
+    !serverHeaderData.navItems ||
+    serverHeaderData.navItems.length === 0 ||
+    process.env.NODE_ENV === 'production'
 
-  // In production, always force dynamic header for non-blog pages
+  const headerData = shouldUseFallback ? FALLBACK_HEADER_DATA : serverHeaderData
+
   const useStaticHeader = process.env.NODE_ENV === 'production' ? false : initialStaticHeaderValue
 
   useEffect(() => {
@@ -81,10 +81,13 @@ export default function DynamicHeaderWrapper({
     console.log('Is blog post page:', isBlogPostPage)
     console.log('Environment:', process.env.NODE_ENV)
     console.log('Using static header:', useStaticHeader)
-    console.log('Using fallback data:', process.env.NODE_ENV === 'production' || !serverHeaderData)
-  }, [pathname, isBlogPostPage, serverHeaderData, useStaticHeader])
+    console.log('Using fallback data:', shouldUseFallback)
 
-  // For blog post pages, use the blog header
+    if (!shouldUseFallback && serverHeaderData) {
+      console.log('Server provided nav items:', serverHeaderData.navItems?.length || 0)
+    }
+  }, [pathname, isBlogPostPage, serverHeaderData, useStaticHeader, shouldUseFallback])
+
   if (isBlogPostPage) {
     return (
       <>
@@ -94,6 +97,5 @@ export default function DynamicHeaderWrapper({
     )
   }
 
-  // For all other pages, always use the dynamic header in production
-  return <DynamicHeaderNav data={headerData} />
+  return useStaticHeader ? <HeaderNav /> : <DynamicHeaderNav data={headerData} />
 }
