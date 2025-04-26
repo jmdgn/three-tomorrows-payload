@@ -20,23 +20,27 @@ import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { TitleIntroductionBlock } from './blocks/Titles/config'
 
-// ✅ Import cloud storage plugin and adapter
-import { cloudStorage } from '@payloadcms/plugin-cloud-storage'
-import { vercelBlobAdapter } from '@payloadcms/plugin-cloud-storage/adapters/vercel-blob'
+// ✅ Import cloud storage plugin and AWS SDK
+import { CloudStoragePlugin } from '@payloadcms/plugin-cloud-storage'
+import aws from 'aws-sdk'
 
 // ✅ Get __dirname
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// ✅ Configure cloud storage plugin
-const storage = cloudStorage({
-  collections: {
-    media: {
-      adapter: vercelBlobAdapter({
-        token: process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
-      }),
-    },
-  },
+// ✅ Configure AWS S3
+const s3 = new aws.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID, // AWS Access Key ID
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, // AWS Secret Key
+  region: process.env.AWS_REGION || 'us-east-1', // Your AWS Region (e.g., 'us-east-1')
+})
+
+// ✅ Configure cloud storage plugin to use S3
+const storage = CloudStoragePlugin({
+  s3,
+  bucket: process.env.AWS_BUCKET_NAME, // Your S3 bucket name
+  uploadFolder: 'media/', // Folder inside the bucket to store files
+  acl: 'public-read', // Set to 'public-read' or 'private' based on your needs
 })
 
 export default buildConfig({
@@ -94,7 +98,6 @@ export default buildConfig({
   cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
 
-  // ✅ Use cloud storage plugin before others
   plugins: [storage, ...plugins],
 
   secret: process.env.PAYLOAD_SECRET,
