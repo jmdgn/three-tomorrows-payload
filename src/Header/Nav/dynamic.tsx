@@ -6,25 +6,25 @@ import Image from 'next/image'
 
 interface HeaderData {
   navItems?: Array<{
-    id: string;
+    id: string
     link?: {
-      type?: string;
-      label?: string;
-      url?: string;
-      newTab?: boolean;
+      type?: string
+      label?: string
+      url?: string
+      newTab?: boolean
       reference?: {
-        relationTo?: string;
+        relationTo?: string
         value?: {
-          slug?: string;
-          title?: string;
-          id?: string;
+          slug?: string
+          title?: string
+          id?: string
         }
-      };
-    };
-  }> | null;
-  logo?: any;
-  ctaLink?: any;
-  ctaLabel?: string;
+      }
+    }
+  }> | null
+  logo?: any
+  ctaLink?: any
+  ctaLabel?: string
 }
 
 const FALLBACK_NAV_ITEMS = [
@@ -36,90 +36,92 @@ const FALLBACK_NAV_ITEMS = [
 ]
 
 export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }) => {
-  const isClient = typeof window !== 'undefined';
-  
+  const isClient = typeof window !== 'undefined'
+
+  // For debugging purposes only
   React.useEffect(() => {
     if (isClient && process.env.NODE_ENV === 'development') {
-      console.log('DynamicHeaderNav received data:', data ? 'yes' : 'no');
-      console.log('navItems count:', data?.navItems?.length || 0);
-      
+      console.log('DynamicHeaderNav received data:', data ? 'yes' : 'no')
+      console.log('navItems count:', data?.navItems?.length || 0)
+
       // Log raw navItems to inspect structure
       if (data?.navItems) {
-        console.log('Raw navItems structure:', JSON.stringify(data.navItems, null, 2));
+        console.log('Raw navItems structure:', JSON.stringify(data.navItems, null, 2))
       }
     }
-  }, [data, isClient]);
+  }, [data, isClient])
 
   const navItems = React.useMemo(() => {
-    if (!data?.navItems || !Array.isArray(data.navItems) || data.navItems.length === 0) {
-      if (isClient) console.log('Using FALLBACK_NAV_ITEMS due to missing navItems');
-      return FALLBACK_NAV_ITEMS;
+    // If no data or navItems, return fallback
+    if (!data || !data.navItems || !Array.isArray(data.navItems) || data.navItems.length === 0) {
+      if (isClient && process.env.NODE_ENV === 'development') {
+        console.log('Using FALLBACK_NAV_ITEMS due to missing navItems')
+      }
+      return FALLBACK_NAV_ITEMS
     }
 
+    // Process the nav items
     const validItems = data.navItems
-      .filter(item => {
-        const hasLabel = Boolean(item.link?.label);
-        
-        // Enhanced validation logic for different link types
-        let hasValidLink = false;
-        if (item.link?.url) {
-          hasValidLink = true;
-        } else if (item.link?.type === 'custom') {
-          hasValidLink = true;
-        } else if (item.link?.type === 'reference' && item.link?.reference?.value) {
-          hasValidLink = true;
-          
-          // Log the reference structure
-          if (isClient) {
-            console.log('Reference link found:', item.id, JSON.stringify(item.link.reference));
-          }
+      .filter((item) => {
+        // Base case - we need an item with a link and label
+        if (!item || !item.link || !item.link.label) {
+          return false
         }
-        
-        if (isClient && process.env.NODE_ENV === 'development') {
-          console.log('Validating nav item:', item.id, {
-            link: item.link,
-            hasLabel,
-            hasValidLink,
-            type: item.link?.type,
-            url: item.link?.url,
-            refValue: item.link?.reference?.value
-          });
+
+        // Link URL directly provided
+        if (item.link.url) {
+          return true
         }
-        
-        return hasLabel && hasValidLink;
+
+        // Reference link
+        if (item.link.type === 'reference' && item.link.reference?.value) {
+          return true
+        }
+
+        // Custom link with no URL (should have one, but we'll be forgiving)
+        if (item.link.type === 'custom') {
+          return true
+        }
+
+        return false
       })
-      .map(item => {
-        // Handle reference links specially
-        if (item.link?.type === 'reference' && item.link?.reference?.value) {
-          const refValue = item.link.reference.value;
-          return {
-            label: item.link.label || refValue.title || 'Page',
-            url: item.link.url || `/${refValue.slug}` || '#',
-            newTab: item.link.newTab || false
-          };
+      .map((item) => {
+        // Build the normalized nav item
+        let url = '#'
+
+        // Direct URL
+        if (item.link?.url) {
+          url = item.link.url
         }
-        
+        // Reference URL
+        else if (item.link?.type === 'reference' && item.link?.reference?.value) {
+          const refValue = item.link.reference.value
+          url = `/${refValue.slug}` || '#'
+        }
+
         return {
           label: item.link!.label!,
-          url: item.link!.url || '#',
-          newTab: item.link!.newTab || false
-        };
-      });
+          url: url,
+          newTab: item.link!.newTab || false,
+        }
+      })
 
     if (validItems.length === 0) {
-      if (isClient) console.log('No valid items after filtering, using fallback');
-      return FALLBACK_NAV_ITEMS;
+      if (isClient && process.env.NODE_ENV === 'development') {
+        console.log('No valid items after filtering, using fallback')
+      }
+      return FALLBACK_NAV_ITEMS
     }
-    
-    if (isClient) {
-      console.log('Using', validItems.length, 'valid navigation items:');
-      console.log('Final nav items:', JSON.stringify(validItems, null, 2));
-    }
-    return validItems;
-  }, [data, isClient]);
 
-  const ctaLabel = data?.ctaLabel || 'Talk To Us';
-  const ctaLink = data?.ctaLink?.url || '/contact';
+    if (isClient && process.env.NODE_ENV === 'development') {
+      console.log('Using', validItems.length, 'valid navigation items:')
+      console.log('Final nav items:', JSON.stringify(validItems, null, 2))
+    }
+    return validItems
+  }, [data, isClient])
+
+  const ctaLabel = data?.ctaLabel || 'Talk To Us'
+  const ctaLink = data?.ctaLink?.url || '/contact'
 
   return (
     <header className="main-nav">
@@ -150,9 +152,7 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
                           {item.label}
                         </a>
                       ) : (
-                        <Link href={item.url}>
-                          {item.label}
-                        </Link>
+                        <Link href={item.url}>{item.label}</Link>
                       )}
                     </li>
                   ))}
@@ -173,4 +173,4 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
   )
 }
 
-export default DynamicHeaderNav;
+export default DynamicHeaderNav
