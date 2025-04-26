@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import DynamicHeaderNav from './dynamic'
 
-// Mock data for testing dynamic header
 const MOCK_HEADER_DATA = {
   navItems: [
     {
@@ -56,20 +55,16 @@ const MOCK_HEADER_DATA = {
 
 export const HeaderNav: React.FC = () => {
   const pathname = usePathname()
-  const [headerData, setHeaderData] = useState(null)
+  const [headerData, setHeaderData] = useState(MOCK_HEADER_DATA)
 
   useEffect(() => {
-    // In a real implementation, you would fetch this data from your API
-    // For now, we're using mock data for testing
+    console.log('HeaderNav component running on pathname:', pathname)
+    console.log('Environment:', process.env.NODE_ENV)
+
     setHeaderData(MOCK_HEADER_DATA)
-  }, [])
+  }, [pathname])
 
-  // Always use DynamicHeaderNav, but with appropriate data based on the route
-  if (pathname === '/') {
-    return <DynamicHeaderNav data={headerData} />
-  }
-
-  return <DynamicHeaderNav data={MOCK_HEADER_DATA} />
+  return <DynamicHeaderNav data={headerData} />
 }
 
 export default HeaderNav
