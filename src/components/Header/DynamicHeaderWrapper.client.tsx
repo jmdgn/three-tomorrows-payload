@@ -67,32 +67,54 @@ export default function DynamicHeaderWrapper({
   const pathname = usePathname()
   const isBlogPostPage = pathname?.startsWith('/posts/') && pathname !== '/posts'
 
-  // Add state for client-side fetched data if needed
-  const [clientFetchedData, setClientFetchedData] = useState(null)
+  // Function to validate server data with detailed logging
+  const validateServerData = () => {
+    console.log('Server data received:', serverHeaderData ? 'yes' : 'no')
 
-  // Check if server data is valid
-  const isServerDataValid =
-    serverHeaderData &&
-    serverHeaderData.navItems &&
-    serverHeaderData.navItems.length > 0 &&
-    serverHeaderData.navItems.some(
-      (item) =>
-        item.link?.label &&
-        (item.link?.url ||
-          item.link?.type === 'custom' ||
-          (item.link?.type === 'reference' && item.link?.reference?.value)),
+    if (!serverHeaderData) {
+      console.log('Server data is null or undefined')
+      return false
+    }
+
+    console.log(
+      'Server data navItems:',
+      serverHeaderData.navItems ? `${serverHeaderData.navItems.length} items` : 'missing',
     )
 
-  // Prioritize in this order:
-  // 1. Server data if valid
-  // 2. Client fetched data if available
-  // 3. Fallback data as last resort
-  const headerData = isServerDataValid
-    ? serverHeaderData
-    : clientFetchedData || FALLBACK_HEADER_DATA
+    if (
+      !serverHeaderData.navItems ||
+      !Array.isArray(serverHeaderData.navItems) ||
+      serverHeaderData.navItems.length === 0
+    ) {
+      console.log('Server data has no valid navItems array')
+      return false
+    }
 
-  // Only use static header in development if specifically required
-  // Force dynamic header in production or when we have valid data
+    // Check for at least one valid navigation item
+    const hasValidItem = serverHeaderData.navItems.some((item) => {
+      if (!item || !item.link || !item.link.label) {
+        return false
+      }
+
+      const hasValidUrl = !!item.link.url
+      const isCustomType = item.link.type === 'custom'
+      const hasValidReference =
+        item.link.type === 'reference' && item.link.reference && item.link.reference.value
+
+      return hasValidUrl || isCustomType || hasValidReference
+    })
+
+    console.log('Server data has at least one valid nav item:', hasValidItem)
+    return hasValidItem
+  }
+
+  // Validate server data
+  const isServerDataValid = validateServerData()
+
+  // Prioritize server data if valid, otherwise use fallback
+  const headerData = isServerDataValid ? serverHeaderData : FALLBACK_HEADER_DATA
+
+  // Always use dynamic header in production or when we have valid data
   const useStaticHeader = isServerDataValid
     ? false
     : process.env.NODE_ENV === 'production'
@@ -105,27 +127,8 @@ export default function DynamicHeaderWrapper({
     console.log('Environment:', process.env.NODE_ENV)
     console.log('Server data valid:', isServerDataValid)
     console.log('Using static header:', useStaticHeader)
-    console.log('Using fallback data:', !isServerDataValid && !clientFetchedData)
-
-    // You could add client-side data fetching here if needed
-    // For example, fetching from an API endpoint that returns navigation data
-    // This would be especially useful in production where SSR data might be unreliable
-
-    // Example client-side fetch (uncomment if needed):
-    /*
-    if (!isServerDataValid && process.env.NODE_ENV === 'production') {
-      fetch('/api/navigation')
-        .then(res => res.json())
-        .then(data => {
-          console.log('Client-side fetched navigation data:', data);
-          setClientFetchedData(data);
-        })
-        .catch(err => {
-          console.error('Error fetching navigation data:', err);
-        });
-    }
-    */
-  }, [pathname, isBlogPostPage, isServerDataValid, useStaticHeader, clientFetchedData])
+    console.log('Using fallback data:', !isServerDataValid)
+  }, [pathname, isBlogPostPage, isServerDataValid, useStaticHeader])
 
   // For blog post pages, use the blog header
   if (isBlogPostPage) {
