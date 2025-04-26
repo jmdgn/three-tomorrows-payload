@@ -33,6 +33,7 @@
     "@payloadcms/live-preview-react": "latest",
     "@payloadcms/next": "^3.35.0",
     "@payloadcms/payload-cloud": "^3.35.0",
+    "@payloadcms/plugin-cloud": "^3.0.2",
     "@payloadcms/plugin-form-builder": "^3.35.0",
     "@payloadcms/plugin-nested-docs": "^3.35.0",
     "@payloadcms/plugin-redirects": "^3.35.0",
