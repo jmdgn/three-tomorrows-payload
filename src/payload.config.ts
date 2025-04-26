@@ -29,12 +29,12 @@ const dirname = path.dirname(filename)
 const storage = s3Storage({
   collections: {
     media: {
-      bucket: process.env.AWS_BUCKET_NAME!,
+      bucket: process.env.AWS_BUCKET_NAME,
       config: {
-        region: process.env.AWS_REGION!,
+        region: process.env.AWS_REGION,
         credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
         },
       },
       prefix: 'media',
@@ -104,3 +104,5 @@ export default buildConfig({
     tasks: [],
   },
 })
+
+console.log('AWS_BUCKET_NAME:', process.env.AWS_BUCKET_NAME)
