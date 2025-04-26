@@ -1,5 +1,4 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { cloudStorage } from '@payloadcms/plugin-cloud'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -80,16 +79,7 @@ export default buildConfig({
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
   cors: [process.env.PAYLOAD_URL || getServerSideURL()].filter(Boolean), // Ensure correct production URL
   globals: [Header, Footer],
-  plugins: [
-    ...plugins,
-    cloudStorage({
-      collections: {
-        media: {
-          adapter: 'vercel',
-        },
-      },
-    }),
-  ],
+  plugins: [...plugins],
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
