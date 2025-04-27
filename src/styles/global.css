@@ -1311,14 +1311,15 @@ img.service-image {
     width: 100%;
     overflow-x: scroll;
     scroll-snap-type: x mandatory;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    cursor: grab; }
+    cursor: grab;
+    overscroll-behavior-x: contain; }
     
 .service-carousel::-webkit-scrollbar {
-    display: none; /* Chrome/Safari/Opera */ }
+    display: none; }
     
 .service-carousel.active {
     cursor: grabbing; }

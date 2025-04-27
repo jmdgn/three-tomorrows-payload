@@ -1017,20 +1017,22 @@ form.email-signup-form {
 
 form.email-signup-form .form-group {
 	position: relative;
-    width: -moz-fit-content;
-    width: fit-content;
-    max-width: 100%;
+    width: 100%;
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
     border: 1px solid rgba(255,255,255,0.4);
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between; }
+    border-radius: 8px; }
 
 .form-group input {
-    flex: 1 1 auto;
-  	min-width: 0; }
+	display: inline-block;
+  	width: calc(100% - 168px);
+  	vertical-align: middle; }
 
 .form-group button {
-	flex-shrink: 0; }
+	display: inline-block;
+  	width: 120px;
+  	vertical-align: middle; }
 
 input[type="email"] {
 	min-width: fit-content; }
