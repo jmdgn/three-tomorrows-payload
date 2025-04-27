@@ -10,11 +10,14 @@ const productionUrl =
   process.env.NEXT_PUBLIC_SERVER_URL
 
 if (process.env.NODE_ENV === 'production' && productionUrl) {
+  if (!productionUrl.startsWith('http://') && !productionUrl.startsWith('https://')) {
+    productionUrl = `https://${productionUrl}`
+    console.log('Added https:// protocol to production URL:', productionUrl)
+  }
+
   process.env.NEXT_PUBLIC_SERVER_URL = productionUrl
   process.env.PAYLOAD_PUBLIC_SERVER_URL = productionUrl
   console.log('Production mode: Server URL set to', productionUrl)
-} else {
-  console.log('Development mode: Using existing server URLs')
 }
 
 console.log('Environment:', process.env.NODE_ENV)

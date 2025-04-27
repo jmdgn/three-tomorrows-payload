@@ -4,7 +4,12 @@ const RAILWAY_STATIC_URL = process.env.RAILWAY_STATIC_URL
 const RAILWAY_PUBLIC_URL = process.env.RAILWAY_PUBLIC_URL
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
-const serverUrl = RAILWAY_STATIC_URL || RAILWAY_PUBLIC_URL || NEXT_PUBLIC_SERVER_URL
+let serverUrl = RAILWAY_STATIC_URL || RAILWAY_PUBLIC_URL || NEXT_PUBLIC_SERVER_URL
+
+if (serverUrl && !serverUrl.startsWith('http://') && !serverUrl.startsWith('https://')) {
+  serverUrl = `https://${serverUrl}`
+  console.log('Added https:// protocol to server URL:', serverUrl)
+}
 
 console.log('Building with server URL:', serverUrl)
 

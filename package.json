@@ -18,7 +18,7 @@
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "prepare": "echo 'Skipping type generation in production'",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
-    "start": "next start",
+    "start": "node .next/standalone/server.js",
     "vercel-build": "next build && touch .next/server/app/\\(frontend\\)/\\(internal\\)/page_client-reference-manifest.js"
   },
   "dependencies": {
