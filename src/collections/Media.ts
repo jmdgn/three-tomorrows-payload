@@ -8,6 +8,40 @@ import {
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 
+const getS3Config = () => {
+  console.log('Configuring Media collection with S3 settings:')
+  console.log('- AWS_BUCKET_NAME:', process.env.AWS_BUCKET_NAME)
+  console.log('- AWS_REGION:', process.env.AWS_REGION)
+  console.log(
+    '- AWS_ACCESS_KEY_ID:',
+    process.env.AWS_ACCESS_KEY_ID ? 'Set (value hidden)' : 'Not set',
+  )
+  console.log(
+    '- AWS_SECRET_ACCESS_KEY:',
+    process.env.AWS_SECRET_ACCESS_KEY ? 'Set (value hidden)' : 'Not set',
+  )
+
+  if (
+    process.env.NODE_ENV === 'production' &&
+    process.env.AWS_BUCKET_NAME &&
+    process.env.AWS_ACCESS_KEY_ID &&
+    process.env.AWS_SECRET_ACCESS_KEY
+  ) {
+    return {
+      disableLocalStorage: true,
+      staticURL: '/media',
+    }
+  }
+
+  console.log('Using local storage for media (development or missing S3 credentials)')
+  return {
+    disableLocalStorage: false,
+    staticURL: '/media',
+  }
+}
+
+const storageConfig = getS3Config()
+
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
@@ -29,9 +63,39 @@ export const Media: CollectionConfig = {
       { name: 'og', width: 1200, height: 630, crop: 'center' },
     ],
     focalPoint: true,
+    ...storageConfig,
+  },
+  hooks: {
+    afterRead: [
+      ({ doc }) => {
+        if (doc && doc.url && !doc.url.startsWith('http')) {
+          const baseUrl =
+            process.env.NEXT_PUBLIC_SERVER_URL ||
+            'https://three-tomorrows-payload-production.up.railway.app'
+          const sanitizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
 
-    disableLocalStorage: true,
-    staticURL: '/media',
+          const sanitizedFileUrl = doc.url.startsWith('/') ? doc.url : `/${doc.url}`
+
+          doc.url = `${sanitizedBaseUrl}${sanitizedFileUrl}`
+
+          if (doc.sizes) {
+            Object.keys(doc.sizes).forEach((size) => {
+              if (
+                doc.sizes[size] &&
+                doc.sizes[size].url &&
+                !doc.sizes[size].url.startsWith('http')
+              ) {
+                const sizeUrl = doc.sizes[size].url
+                const sanitizedSizeUrl = sizeUrl.startsWith('/') ? sizeUrl : `/${sizeUrl}`
+                doc.sizes[size].url = `${sanitizedBaseUrl}${sanitizedSizeUrl}`
+              }
+            })
+          }
+        }
+
+        return doc
+      },
+    ],
   },
   fields: [
     {

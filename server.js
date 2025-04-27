@@ -4,7 +4,7 @@ import next from 'next'
 import { buildConfig } from './src/payload.config.ts'
 
 function ensureUrlHasProtocol(url) {
-  if (!url) return 'http://localhost:3000'
+  if (!url) return 'https://three-tomorrows-payload-production.up.railway.app'
 
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     return `https://${url}`
@@ -66,6 +66,16 @@ const server = express()
     })
 
     server.use((req, res, next) => {
+      if (req.path.includes('media') || req.path.includes('api') || req.path === '/') {
+        console.log('Request path:', req.path)
+        console.log('Request hostname:', req.hostname)
+        console.log('Request headers origin:', req.headers.origin)
+        console.log('Request headers referer:', req.headers.referer)
+      }
+      next()
+    })
+
+    server.use((req, res, next) => {
       const allowedOrigins = [
         'https://threetomorrows.co',
         'https://threetomorrows.com',
@@ -101,6 +111,68 @@ const server = express()
         RAILWAY_PUBLIC_URL: process.env.RAILWAY_PUBLIC_URL,
         RAILWAY_STATIC_URL: process.env.RAILWAY_STATIC_URL,
       })
+    })
+
+    server.get('/debug-url', (req, res) => {
+      const urlsToTest = [
+        'threetomorrows.co',
+        'https://threetomorrows.co',
+        process.env.NEXT_PUBLIC_SERVER_URL,
+        process.env.PAYLOAD_PUBLIC_SERVER_URL,
+        productionUrl,
+      ]
+
+      const results = urlsToTest.map((url) => {
+        try {
+          const withProtocol = ensureUrlHasProtocol(url)
+          const parsed = new URL(withProtocol)
+          return {
+            url,
+            withProtocol,
+            success: true,
+            parsed: parsed.toString(),
+          }
+        } catch (e) {
+          return {
+            url,
+            withProtocol: ensureUrlHasProtocol(url),
+            success: false,
+            error: e.message,
+          }
+        }
+      })
+
+      res.json(results)
+    })
+
+    server.get('/debug-media', (req, res) => {
+      const mediaPath = req.query.path
+      if (!mediaPath) {
+        return res.status(400).json({ error: 'Please provide a path query parameter' })
+      }
+
+      const baseS3Url = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION || 'ap-southeast-2'}.amazonaws.com`
+
+      const possiblePaths = [
+        `${baseS3Url}/${mediaPath}`,
+        `${baseS3Url}/media/${mediaPath}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/media/${mediaPath}`,
+        `/media/${mediaPath}`,
+      ]
+
+      res.json({
+        mediaPath,
+        baseS3Url,
+        possiblePaths,
+        awsBucket: process.env.AWS_BUCKET_NAME,
+        awsRegion: process.env.AWS_REGION,
+      })
+    })
+
+    // Error handling middleware
+    server.use((err, req, res, next) => {
+      console.error('Server error:', err)
+      res.status(500).json({ error: 'Internal server error', message: err.message })
     })
 
     server.all('*', (req, res) => handle(req, res))

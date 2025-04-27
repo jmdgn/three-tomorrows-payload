@@ -14,6 +14,14 @@ import ClientNavigationHandler from '../../components/HomeScripts/ClientNavigati
 import DynamicHeaderWrapper from '../../components/Header/DynamicHeaderWrapper.client'
 import EnvLayout from './EnvLayout'
 
+function ensureUrlHasProtocol(url) {
+  if (!url) return 'https://three-tomorrows-payload-production.up.railway.app'
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`
+  }
+  return url
+}
+
 interface HeaderData {
   navItems?:
     | {
@@ -80,10 +88,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   )
 }
 
+const metadataBaseUrl = ensureUrlHasProtocol(
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+    process.env.PAYLOAD_PUBLIC_SERVER_URL ||
+    'three-tomorrows-payload-production.up.railway.app',
+)
+
 export const metadata: Metadata = {
   title: 'Three Tomorrows | Digital Consultancy',
   description: 'Disruption By Design',
-  metadataBase: new URL(getServerSideURL()),
+  metadataBase: new URL(metadataBaseUrl),
   openGraph: mergeOpenGraph(),
   twitter: {
     card: 'summary_large_image',
