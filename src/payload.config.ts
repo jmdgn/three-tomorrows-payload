@@ -51,12 +51,16 @@ if (
           accessKeyId: process.env.AWS_ACCESS_KEY_ID,
           secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
         },
+        // Add force path style for debugging if needed
+        // forcePathStyle: true,
       },
       collections: {
         media: {
           prefix: 'media',
         },
       },
+      // REMOVE ACL - this is what's causing the error
+      // acl: 'public-read',
     }),
   }
 } else {

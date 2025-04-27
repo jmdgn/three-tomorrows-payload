@@ -8,7 +8,9 @@ import {
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 
+// Function to get the appropriate S3 configuration
 const getS3Config = () => {
+  // Log to help with debugging
   console.log('Configuring Media collection with S3 settings:')
   console.log('- AWS_BUCKET_NAME:', process.env.AWS_BUCKET_NAME)
   console.log('- AWS_REGION:', process.env.AWS_REGION)
@@ -21,6 +23,7 @@ const getS3Config = () => {
     process.env.AWS_SECRET_ACCESS_KEY ? 'Set (value hidden)' : 'Not set',
   )
 
+  // Check if running in production with S3 configured
   if (
     process.env.NODE_ENV === 'production' &&
     process.env.AWS_BUCKET_NAME &&
@@ -33,6 +36,7 @@ const getS3Config = () => {
     }
   }
 
+  // Fallback to local storage for development
   console.log('Using local storage for media (development or missing S3 credentials)')
   return {
     disableLocalStorage: false,
@@ -40,6 +44,7 @@ const getS3Config = () => {
   }
 }
 
+// Get appropriate storage config
 const storageConfig = getS3Config()
 
 export const Media: CollectionConfig = {
@@ -68,16 +73,21 @@ export const Media: CollectionConfig = {
   hooks: {
     afterRead: [
       ({ doc }) => {
+        // Make sure URLs are properly formatted
         if (doc && doc.url && !doc.url.startsWith('http')) {
+          // Parse URL structure
           const baseUrl =
             process.env.NEXT_PUBLIC_SERVER_URL ||
             'https://three-tomorrows-payload-production.up.railway.app'
           const sanitizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
 
+          // Ensure URL starts with a slash
           const sanitizedFileUrl = doc.url.startsWith('/') ? doc.url : `/${doc.url}`
 
+          // Construct full URL
           doc.url = `${sanitizedBaseUrl}${sanitizedFileUrl}`
 
+          // Also fix sizes URLs if they exist
           if (doc.sizes) {
             Object.keys(doc.sizes).forEach((size) => {
               if (
