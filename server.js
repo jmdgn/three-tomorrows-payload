@@ -3,21 +3,30 @@ import payload from 'payload'
 import next from 'next'
 import { buildConfig } from './src/payload.config.ts'
 
-const productionUrl =
+function ensureUrlHasProtocol(url) {
+  if (!url) return 'http://localhost:3000'
+
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`
+  }
+
+  return url
+}
+
+const rawProductionUrl =
   process.env.RAILWAY_STATIC_URL ||
   process.env.RAILWAY_PUBLIC_URL ||
   process.env.PAYLOAD_PUBLIC_SERVER_URL ||
   process.env.NEXT_PUBLIC_SERVER_URL
 
-if (process.env.NODE_ENV === 'production' && productionUrl) {
-  if (!productionUrl.startsWith('http://') && !productionUrl.startsWith('https://')) {
-    productionUrl = `https://${productionUrl}`
-    console.log('Added https:// protocol to production URL:', productionUrl)
-  }
+const productionUrl = ensureUrlHasProtocol(rawProductionUrl)
 
+if (process.env.NODE_ENV === 'production' && productionUrl) {
   process.env.NEXT_PUBLIC_SERVER_URL = productionUrl
   process.env.PAYLOAD_PUBLIC_SERVER_URL = productionUrl
   console.log('Production mode: Server URL set to', productionUrl)
+} else {
+  console.log('Development mode: Using existing server URLs')
 }
 
 console.log('Environment:', process.env.NODE_ENV)
@@ -61,6 +70,7 @@ const server = express()
         'https://threetomorrows.co',
         'https://threetomorrows.com',
         'https://www.threetomorrows.co',
+        productionUrl,
       ]
       const origin = req.headers.origin
 

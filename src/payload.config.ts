@@ -24,6 +24,16 @@ import { s3Storage } from '@payloadcms/storage-s3'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+function ensureUrlHasProtocol(url: string): string {
+  if (!url) return 'http://localhost:3000'
+
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`
+  }
+
+  return url
+}
+
 let storageOptions = {}
 if (
   process.env.AWS_BUCKET_NAME &&
@@ -54,13 +64,16 @@ if (
   console.warn('AWS credentials not found - using local file storage')
 }
 
-const serverURL =
+const rawServerURL =
   process.env.RAILWAY_STATIC_URL ||
   process.env.PAYLOAD_PUBLIC_SERVER_URL ||
   process.env.NEXT_PUBLIC_SERVER_URL ||
   'http://localhost:3000'
 
-console.log('Configuring server with URL:', serverURL)
+const serverURL = ensureUrlHasProtocol(rawServerURL)
+
+console.log('Raw server URL from env:', rawServerURL)
+console.log('Configuring server with final URL:', serverURL)
 
 export default buildConfig({
   admin: {
@@ -102,9 +115,11 @@ export default buildConfig({
   collections: [Pages, Posts, Media, Categories, Services, Users, Subscribers, Homepage],
 
   cors: [
-    process.env.NEXT_PUBLIC_SERVER_URL,
-    process.env.PAYLOAD_PUBLIC_SERVER_URL,
+    ensureUrlHasProtocol(process.env.NEXT_PUBLIC_SERVER_URL || ''),
+    ensureUrlHasProtocol(process.env.PAYLOAD_PUBLIC_SERVER_URL || ''),
     'http://localhost:3000',
+    'https://threetomorrows.co',
+    'https://www.threetomorrows.co',
   ].filter(Boolean),
 
   globals: [Header, Footer],
@@ -115,7 +130,7 @@ export default buildConfig({
 
   upload: {
     limits: {
-      fileSize: 10000000, // 10MB
+      fileSize: 10000000,
     },
   },
 
