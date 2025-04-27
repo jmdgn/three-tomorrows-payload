@@ -50,6 +50,9 @@ const CustomHomepage = (props) => {
   const isDownRef = useRef(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+
+  const servicesLinkUrl = servicesSection?.ctaLink || '/services';
+  const contactLinkUrl = contactSection?.ctaLink || '/contact';
   
   const serviceItems = servicesSection?.services || [
     {
@@ -618,7 +621,14 @@ const CustomHomepage = (props) => {
                 </div>
                 <div className="txtContent-container">
                   <p className="xlarge"><AnimatedTitle staggerDelay={0.02} duration={0.6}>{servicesSection?.subheading || 'Our services form a natural progression from understanding to action.'}</AnimatedTitle></p>
-                  <div className="body-button">{servicesSection?.ctaText || 'How our services can help you'}</div>
+                  <div 
+                    className="body-button" 
+                    onClick={() => window.location.href = servicesLinkUrl}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    {servicesSection?.ctaText || 'How our services can help you'}
+                  </div>
                 </div>
               </div>
               
@@ -831,7 +841,14 @@ const CustomHomepage = (props) => {
                     {contactSection?.description || "Let's talk about how we can implement strategy and transformation into your business to help you shape tomorrow."}
                   </AnimatedTitle>
                 </p>
-                <div className="body-button">{contactSection?.ctaText || 'Talk To Us'}</div>
+                <div 
+                  className="body-button" 
+                  onClick={() => window.location.href = contactLinkUrl}
+                  role="button"
+                  tabIndex={0}
+                >
+                  {contactSection?.ctaText || 'Talk To Us'}
+                </div>
               </div>
             </div>
           </div>

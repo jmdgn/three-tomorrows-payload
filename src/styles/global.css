@@ -983,6 +983,7 @@ section.intro-section {
     transition: all 0.3s linear; }
 
 .body-button:hover {
+    cursor: pointer;
     background: #191C1C;
     color: #FFF;
     box-shadow: 2px 2px 12px 0px rgba(0, 0, 0, 0.2);
@@ -1084,6 +1085,10 @@ section.service-panel {
 
 .service-panel {
     scroll-margin-top: 100px; }
+
+#section-third {
+    will-change: background-size, padding, height;
+    transition: background-size 0.5s ease, padding 0.5s ease, height 0.5s ease; }
 
 section.factoids-complete {
     position: relative;

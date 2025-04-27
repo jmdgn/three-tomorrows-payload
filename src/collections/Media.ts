@@ -8,9 +8,7 @@ import {
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
 
-// Function to get the appropriate S3 configuration
 const getS3Config = () => {
-  // Log to help with debugging
   console.log('Configuring Media collection with S3 settings:')
   console.log('- AWS_BUCKET_NAME:', process.env.AWS_BUCKET_NAME)
   console.log('- AWS_REGION:', process.env.AWS_REGION)
@@ -23,7 +21,6 @@ const getS3Config = () => {
     process.env.AWS_SECRET_ACCESS_KEY ? 'Set (value hidden)' : 'Not set',
   )
 
-  // Check if running in production with S3 configured
   if (
     process.env.NODE_ENV === 'production' &&
     process.env.AWS_BUCKET_NAME &&
@@ -36,7 +33,6 @@ const getS3Config = () => {
     }
   }
 
-  // Fallback to local storage for development
   console.log('Using local storage for media (development or missing S3 credentials)')
   return {
     disableLocalStorage: false,
@@ -44,7 +40,6 @@ const getS3Config = () => {
   }
 }
 
-// Get appropriate storage config
 const storageConfig = getS3Config()
 
 export const Media: CollectionConfig = {
@@ -73,33 +68,66 @@ export const Media: CollectionConfig = {
   hooks: {
     afterRead: [
       ({ doc }) => {
-        // Make sure URLs are properly formatted
-        if (doc && doc.url && !doc.url.startsWith('http')) {
-          // Parse URL structure
-          const baseUrl =
-            process.env.NEXT_PUBLIC_SERVER_URL ||
-            'https://three-tomorrows-payload-production.up.railway.app'
-          const sanitizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
+        if (process.env.NODE_ENV === 'development') {
+          console.log('MEDIA afterRead - Processing document:', doc ? doc.id : 'undefined')
+        }
 
-          // Ensure URL starts with a slash
-          const sanitizedFileUrl = doc.url.startsWith('/') ? doc.url : `/${doc.url}`
+        if (doc) {
+          if (doc.url && !doc.url.startsWith('http')) {
+            const baseUrl =
+              process.env.NEXT_PUBLIC_SERVER_URL ||
+              'https://three-tomorrows-payload-production.up.railway.app'
+            const sanitizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl
 
-          // Construct full URL
-          doc.url = `${sanitizedBaseUrl}${sanitizedFileUrl}`
+            const sanitizedFileUrl = doc.url.startsWith('/') ? doc.url : `/${doc.url}`
 
-          // Also fix sizes URLs if they exist
-          if (doc.sizes) {
-            Object.keys(doc.sizes).forEach((size) => {
-              if (
-                doc.sizes[size] &&
-                doc.sizes[size].url &&
-                !doc.sizes[size].url.startsWith('http')
-              ) {
-                const sizeUrl = doc.sizes[size].url
-                const sanitizedSizeUrl = sizeUrl.startsWith('/') ? sizeUrl : `/${sizeUrl}`
-                doc.sizes[size].url = `${sanitizedBaseUrl}${sanitizedSizeUrl}`
-              }
-            })
+            const oldUrl = doc.url
+            doc.url = `${sanitizedBaseUrl}${sanitizedFileUrl}`
+
+            if (process.env.NODE_ENV === 'development') {
+              console.log(`Fixed URL: ${oldUrl} → ${doc.url}`)
+            }
+
+            if (doc.sizes) {
+              Object.keys(doc.sizes).forEach((size) => {
+                if (
+                  doc.sizes[size] &&
+                  doc.sizes[size].url &&
+                  !doc.sizes[size].url.startsWith('http')
+                ) {
+                  const sizeUrl = doc.sizes[size].url
+                  const sanitizedSizeUrl = sizeUrl.startsWith('/') ? sizeUrl : `/${sizeUrl}`
+                  const oldSizeUrl = doc.sizes[size].url
+                  doc.sizes[size].url = `${sanitizedBaseUrl}${sanitizedSizeUrl}`
+
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log(`Fixed ${size} URL: ${oldSizeUrl} → ${doc.sizes[size].url}`)
+                  }
+                }
+              })
+            }
+          } else if (doc.url && process.env.NODE_ENV === 'development') {
+            console.log('URL already has protocol, keeping as is:', doc.url)
+          }
+
+          if (doc.url && doc.url.includes('s3.amazonaws.com')) {
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Detected S3 URL:', doc.url)
+            }
+
+            if (doc.sizes) {
+              Object.keys(doc.sizes).forEach((size) => {
+                if (
+                  doc.sizes[size] &&
+                  doc.sizes[size].url &&
+                  !doc.sizes[size].url.includes('s3.amazonaws.com')
+                ) {
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log(`Size ${size} URL might need S3 prefix:`, doc.sizes[size].url)
+                  }
+                }
+              })
+            }
           }
         }
 

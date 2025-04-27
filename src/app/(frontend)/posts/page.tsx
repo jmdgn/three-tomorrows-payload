@@ -17,35 +17,39 @@ export default async function Page() {
 
   const posts = await payload.find({
     collection: 'posts',
-    depth: 2, // Increased depth to get category details
+    depth: 2,
     limit: 12,
     overrideAccess: false,
     select: {
       title: true,
       slug: true,
       categories: true,
-      meta: true,
+      meta: {
+        image: true,
+        description: true,
+      },
       publishedAt: true,
+      heroImage: true,
     },
   })
 
   return (
     <div className="pt-24 pb-24">
       <div className="pt24-inner">
-          <PageClient />
-          <div className="mb-16">
-            <div className="prose dark:prose-invert max-w-none">
-              <h3>Blog</h3>
-            </div>
+        <PageClient />
+        <div className="mb-16">
+          <div className="prose dark:prose-invert max-w-none">
+            <h3>Blog</h3>
           </div>
+        </div>
 
-          <CollectionArchive posts={posts.docs} />
+        <CollectionArchive posts={posts.docs} />
 
-          <div className="container">
-            {posts.totalPages > 1 && posts.page && (
-              <Pagination page={posts.page} totalPages={posts.totalPages} />
-            )}
-          </div>
+        <div className="container">
+          {posts.totalPages > 1 && posts.page && (
+            <Pagination page={posts.page} totalPages={posts.totalPages} />
+          )}
+        </div>
       </div>
     </div>
   )
