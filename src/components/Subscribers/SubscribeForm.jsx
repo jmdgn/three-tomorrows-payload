@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getClientSideURL } from '@/utilities/getURL';
 
 const SubscribeForm = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +16,6 @@ const SubscribeForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Basic validation
     if (!email || !email.includes('@')) {
       setSubmitStatus({ type: 'error', message: 'Please enter a valid email address' });
       return;
@@ -26,7 +26,12 @@ const SubscribeForm = () => {
     try {
       console.log('Submitting email:', email);
       
-      const response = await fetch('/api/subscribe', {
+      const baseUrl = getClientSideURL();
+      const apiUrl = `${baseUrl}/api/subscribe`;
+      
+      console.log('Using API URL:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +54,6 @@ const SubscribeForm = () => {
         throw new Error(data?.error || 'Subscription failed');
       }
       
-      // Success
       setSubmitStatus({ 
         type: 'success', 
         message: data?.message || 'Thank you for subscribing!' 
