@@ -55,10 +55,12 @@ if (
 }
 
 const serverURL =
+  process.env.RAILWAY_STATIC_URL ||
   process.env.PAYLOAD_PUBLIC_SERVER_URL ||
   process.env.NEXT_PUBLIC_SERVER_URL ||
   'http://localhost:3000'
-console.log('Using server URL:', serverURL)
+
+console.log('Configuring server with URL:', serverURL)
 
 export default buildConfig({
   admin: {

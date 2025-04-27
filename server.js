@@ -3,10 +3,26 @@ import payload from 'payload'
 import next from 'next'
 import { buildConfig } from './src/payload.config.ts'
 
+const productionUrl =
+  process.env.RAILWAY_STATIC_URL ||
+  process.env.RAILWAY_PUBLIC_URL ||
+  process.env.PAYLOAD_PUBLIC_SERVER_URL ||
+  process.env.NEXT_PUBLIC_SERVER_URL
+
+if (process.env.NODE_ENV === 'production' && productionUrl) {
+  process.env.NEXT_PUBLIC_SERVER_URL = productionUrl
+  process.env.PAYLOAD_PUBLIC_SERVER_URL = productionUrl
+  console.log('Production mode: Server URL set to', productionUrl)
+} else {
+  console.log('Development mode: Using existing server URLs')
+}
+
 console.log('Environment:', process.env.NODE_ENV)
 console.log('PORT environment variable:', process.env.PORT)
 console.log('NEXT_PUBLIC_SERVER_URL:', process.env.NEXT_PUBLIC_SERVER_URL)
 console.log('PAYLOAD_PUBLIC_SERVER_URL:', process.env.PAYLOAD_PUBLIC_SERVER_URL)
+console.log('RAILWAY_STATIC_URL:', process.env.RAILWAY_STATIC_URL)
+console.log('RAILWAY_PUBLIC_URL:', process.env.RAILWAY_PUBLIC_URL)
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -38,7 +54,19 @@ const server = express()
     })
 
     server.use((req, res, next) => {
-      res.header('Access-Control-Allow-Origin', 'https://threetomorrows.co')
+      const allowedOrigins = [
+        'https://threetomorrows.co',
+        'https://threetomorrows.com',
+        'https://www.threetomorrows.co',
+      ]
+      const origin = req.headers.origin
+
+      if (allowedOrigins.includes(origin)) {
+        res.header('Access-Control-Allow-Origin', origin)
+      } else {
+        res.header('Access-Control-Allow-Origin', '*')
+      }
+
       res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
       res.header(
         'Access-Control-Allow-Headers',
@@ -50,6 +78,16 @@ const server = express()
       }
 
       next()
+    })
+
+    server.get('/debug-env', (req, res) => {
+      res.json({
+        NODE_ENV: process.env.NODE_ENV,
+        NEXT_PUBLIC_SERVER_URL: process.env.NEXT_PUBLIC_SERVER_URL,
+        PAYLOAD_PUBLIC_SERVER_URL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
+        RAILWAY_PUBLIC_URL: process.env.RAILWAY_PUBLIC_URL,
+        RAILWAY_STATIC_URL: process.env.RAILWAY_STATIC_URL,
+      })
     })
 
     server.all('*', (req, res) => handle(req, res))

@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "build:railway": "cross-env PAYLOAD_PUBLIC_SERVER_URL=$RAILWAY_PUBLIC_URL NODE_ENV=production next build && find .next -type f -name '*.js' -exec sed -i 's|http://localhost:3000|https://three-tomorrows-payload-production.up.railway.app|g' {} \\;",
+    "build:railway": "cross-env PAYLOAD_PUBLIC_SERVER_URL=$RAILWAY_STATIC_URL NEXT_PUBLIC_SERVER_URL=$RAILWAY_STATIC_URL NODE_ENV=production next build && find .next -type f -name '*.js' -exec sed -i 's|http://localhost:3000|https://three-tomorrows-payload-production.up.railway.app|g' {} \\;",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "next dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",

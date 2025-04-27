@@ -1,10 +1,12 @@
 import redirects from './redirects.js'
 
+const RAILWAY_STATIC_URL = process.env.RAILWAY_STATIC_URL
+const RAILWAY_PUBLIC_URL = process.env.RAILWAY_PUBLIC_URL
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
-const RAILWAY_PUBLIC_URL = process.env.RAILWAY_PUBLIC_URL
+const serverUrl = RAILWAY_STATIC_URL || RAILWAY_PUBLIC_URL || NEXT_PUBLIC_SERVER_URL
 
-const serverUrl = RAILWAY_PUBLIC_URL || NEXT_PUBLIC_SERVER_URL
+console.log('Building with server URL:', serverUrl)
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

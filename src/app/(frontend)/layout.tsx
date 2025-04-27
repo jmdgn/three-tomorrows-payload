@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next/types'
 import React from 'react'
 
 import NewFooter from '../../Footer/SiteFooter.jsx'
@@ -12,6 +12,7 @@ import '../../styles/media-queries.css'
 import FooterProvider from '../../components/FooterProvider'
 import ClientNavigationHandler from '../../components/HomeScripts/ClientNavigationHandler.client'
 import DynamicHeaderWrapper from '../../components/Header/DynamicHeaderWrapper.client'
+import EnvLayout from './EnvLayout'
 
 interface HeaderData {
   navItems?:
@@ -48,7 +49,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let headerData = null
 
   try {
-    // Still try to fetch the header data in case it works
     const canAccessHeader = await testHeaderAccess()
     if (canAccessHeader) {
       headerData = await fetchHeader()
@@ -63,16 +63,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link href="/favicon/favicon.ico" rel="icon" sizes="32x32" />
       </head>
       <body suppressHydrationWarning>
-        <ClientNavigationHandler />
+        <EnvLayout>
+          <ClientNavigationHandler />
 
-        <PostHeaderProvider>
-          {/* Client component wrapper that determines which header to show */}
-          <DynamicHeaderWrapper headerData={headerData} useStaticHeader={false} />
+          <PostHeaderProvider>
+            {/* Client component wrapper that determines which header to show */}
+            <DynamicHeaderWrapper headerData={headerData} useStaticHeader={false} />
 
-          <Providers>{children}</Providers>
-          <FooterProvider />
-          <NewFooter />
-        </PostHeaderProvider>
+            <Providers>{children}</Providers>
+            <FooterProvider />
+            <NewFooter />
+          </PostHeaderProvider>
+        </EnvLayout>
       </body>
     </html>
   )
