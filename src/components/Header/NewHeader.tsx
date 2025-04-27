@@ -16,13 +16,11 @@ type Props = {
 }
 
 export const NewHeader: React.FC<Props> = ({ header = {} as HeaderType }) => {
-  // Process header data to get nav items
   const navItems = React.useMemo(() => {
     if (!header?.navItems || !Array.isArray(header.navItems) || header.navItems.length === 0) {
       return FALLBACK_NAV_ITEMS
     }
 
-    // Process the nav items from the header
     const validItems = header.navItems
       .filter((item) => {
         return item?.link?.label
@@ -49,7 +47,6 @@ export const NewHeader: React.FC<Props> = ({ header = {} as HeaderType }) => {
     return validItems.length > 0 ? validItems : FALLBACK_NAV_ITEMS
   }, [header])
 
-  // Get CTA info
   const ctaLabel = header?.ctaLabel || 'Talk To Us'
   const ctaLink = header?.ctaLink?.url || '/contact'
 
