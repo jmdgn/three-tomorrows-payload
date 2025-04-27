@@ -59,29 +59,23 @@ const CustomHomepage = (props) => {
       description: 'Cutting through noise to identify the signals that matter most for your future. Helping you see beyond the horizon and prepare for multiple possible tomorrows.',
       image: 'assets/images/services/trend.png',
     },
-    // Other service items...
   ];
   
   const totalSlides = serviceItems.length;
 
   const factoidItems = factoidsSection?.factoids || [
     { text: '70% of small businesses will transition to new ownership in the next decade' },
-    // Other factoid items...
   ];
 
   const techExpertiseItems = expertiseSection?.techExpertise?.items || [
     { text: 'AI Integration', isImage: false },
-    // Other tech expertise items...
   ];
 
   const sustainabilityExpertiseItems = expertiseSection?.sustainabilityExpertise?.items || [
     { text: 'Shared Value Creation', isImage: false },
-    // Other sustainability expertise items...
   ];
 
-  // This useEffect handles Three.js initialization
   useEffect(() => {
-    // This is to ensure Three.js is initialized if it hasn't been already
     if (typeof window !== 'undefined' && window.initThreeJS && !window.threeJSInitialized) {
       console.log('CustomHomepage: Initializing Three.js');
       window.threeJSInitialized = true;
@@ -91,7 +85,6 @@ const CustomHomepage = (props) => {
       });
     }
 
-    // Check for scene container and water container
     const checkContainers = () => {
       const sceneContainer = document.getElementById('scene-container');
       const waterContainer = document.querySelector('.water-container');
@@ -110,7 +103,6 @@ const CustomHomepage = (props) => {
       }
     };
     
-    // Check after a short delay to ensure components are mounted
     const timeoutId = setTimeout(checkContainers, 500);
     
     return () => {

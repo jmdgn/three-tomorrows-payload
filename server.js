@@ -1,14 +1,12 @@
-// server.js
 import express from 'express'
 import payload from 'payload'
 import next from 'next'
-// Import the Payload configuration
 import { buildConfig } from './src/payload.config.ts'
 
-// Add detailed environment logging
 console.log('Environment:', process.env.NODE_ENV)
 console.log('PORT environment variable:', process.env.PORT)
-console.log('Server URL:', process.env.NEXT_PUBLIC_SERVER_URL)
+console.log('NEXT_PUBLIC_SERVER_URL:', process.env.NEXT_PUBLIC_SERVER_URL)
+console.log('PAYLOAD_PUBLIC_SERVER_URL:', process.env.PAYLOAD_PUBLIC_SERVER_URL)
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -26,16 +24,29 @@ const server = express()
     await payload.init({
       secret: process.env.PAYLOAD_SECRET,
       express: server,
-      config: buildConfig, // Use the buildConfig function from the config file
+      config: buildConfig,
+      onInit: () => {
+        console.log(
+          'Payload CMS initialized successfully with URL:',
+          process.env.PAYLOAD_PUBLIC_SERVER_URL,
+        )
+      },
     })
-    console.log('Payload CMS initialized successfully')
 
-    // Add a health check endpoint
     server.get('/health', (req, res) => {
       res.status(200).send('OK')
     })
 
-    // Let Next.js handle all other routes
+    server.use((req, res, next) => {
+      res.header('Access-Control-Allow-Origin', '*')
+      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH')
+      res.header(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+      )
+      next()
+    })
+
     server.all('*', (req, res) => handle(req, res))
 
     const port = process.env.PORT || 3000
