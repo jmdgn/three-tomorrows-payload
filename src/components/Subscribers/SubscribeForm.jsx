@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { getClientSideURL } from '@/utilities/getURL';
 
 const SubscribeForm = () => {
   const [email, setEmail] = useState('');
@@ -26,12 +25,7 @@ const SubscribeForm = () => {
     try {
       console.log('Submitting email:', email);
       
-      const baseUrl = getClientSideURL();
-      const apiUrl = `${baseUrl}/api/subscribe`;
-      
-      console.log('Using API URL:', apiUrl);
-      
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
