@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "build:railway": "cross-env PAYLOAD_PUBLIC_SERVER_URL=$RAILWAY_STATIC_URL NEXT_PUBLIC_SERVER_URL=$RAILWAY_STATIC_URL NODE_ENV=production next build && find .next -type f -name '*.js' -exec sed -i 's|http://localhost:3000|https://three-tomorrows-payload-production.up.railway.app|g' {} \\;",
+    "build:railway": "RAILWAY_STATIC_URL=${RAILWAY_STATIC_URL:-https://three-tomorrows-payload-production.up.railway.app} NEXT_PUBLIC_SERVER_URL=${NEXT_PUBLIC_SERVER_URL:-https://three-tomorrows-payload-production.up.railway.app} PAYLOAD_PUBLIC_SERVER_URL=${PAYLOAD_PUBLIC_SERVER_URL:-https://three-tomorrows-payload-production.up.railway.app} NODE_ENV=production next build && find .next -type f -name '*.js' -exec sed -i 's|http://localhost:3000|https://three-tomorrows-payload-production.up.railway.app|g' {} \\;",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "next dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
@@ -18,8 +18,7 @@
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "prepare": "echo 'Skipping type generation in production'",
     "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
-    "start": "next start",
-    "vercel-build": "next build && touch .next/server/app/\\(frontend\\)/\\(internal\\)/page_client-reference-manifest.js"
+    "start": "next start"
   },
   "dependencies": {
     "@lexical/code": "^0.28.0",
