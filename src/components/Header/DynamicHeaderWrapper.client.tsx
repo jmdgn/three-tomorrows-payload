@@ -67,12 +67,10 @@ export default function DynamicHeaderWrapper({
   const pathname = usePathname()
   const isBlogPostPage = pathname?.startsWith('/posts/') && pathname !== '/posts'
 
-  // State for client-side fetched data
   const [clientData, setClientData] = useState(null)
   const [isClientLoading, setIsClientLoading] = useState(false)
   const [clientFetchAttempted, setClientFetchAttempted] = useState(false)
 
-  // Function to validate header data
   const isValidHeaderData = (data) => {
     if (!data) return false
 
@@ -80,7 +78,6 @@ export default function DynamicHeaderWrapper({
       return false
     }
 
-    // Check for at least one valid navigation item
     return data.navItems.some((item) => {
       if (!item || !item.link || !item.link.label) {
         return false
@@ -95,19 +92,15 @@ export default function DynamicHeaderWrapper({
     })
   }
 
-  // Validate server data
   const isServerDataValid = isValidHeaderData(serverHeaderData)
 
-  // Client-side data fetching
   useEffect(() => {
-    // Only attempt client fetch if server data is invalid and we haven't tried yet
     if (!isServerDataValid && !clientFetchAttempted && !isClientLoading) {
       const fetchHeaderData = async () => {
         setIsClientLoading(true)
         console.log('Attempting client-side header data fetch')
 
         try {
-          // Attempt to fetch from your API endpoint
           const response = await fetch('/api/header')
 
           if (!response.ok) {
@@ -135,17 +128,12 @@ export default function DynamicHeaderWrapper({
     }
   }, [isServerDataValid, clientFetchAttempted, isClientLoading])
 
-  // Prioritize data sources:
-  // 1. Server data if valid
-  // 2. Client-fetched data if valid
-  // 3. Fallback data as a last resort
   const headerData = isServerDataValid
     ? serverHeaderData
     : isValidHeaderData(clientData)
       ? clientData
       : FALLBACK_HEADER_DATA
 
-  // Always use dynamic header in production or when we have valid data
   const useStaticHeader =
     isServerDataValid || isValidHeaderData(clientData)
       ? false
@@ -153,7 +141,6 @@ export default function DynamicHeaderWrapper({
         ? false
         : initialStaticHeaderValue
 
-  // Determine if we're using fallback data
   const usingFallbackData = !isServerDataValid && !isValidHeaderData(clientData)
 
   useEffect(() => {
@@ -175,7 +162,6 @@ export default function DynamicHeaderWrapper({
     usingFallbackData,
   ])
 
-  // For blog post pages, use the blog header
   if (isBlogPostPage) {
     return (
       <>
@@ -185,6 +171,5 @@ export default function DynamicHeaderWrapper({
     )
   }
 
-  // For all other pages, use the appropriate header based on flags
   return useStaticHeader ? <HeaderNav /> : <DynamicHeaderNav data={headerData} />
 }

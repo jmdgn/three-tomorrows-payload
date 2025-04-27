@@ -9,7 +9,6 @@ const WorkingFooter = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch footer data from Payload
     const fetchFooter = async () => {
       try {
         const response = await fetch('/api/globals/footer');
@@ -27,11 +26,9 @@ const WorkingFooter = () => {
     fetchFooter();
   }, []);
 
-  // Function to safely render site pages
   const renderSitePages = () => {
     if (footerData?.sitePages && footerData.sitePages.length > 0) {
       return footerData.sitePages.map((page, index) => {
-        // Safely access properties
         const url = page.url || '#';
         const label = page.label || 'Page';
         const newTab = page.newTab || false;
@@ -48,7 +45,6 @@ const WorkingFooter = () => {
         );
       });
     } else {
-      // Fallback content
       return (
         <>
           <a href="#"><h6>What we do</h6></a>
@@ -61,11 +57,9 @@ const WorkingFooter = () => {
     }
   };
 
-  // Function to safely render social links
   const renderSocialLinks = () => {
     if (footerData?.socialLinks && footerData.socialLinks.length > 0) {
       return footerData.socialLinks.map((social, index) => {
-        // Safely access properties
         const url = social.url || '#';
         const platform = social.platform || 'Link';
         const openInNewTab = social.openInNewTab || false;
@@ -82,7 +76,6 @@ const WorkingFooter = () => {
         );
       });
     } else {
-      // Fallback content
       return (
         <>
           <a target="_blank" href="https://www.linkedin.com/company/three-tomorrows/" rel="noopener noreferrer">
@@ -147,7 +140,7 @@ const WorkingFooter = () => {
                   ) : (
                     <img
                       className="logoIcon"
-                      src="/media/universal/logo-icon.svg"
+                      src="/assets/logo/logo-icon.svg"
                       width={40}
                       height={40}
                       alt="Three Tomorrows Icon"
