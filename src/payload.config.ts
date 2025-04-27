@@ -57,7 +57,6 @@ if (
           prefix: 'media',
         },
       },
-      acl: 'public-read',
     }),
   }
 } else {
