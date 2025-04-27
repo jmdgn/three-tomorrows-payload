@@ -11,7 +11,7 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchHomepageData() {
       try {
-        const baseUrl = getClientSideURL()
+        const baseUrl = 'https://three-tomorrows-payload-production.up.railway.app'
 
         console.log('Fetching homepage data from:', `${baseUrl}/api/homepage?limit=1`)
 
