@@ -13,7 +13,7 @@ html {
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: 100dvh;
     background-color: inherit;
     color: inherit;
     font-family: "Neue Montreal", Helvetica, Arial, sans-serif; }
@@ -280,7 +280,7 @@ a:-webkit-any-link {
 
 [data-scene] {
     position: relative;
-    min-height: 50vh; }
+    min-height: 50dvh; }
 
 [data-scene][data-loading]::after {
     content: '';
@@ -464,7 +464,7 @@ ul.menu-ribbon li:hover {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
@@ -828,7 +828,7 @@ form .mb-4 {
 section.intro-section {
     display: flex;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     animation: changePosition 2s forwards; }
 
 @keyframes changePosition {
@@ -844,7 +844,7 @@ section.intro-section {
     position: fixed;
     display: block;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     left: 0;
     top: 0;
     opacity: 0;
@@ -857,7 +857,7 @@ section.intro-section {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     z-index: 1; }
 
 .background-elements {
@@ -865,7 +865,7 @@ section.intro-section {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     z-index: 0; }
 
 .intro-title,
@@ -1010,7 +1010,7 @@ section.intro-section {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     background: linear-gradient(180deg, #DBE5ED 0%, #EFF0F1 100%);
     opacity: 0; }
 
@@ -1023,7 +1023,7 @@ section.intro-section {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     pointer-events: none;
     z-index: 1; }
 
@@ -1037,7 +1037,7 @@ section.intro-section {
     transform: translate(-50%, -50%);
     opacity: 0;
     width: 100vw; 
-    height: 100vh;
+    height: 100dvh;
     filter: blur(1px);
     transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.4s ease-in-out;
     will-change: transform; }
@@ -1045,8 +1045,8 @@ section.intro-section {
 .terrain-feature {
     position: absolute;
     width: 100vw;
-    height: 100vh;
-    top: 100vh;
+    height: 100dvh;
+    top: 100dvh;
     left: 0; }
 
 .terrain-feature canvas {
@@ -1078,7 +1078,7 @@ section.service-panel {
     z-index: 2; }
 
 section.intro-para {
-    height: 100vh; }
+    height: 100dvh; }
 
 section.service-panel {
     height: fit-content; }
@@ -1095,7 +1095,7 @@ section.factoids-complete {
     display: flex;
     width: 100%;
     height: 100%;
-    margin-bottom: 20vh; }
+    margin-bottom: 20dvh; }
 
 .text-container.left,
 .content-container.right {
@@ -1374,7 +1374,7 @@ img.service-image {
 .factoidBkgnd-sticky {
     position: sticky;
     width: 5vw;
-    height: 5vh;
+    height: 5dvh;
     top: 100px;
     border-radius: 4px;
     margin: 0 auto;
@@ -1399,13 +1399,13 @@ img.service-image {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     z-index: 1; }
 
 .factoidContent-full {
     position: relative;
     width: 100%;
-    top: -50vh;
+    top: -50dvh;
     opacity: 0;
     transition: all 0.3s ease-out;
     z-index: 2; }
@@ -1415,7 +1415,7 @@ img.service-image {
     width: 100%;
     max-width: 1400px;
     height: fit-content;
-    padding: 20vh 0;
+    padding: 20dvh 0;
     text-align: center;
     margin: 0 auto;
     transition: all 0.2s ease-out; }
@@ -1437,14 +1437,14 @@ img.service-image {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 20vh;
-    margin: 60vh 0; }
+    height: 20dvh;
+    margin: 60dvh 0; }
 
 .factoidSingle-container:first-child {
-    margin: 40vh 0 60vh 0; }
+    margin: 40dvh 0 60dvh 0; }
 
 .factoidSingle-container:last-child {
-    margin: 60vh 0 40vh 0; }
+    margin: 60dvh 0 40dvh 0; }
 
 .factCard-container {
     position: relative;
@@ -1606,7 +1606,7 @@ img.carousel-image {
     position: relative;
     width: 100%;
     height: 100%;
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     align-items: center;
     flex-direction: column;

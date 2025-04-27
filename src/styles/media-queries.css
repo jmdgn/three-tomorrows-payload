@@ -156,7 +156,9 @@ p.body-intro {
 	min-width: 42%; }
 
 .infinite-carousel .carousel-item.square {
-	max-height: 420px; }
+	max-height: 420px;
+	max-width: 420px;
+	width: 100%; }
 
 /* Contact Home Styles */
 .contactPanel-home {
@@ -323,8 +325,8 @@ header.blog .header-container .contactBtn-container {
 	min-width: 48%; }
 
 .infinite-carousel .carousel-item.square {
-	max-height: 400px; }
-
+	max-height: 400px;
+	max-width: 400px; }
 
 .linkColumn-left,
 .socialColumn-left {
@@ -514,7 +516,8 @@ section.intro-para {
 
 /* Our Expertise Section Styles */
 .infinite-carousel .carousel-item.square {
-	max-height: 360px; }
+	max-height: 360px;
+	max-width: 360px; }
 
 .tech-card h3.thin {
 	font-size: 36px;
@@ -1016,12 +1019,18 @@ form.email-signup-form .form-group {
 	position: relative;
     width: -moz-fit-content;
     width: fit-content;
-    max-width: auto;
+    max-width: 100%;
     border: 1px solid rgba(255,255,255,0.4);
     border-radius: 8px;
-    width: 100%;
     display: flex;
     justify-content: space-between; }
+
+.form-group input {
+    flex: 1 1 auto;
+  	min-width: 0; }
+
+.form-group button {
+	flex-shrink: 0; }
 
 input[type="email"] {
 	min-width: fit-content; }
@@ -1081,7 +1090,8 @@ p.xlarge {
 	padding-bottom: 4rem; }
 
 .infinite-carousel .carousel-item.square {
-	max-height: 320px; }
+	max-height: 320px;
+	max-width: 320px; }
 
 .tech-card h3.thin {
 	font-size: 32px;
