@@ -200,7 +200,6 @@ function animate() {
   water.material.uniforms['time'].value += 0.06 / 60.0
 }
 
-// Add this at the very bottom:
 window.initOceanScene = function () {
   console.log('Initializing ocean scene...')
   init()
