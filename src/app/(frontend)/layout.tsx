@@ -68,7 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
         <link href="/favicon/favicon.ico" rel="icon" sizes="32x32" />
       </head>
       <body suppressHydrationWarning>
