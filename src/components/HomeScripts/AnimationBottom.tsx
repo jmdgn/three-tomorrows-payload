@@ -274,6 +274,7 @@ export function useAnimationBottom() {
 
         const rect = section.getBoundingClientRect()
         const windowHeight = window.innerHeight
+        const windowWidth = window.innerWidth
 
         const enterStart = windowHeight * 0.8
         const enterEnd = windowHeight * 0.2
@@ -303,15 +304,30 @@ export function useAnimationBottom() {
         // Clamp again for safety
         progress = Math.max(0, Math.min(1, progress))
 
-        const width = 5 + (100 - 5) * progress
-        const height = 5 + (100 - 5) * progress
+        // Calculate absolute pixel values based on viewport dimensions
+        const minWidth = 60 // Minimum width in pixels instead of 5vw
+        const minHeight = 60 // Minimum height in pixels instead of 5vh
+
+        // Calculate max dimensions based on a percentage of the viewport
+        const maxWidth = windowWidth * 1
+        const maxHeight = windowHeight * 1
+
+        // Calculate current dimensions
+        const width = minWidth + (maxWidth - minWidth) * progress
+        const height = minHeight + (maxHeight - minHeight) * progress
         const borderRadius = 32 * (1 - progress)
+
+        // For positioning, calculate based on parent container's center
         const topOffset = 50 * (1 - progress)
 
-        stickyElem.style.width = `${width}vw`
-        stickyElem.style.height = `${height}vh`
+        // Apply styles using pixels instead of viewport units
+        stickyElem.style.width = `${width}px`
+        stickyElem.style.height = `${height}px`
         stickyElem.style.borderRadius = `${borderRadius}px`
         stickyElem.style.top = `${topOffset}px`
+
+        // Ensure the element stays centered horizontally
+        stickyElem.style.left = `${(windowWidth - width) / 2}px`
 
         // Content fade-in after 85% growth
         const opacityStart = 0.85
