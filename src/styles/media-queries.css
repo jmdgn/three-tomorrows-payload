@@ -1099,7 +1099,7 @@ h4 {
 	transform: scale(1.05); }
 
 section.intro-para {
-	height: 100dvh; }
+	height: calc(var(--vh, 1vh) * 100); }
 
 .serviceFt-image {
 	max-width: 200px;
