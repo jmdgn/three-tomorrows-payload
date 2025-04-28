@@ -1,4 +1,26 @@
 /* Default Styles */
+:root {
+    --viewport-height: 100vh;
+  }
+  
+@supports (-webkit-touch-callout: none) {
+    html, body {
+        height: var(--viewport-height);
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure content accounts for safe areas */
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* Prevent scroll chaining on iOS */
+    html {
+        overscroll-behavior-y: none;
+    }
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -1340,12 +1362,12 @@ img.forward-image {
     background-clip: padding-box;
     border: 0.6px solid #CCC;
     box-sizing: border-box;
-    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out; }
+    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
 
 .serviceCard:hover {
     box-shadow: 6px 6px 32px 0px rgba(0, 0, 0, 0.15);
-    transform: translateY(-5px);
-    transition: box-shadow 0.3s ease-out, transform 0.3s ease-out; }
+    transform: translateY(-5px); }
 
 .serviceContent-panelTop {
     position: relative;
