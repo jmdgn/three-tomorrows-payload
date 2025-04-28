@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -37,14 +37,13 @@ const FALLBACK_NAV_ITEMS = [
 
 export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }) => {
   const isClient = typeof window !== 'undefined'
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // For debugging purposes only
   React.useEffect(() => {
     if (isClient && process.env.NODE_ENV === 'development') {
       console.log('DynamicHeaderNav received data:', data ? 'yes' : 'no')
       console.log('navItems count:', data?.navItems?.length || 0)
 
-      // Log raw navItems to inspect structure
       if (data?.navItems) {
         console.log('Raw navItems structure:', JSON.stringify(data.navItems, null, 2))
       }
@@ -52,7 +51,6 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
   }, [data, isClient])
 
   const navItems = React.useMemo(() => {
-    // If no data or navItems, return fallback
     if (!data || !data.navItems || !Array.isArray(data.navItems) || data.navItems.length === 0) {
       if (isClient && process.env.NODE_ENV === 'development') {
         console.log('Using FALLBACK_NAV_ITEMS due to missing navItems')
@@ -60,25 +58,20 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
       return FALLBACK_NAV_ITEMS
     }
 
-    // Process the nav items
     const validItems = data.navItems
       .filter((item) => {
-        // Base case - we need an item with a link and label
         if (!item || !item.link || !item.link.label) {
           return false
         }
 
-        // Link URL directly provided
         if (item.link.url) {
           return true
         }
 
-        // Reference link
         if (item.link.type === 'reference' && item.link.reference?.value) {
           return true
         }
 
-        // Custom link with no URL (should have one, but we'll be forgiving)
         if (item.link.type === 'custom') {
           return true
         }
@@ -86,15 +79,11 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
         return false
       })
       .map((item) => {
-        // Build the normalized nav item
         let url = '#'
 
-        // Direct URL
         if (item.link?.url) {
           url = item.link.url
-        }
-        // Reference URL
-        else if (item.link?.type === 'reference' && item.link?.reference?.value) {
+        } else if (item.link?.type === 'reference' && item.link?.reference?.value) {
           const refValue = item.link.reference.value
           url = `/${refValue.slug}` || '#'
         }
@@ -120,6 +109,10 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
     return validItems
   }, [data, isClient])
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
   const ctaLabel = data?.ctaLabel || 'Talk To Us'
   const ctaLink = data?.ctaLink?.url || '/contact'
 
@@ -141,7 +134,8 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
               </Link>
             </div>
           </div>
-          <div className="menu-container">
+          {/* Desktop Navigation Menu */}
+          <div className="menu-container desktop-menu">
             <nav>
               <div className="nav-menu">
                 <ul className="menu-ribbon">
@@ -166,8 +160,42 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
                 {ctaLabel}
               </Link>
             </div>
+            {/* Mobile Menu Toggle Button */}
+            <div className="mobile-menu-toggle">
+              <button onClick={toggleMobileMenu} className="menu-toggle-btn">
+                {mobileMenuOpen ? 'Close' : 'Menu'}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="mobile-menu">
+            <nav>
+              <ul className="mobile-menu-items">
+                {navItems.map((item, index) => (
+                  <li key={`mobile-nav-${index}`}>
+                    {item.newTab ? (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link href={item.url} onClick={() => setMobileMenuOpen(false)}>
+                        {item.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        )}
       </nav>
     </header>
   )

@@ -687,7 +687,7 @@ p.body-intro.mobile {
 	padding-bottom: 8rem; }
 
 .header-container {
-	padding: .5rem 1rem; }
+	padding: .5rem; }
 
 .menu-container {
 	display: none; }
@@ -930,7 +930,8 @@ img.article-image {
 	scroll-behavior: smooth;
 	-webkit-overflow-scrolling: touch;
 	cursor: grab;
-	margin: 0; }
+	margin: 0;
+	padding: 1rem 0; }
 
 .service-carousel::-webkit-scrollbar {
 	display: none; }
@@ -947,6 +948,9 @@ img.article-image {
 	margin: 0;
 	box-sizing: border-box;
 	height: 100%; }
+
+.serviceCard:hover {
+	box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.15); }
 	  
 .serviceText-panelBottom {
 	width: 100%; }
@@ -961,7 +965,7 @@ img.article-image {
 .carousel-dots {
 	display: flex;
     justify-content: center;
-    margin-top: 1.5rem;
+    margin-top: 0;
     gap: 10px;
     padding: 0.5rem 0; }
 	  
@@ -1048,6 +1052,37 @@ form.email-signup-form input[type="email"] {
 
 article.pt-16.pb-24 {
 	padding-bottom: 6rem; }
+}
+
+
+@media (max-width: 768px) {
+.desktop-menu {
+	display: none; }
+
+.mobile-menu-toggle {
+	display: flex;
+	align-items: center; }
+
+.header-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%; }
+	
+.contactBtn-container {
+	display: flex;
+	align-items: center; }
+
+.contactCta.header {
+	padding: 8px 20px; }
+}
+  
+@media (min-width: 769px) {
+.mobile-menu-toggle {
+	display: none; }
+
+.mobile-menu {
+	display: none; }
 }
 
 
