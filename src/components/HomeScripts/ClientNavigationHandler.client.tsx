@@ -30,49 +30,22 @@ export default function ClientNavigationHandler() {
     const isSafari = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
 
     if (isIOS && isSafari) {
-      console.log('Applying iOS Safari URL bar fix')
+      console.log('Applying iOS Safari URL bar fix - keeping URL bar fixed')
 
       setTimeout(() => {
         window.scrollTo(0, 1)
+      }, 100)
 
-        const viewportHeight = window.innerHeight
-        document.documentElement.style.setProperty('--viewport-height', `${viewportHeight}px`)
-
-        const body = document.body
-        const html = document.documentElement
-
-        body.style.height = `${viewportHeight}px`
-        html.style.height = `${viewportHeight}px`
-      }, 300)
-
-      const handleTouchMove = (e) => {
-        const isAtTop = window.pageYOffset === 0
-        const isAtBottom = window.innerHeight + window.pageYOffset >= document.body.offsetHeight
-
-        if (
-          (isAtTop && e.touches[0].screenY > e.touches[0].clientY) ||
-          (isAtBottom && e.touches[0].screenY < e.touches[0].clientY)
-        ) {
-          e.preventDefault()
+      const handleScroll = () => {
+        if (window.scrollY < 5) {
+          window.scrollTo(0, 5)
         }
       }
 
-      const handleResize = () => {
-        const newViewportHeight = window.innerHeight
-        document.documentElement.style.setProperty('--viewport-height', `${newViewportHeight}px`)
-
-        const body = document.body
-        const html = document.documentElement
-        body.style.height = `${newViewportHeight}px`
-        html.style.height = `${newViewportHeight}px`
-      }
-
-      document.addEventListener('touchmove', handleTouchMove, { passive: false })
-      window.addEventListener('resize', handleResize)
+      window.addEventListener('scroll', handleScroll)
 
       return () => {
-        document.removeEventListener('touchmove', handleTouchMove)
-        window.removeEventListener('resize', handleResize)
+        window.removeEventListener('scroll', handleScroll)
       }
     }
   }, [])

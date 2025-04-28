@@ -1,23 +1,4 @@
 /* Default Styles */
-:root {
-    --viewport-height: 100vh;
-  }
-  
-@supports (-webkit-touch-callout: none) {
-html, body {
-    height: var(--viewport-height);
-    overflow: auto;
-    -webkit-overflow-scrolling: touch; }
-
-/* Ensure content accounts for safe areas */
-body {
-    padding-bottom: env(safe-area-inset-bottom); }
-
-/* Prevent scroll chaining on iOS */
-html {
-    overscroll-behavior-y: none; }
-}
-
 html, body {
     margin: 0;
     padding: 0;
