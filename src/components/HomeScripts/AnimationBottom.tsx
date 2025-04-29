@@ -269,70 +269,100 @@ export function useAnimationBottom() {
         return 1 - Math.pow(1 - x, 3)
       }
 
+      function slowEase(x: number) {
+        return Math.pow(x, 1.5) * (1 - x) + x * Math.pow(x, 2)
+      }
+
+      function extraSlowEase(x: number) {
+        return Math.pow(x, 0.6)
+      }
+
       function updateStickyFromScroll() {
         if (!section || !stickyElem || !contentFull) return
+
+        // Get reference to the anchorBtn-container - specifically looking inside factoidContent-full
+        // This matches the structure in your CustomHomepage.jsx
+        const anchorBtnContainer = contentFull.querySelector(
+          '.anchorBtn-container',
+        ) as HTMLElement | null
 
         const rect = section.getBoundingClientRect()
         const windowHeight = window.innerHeight
         const windowWidth = window.innerWidth
 
-        const enterStart = windowHeight * 0.8
-        const enterEnd = windowHeight * 0.2
+        const enterStart = windowHeight * 1.6 // Keeping your current value
+        const enterEnd = windowHeight * 0.1
 
         let enterProgress = (enterStart - rect.top) / (enterStart - enterEnd)
         enterProgress = Math.max(0, Math.min(1, enterProgress))
 
         let exitProgress =
-          (windowHeight * 0.8 - rect.bottom) / (windowHeight * 0.8 - windowHeight * 0.2)
+          (windowHeight * 2.0 - rect.bottom) / (windowHeight * 2.0 - windowHeight * 0.05)
         exitProgress = Math.max(0, Math.min(1, exitProgress))
 
-        const easedEnter = easeOutCubic(enterProgress)
-        const easedExit = easeOutCubic(exitProgress)
+        const easedEnter = slowEase(enterProgress)
+        const easedExit = extraSlowEase(exitProgress)
 
         let progress = 0
 
         if (rect.top < windowHeight && rect.bottom > 0) {
           if (enterProgress < 1) {
-            // Growing
             progress = easedEnter
           } else {
-            // Shrinking
             progress = 1 - easedExit
           }
         }
 
-        // Clamp again for safety
         progress = Math.max(0, Math.min(1, progress))
 
-        // Calculate absolute pixel values based on viewport dimensions
-        const minWidth = 60 // Minimum width in pixels instead of 5vw
-        const minHeight = 60 // Minimum height in pixels instead of 5vh
+        // Handle the anchor button visibility
+        // Using a specific threshold to control exactly when it disappears
+        if (anchorBtnContainer) {
+          if (enterProgress >= 1 && exitProgress > 0.05) {
+            // We're in exit phase and past our threshold - hide the button
+            anchorBtnContainer.style.opacity = '0'
 
-        // Calculate max dimensions based on a percentage of the viewport
+            // Adding pointer-events control to make it non-clickable when invisible
+            anchorBtnContainer.style.pointerEvents = 'none'
+          } else {
+            // Otherwise, make sure it's visible
+            anchorBtnContainer.style.opacity = '1'
+            anchorBtnContainer.style.pointerEvents = 'auto'
+          }
+        }
+
+        const minWidth = 60
+        const minHeight = 60
+
         const maxWidth = windowWidth * 1
-        const maxHeight = windowHeight * 1
+        const maxHeight = windowHeight * 1.2
 
-        // Calculate current dimensions
         const width = minWidth + (maxWidth - minWidth) * progress
         const height = minHeight + (maxHeight - minHeight) * progress
         const borderRadius = 32 * (1 - progress)
 
-        // For positioning, calculate based on parent container's center
-        const topOffset = 50 * (1 - progress)
+        const topOffset = 50 * (1 - progress) - windowHeight * 0.1 * progress
 
-        // Apply styles using pixels instead of viewport units
         stickyElem.style.width = `${width}px`
         stickyElem.style.height = `${height}px`
         stickyElem.style.borderRadius = `${borderRadius}px`
         stickyElem.style.top = `${topOffset}px`
 
-        // Ensure the element stays centered horizontally
         stickyElem.style.left = `${(windowWidth - width) / 2}px`
 
-        // Content fade-in after 85% growth
-        const opacityStart = 0.85
-        const opacityProgress = (progress - opacityStart) / (1 - opacityStart)
-        contentFull.style.opacity = Math.max(0, Math.min(1, opacityProgress)).toString()
+        const opacityStartThreshold = 0.75
+
+        let contentOpacity
+        if (enterProgress < 1) {
+          contentOpacity =
+            progress > opacityStartThreshold
+              ? Math.pow((progress - opacityStartThreshold) / (1 - opacityStartThreshold), 0.8)
+              : 0
+        } else {
+          contentOpacity = Math.pow(progress, 1.5)
+        }
+
+        contentFull.style.opacity = Math.max(0, Math.min(1, contentOpacity)).toString()
       }
 
       function onAnimationFrame() {
@@ -343,9 +373,7 @@ export function useAnimationBottom() {
 
       requestAnimationFrame(onAnimationFrame)
 
-      return () => {
-        // No cleanup needed
-      }
+      return () => {}
     }
 
     const setupFactoidCardsFade = () => {

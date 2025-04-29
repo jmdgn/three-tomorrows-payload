@@ -461,15 +461,6 @@ const CustomHomepage = (props) => {
           img.setAttribute('decoding', 'async');
         }
         
-        if (!img.complete) {
-          img.style.opacity = '0';
-          img.style.transition = 'opacity 0.3s ease-in-out';
-          
-          img.addEventListener('load', () => {
-            img.style.opacity = '1';
-          }, { once: true });
-        }
-        
         if ((!img.hasAttribute('width') || !img.hasAttribute('height')) && 
             img.hasAttribute('src') && img.src) {
           const tempImg = new Image();
@@ -743,7 +734,7 @@ const CustomHomepage = (props) => {
                     const expertisePanel = document.getElementById('section-fourth');
                     if (expertisePanel) {
                       const headerHeight = document.querySelector("header")?.offsetHeight || 0;
-                      const offset = window.innerHeight * 0.3;
+                      const offset = window.innerHeight * 0;
                       const targetPosition = expertisePanel.offsetTop - headerHeight + offset;
                       window.scrollTo({
                         top: targetPosition,
@@ -784,11 +775,16 @@ const CustomHomepage = (props) => {
                           {item.isImage ? (
                             <img
                               className="carousel-image"
-                              src={item.image && item.image.id ? getMediaUrl(item.image.id) : (item.image || 'assets/images/expertise/block.png')}
+                              src={getImageSrc(item.image)}
                               width={1024}
                               height={1024}
                               alt="Expertise Display"
                               loading="lazy"
+                              onError={(e) => {
+                                console.error('Image failed to load:', e.target.src);
+                                e.target.src = 'assets/images/expertise/block.png';
+                                e.target.style.opacity = '1';
+                              }}
                             />
                           ) : (
                             <h3 className="thin">{item.text}</h3>
@@ -812,11 +808,14 @@ const CustomHomepage = (props) => {
                           {item.isImage ? (
                             <img
                               className="carousel-image"
-                              src={item.image && item.image.id ? getMediaUrl(item.image.id) : (item.image || 'assets/images/expertise/block.png')}
+                              src={getImageSrc(item.image)}
                               width={1024}
                               height={1024}
                               alt="Expertise Display"
-                              loading="lazy"
+                              onError={(e) => {
+                                console.error('Image failed to load:', e.target.src);
+                                e.target.src = 'assets/images/expertise/block.png';
+                              }}
                             />
                           ) : (
                             <h3 className="thin">{item.text}</h3>

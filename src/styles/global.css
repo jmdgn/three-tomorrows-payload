@@ -13,7 +13,7 @@ html {
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100dvh;
+    min-height: 100svh;
     background-color: inherit;
     color: inherit;
     font-family: "Neue Montreal", Helvetica, Arial, sans-serif; }
@@ -280,7 +280,7 @@ a:-webkit-any-link {
 
 [data-scene] {
     position: relative;
-    min-height: 50dvh; }
+    min-height: 50svh; }
 
 [data-scene][data-loading]::after {
     content: '';
@@ -464,7 +464,7 @@ ul.menu-ribbon li:hover {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100dvh;
+    height: 100svh;
     background: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
@@ -909,7 +909,7 @@ form .mb-4 {
 section.intro-section {
     display: flex;
     width: 100%;
-    height: 100dvh;
+    height: 100svh;
     animation: changePosition 2s forwards; }
 
 @keyframes changePosition {
@@ -925,7 +925,7 @@ section.intro-section {
     position: fixed;
     display: block;
     width: 100vw;
-    height: 100dvh;
+    height: 100svh;
     left: 0;
     top: 0;
     opacity: 0;
@@ -938,7 +938,7 @@ section.intro-section {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100dvh;
+    height: 100svh;
     z-index: 1; }
 
 .background-elements {
@@ -946,7 +946,7 @@ section.intro-section {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100dvh;
+    height: 100svh;
     z-index: 0; }
 
 .intro-title,
@@ -1091,7 +1091,7 @@ section.intro-section {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100dvh;
+    height: 100svh;
     background: linear-gradient(180deg, #DBE5ED 0%, #EFF0F1 100%);
     opacity: 0; }
 
@@ -1104,7 +1104,7 @@ section.intro-section {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100dvh;
+    height: 100svh;
     pointer-events: none;
     z-index: 1; }
 
@@ -1118,7 +1118,7 @@ section.intro-section {
     transform: translate(-50%, -50%);
     opacity: 0;
     width: 100vw; 
-    height: 100dvh;
+    height: 100svh;
     filter: blur(1px);
     transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.4s ease-in-out;
     will-change: transform; }
@@ -1126,8 +1126,8 @@ section.intro-section {
 .terrain-feature {
     position: absolute;
     width: 100vw;
-    height: 100dvh;
-    top: 100dvh;
+    height: 100svh;
+    top: 100svh;
     left: 0; }
 
 .terrain-feature canvas {
@@ -1159,7 +1159,7 @@ section.service-panel {
     z-index: 2; }
 
 section.intro-para {
-    height: 100dvh; }
+    height: 100svh; }
 
 section.service-panel {
     height: fit-content; }
@@ -1176,7 +1176,7 @@ section.factoids-complete {
     display: flex;
     width: 100%;
     height: 100%;
-    margin-bottom: 20dvh; }
+    margin-bottom: 20svh; }
 
 .text-container.left,
 .content-container.right {
@@ -1332,7 +1332,16 @@ img.forward-image {
     position: relative;
     display: flex;
     width: 100%;
-    height: 100%; }
+    height: 100%;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+    transition: box-shadow 0.4s ease-in-out, transform 0.3s ease-out;; }
+
+.servicePanel-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 6px 6px 32px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.4s ease-in-out, transform 0.3s ease-out;; }
 
 .serviceCard {
     position: relative;
@@ -1345,14 +1354,7 @@ img.forward-image {
     background-clip: padding-box;
     border: 0.6px solid #CCC;
     box-sizing: border-box;
-    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 1s ease-in-out, transform 0.3s ease-out;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
-
-.serviceCard:hover {
-    box-shadow: 6px 6px 32px rgba(0, 0, 0, 0.15);
-    transform: translateY(-5px);
-    transition: box-shadow 1s ease-in-out, transform 0.3s ease-out; }
+    transition: all 0.3s ease-out; }
 
 .serviceContent-panelTop {
     position: relative;
@@ -1479,13 +1481,13 @@ img.service-image {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100dvh;
+    height: 100svh;
     z-index: 1; }
 
 .factoidContent-full {
     position: relative;
     width: 100%;
-    top: -50dvh;
+    top: -40svh;
     opacity: 0;
     transition: all 0.3s ease-out;
     z-index: 2; }
@@ -1495,7 +1497,7 @@ img.service-image {
     width: 100%;
     max-width: 1400px;
     height: fit-content;
-    padding: 20dvh 0;
+    padding: 20svh 0;
     text-align: center;
     margin: 0 auto;
     transition: all 0.2s ease-out; }
@@ -1517,14 +1519,14 @@ img.service-image {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 20dvh;
-    margin: 60dvh 0; }
+    height: 20svh;
+    margin: 60svh 0; }
 
 .factoidSingle-container:first-child {
-    margin: 40dvh 0 60dvh 0; }
+    margin: 40svh 0 60svh 0; }
 
 .factoidSingle-container:last-child {
-    margin: 60dvh 0 40dvh 0; }
+    padding-bottom: 80svh; }
 
 .factCard-container {
     position: relative;
@@ -1686,7 +1688,7 @@ img.carousel-image {
     position: relative;
     width: 100%;
     height: 100%;
-    min-height: 100dvh;
+    min-height: 100svh;
     display: flex;
     align-items: center;
     flex-direction: column;
