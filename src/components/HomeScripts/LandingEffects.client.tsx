@@ -113,20 +113,15 @@ export function LandingEffects() {
         const carouselItems = carouselElement.querySelectorAll('.carousel-item')
         if (carouselItems.length === 0) return
 
-        // Cleanup old clones
         carouselElement.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
-        // Determine direction: First carousel LTR, second RTL
-        const isReverse = carouselIndex === 1 // Second carousel has index 1
-        const animationSpeed = isReverse ? -1.2 : 1.2 // Set direction based on index
+        const isReverse = carouselIndex === 1
+        const animationSpeed = isReverse ? -0.4 : 0.4
 
-        // --- Cloning ---
         const cloneCount = 2
 
-        // Clone items with direction-aware placement
         for (let i = 0; i < cloneCount; i++) {
           if (isReverse) {
-            // For RTL, prepend clones in reverse order
             Array.from(carouselItems)
               .reverse()
               .forEach((item) => {
@@ -135,7 +130,6 @@ export function LandingEffects() {
                 carouselElement.prepend(clone)
               })
           } else {
-            // For LTR, append clones normally
             carouselItems.forEach((item) => {
               const clone = item.cloneNode(true)
               clone.classList.add('carousel-item-clone')
@@ -144,17 +138,14 @@ export function LandingEffects() {
           }
         }
 
-        // --- Layout Measurements ---
         const originalCount = carouselItems.length
         const itemWidth = carouselItems[0].offsetWidth
         const originalSetWidth = originalCount * itemWidth
 
-        // Set initial scroll position
         carouselElement.scrollLeft = isReverse
           ? originalSetWidth * (cloneCount - 1)
           : originalSetWidth
 
-        // --- Scroll Control ---
         let isDragging = false
         let startX = 0
         let initialScroll = 0
@@ -163,21 +154,18 @@ export function LandingEffects() {
         const animationRef = { current: null }
         carouselAnimationRefs.push(animationRef)
 
-        // Adjust scroll reset logic for direction
         const adjustScrollPosition = () => {
           const currentScroll = carouselElement.scrollLeft
           const maxScroll = originalSetWidth * (cloneCount + 1)
           const minScroll = originalSetWidth * (cloneCount - 1)
 
           if (animationSpeed > 0) {
-            // LTR
             if (currentScroll >= maxScroll) {
               carouselElement.scrollLeft = currentScroll - originalSetWidth
             } else if (currentScroll <= minScroll) {
               carouselElement.scrollLeft = currentScroll + originalSetWidth
             }
           } else {
-            // RTL
             if (currentScroll <= minScroll) {
               carouselElement.scrollLeft = currentScroll + originalSetWidth * 2
             } else if (currentScroll >= maxScroll) {
@@ -202,7 +190,6 @@ export function LandingEffects() {
           animationRef.current = requestAnimationFrame(autoScroll)
         }
 
-        // --- Event Handlers ---
         const onMouseEnter = () => (isHovering = true)
         const onMouseLeave = () => (isHovering = false)
         const onMouseDown = (e) => {
@@ -369,63 +356,6 @@ export function LandingEffects() {
       }
     }
 
-    /* Image Position Animation on Scroll */
-    const setupImagePositionAnimation = () => {
-      const introParaSection = document.querySelector('.intro-para')
-      const topImage = document.querySelector('.introImage-supportTop')
-      const bottomImage = document.querySelector('.introImage-supportBottom')
-
-      if (!introParaSection || !topImage || !bottomImage) return
-
-      const topStartPos = -25
-      const rightStartPos = -10
-      const bottomStartPos = -30
-      const leftStartPos = -15
-
-      const topTargetPos = -5
-      const rightTargetPos = -5
-      const bottomTargetPos = -12
-      const leftTargetPos = -5
-
-      topImage.style.transition =
-        'top 0.6s cubic-bezier(0.23, 1, 0.32, 1), right 0.6s cubic-bezier(0.23, 1, 0.32, 1)'
-      bottomImage.style.transition =
-        'bottom 0.6s cubic-bezier(0.23, 1, 0.32, 1), left 0.6s cubic-bezier(0.23, 1, 0.32, 1)'
-
-      const handleScroll = () => {
-        if (!isMounted) return
-
-        requestAnimationFrame(() => {
-          const rect = introParaSection.getBoundingClientRect()
-          const windowHeight = window.innerHeight
-
-          const totalDistance = rect.height + windowHeight
-          const distanceTraveled = windowHeight - rect.top
-          let progress = distanceTraveled / totalDistance
-          progress = Math.max(0, Math.min(1, progress))
-
-          const effectIntensity = 1 - Math.abs(progress - 0.5) * 2
-
-          const topPos = topStartPos + (topTargetPos - topStartPos) * effectIntensity + '%'
-          const rightPos = rightStartPos + (rightTargetPos - rightStartPos) * effectIntensity + '%'
-          const bottomPos =
-            bottomStartPos + (bottomTargetPos - bottomStartPos) * effectIntensity + '%'
-          const leftPos = leftStartPos + (leftTargetPos - leftStartPos) * effectIntensity + '%'
-
-          topImage.style.top = topPos
-          topImage.style.right = rightPos
-          bottomImage.style.bottom = bottomPos
-          bottomImage.style.left = leftPos
-        })
-      }
-
-      const throttledHandleScroll = throttle(handleScroll, 16) // ~60fps
-      window.addEventListener('scroll', throttledHandleScroll)
-      eventListeners.push({ element: window, event: 'scroll', handler: throttledHandleScroll })
-
-      handleScroll()
-    }
-
     /* Parallax Mouse Movement - With throttling */
     const setupParallaxMouseMovement = () => {
       let lastUpdateTime = 0
@@ -476,12 +406,10 @@ export function LandingEffects() {
             lerpSpeed,
           )
         } else {
-          // Manual lerp implementation
           currentScaleRef.current =
             currentScaleRef.current + (targetScale - currentScaleRef.current) * lerpSpeed
         }
 
-        // Apply scale to sphere
         const baseScale =
           THREE && THREE.MathUtils && THREE.MathUtils.lerp
             ? THREE.MathUtils.lerp(1, 0.2, sp)
@@ -489,17 +417,13 @@ export function LandingEffects() {
 
         window.sphere.scale.setScalar(baseScale * currentScaleRef.current)
 
-        // Apply smooth position updates
         window.sphere.position.y = Math.sin(time) * 12 + 18
 
-        // Update rotations
         window.sphere.rotation.x = time * 0.3
         window.sphere.rotation.z = time * 0.31
 
-        // Update water
-        window.water.material.uniforms.time.value += 0.8 / 60.0
+        window.water.material.uniforms.time.value += 0.25 / 60.0
 
-        // Render scene
         if (window.controls && window.renderer && window.scene && window.camera) {
           window.controls.update()
           window.renderer.render(window.scene, window.camera)
@@ -521,7 +445,6 @@ export function LandingEffects() {
           const scrollTop = window.scrollY
           let triggerDistance
 
-          // Device-based distance adjustment
           if (window.innerWidth < 768) {
             triggerDistance = 500
           } else if (window.innerWidth < 1024) {
@@ -541,16 +464,14 @@ export function LandingEffects() {
         })
       }
 
-      // Use throttling for better performance while maintaining smoothness
       const throttledHandleScroll = throttle(handleScroll, 20)
       window.addEventListener('scroll', throttledHandleScroll)
       eventListeners.push({ element: window, event: 'scroll', handler: throttledHandleScroll })
 
-      // Initial call
       handleScroll()
     }
 
-    /* Introduction Statement Fade-In - Optimized */
+    /* Introduction Statement Fade-In - Enhanced with Blur */
     const setupIntroStatementFadeIn = () => {
       const statementContainer = document.querySelector('.introState-inner')
       if (!statementContainer) return
@@ -558,7 +479,6 @@ export function LandingEffects() {
       const statement = statementContainer.querySelector('h2')
       if (!statement) return
 
-      // Only proceed with text splitting if not already done
       if (!statementContainer.dataset.processed) {
         const words = statement.textContent.split(' ')
         statement.innerHTML = words
@@ -570,19 +490,37 @@ export function LandingEffects() {
 
       const wordElements = document.querySelectorAll('.fade-word')
 
-      // Helper functions
+      const style = document.createElement('style')
+      style.textContent = `
+    .fade-word {
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(15px);
+      transition: opacity 0.7s ease-out, filter 0.8s ease-out, transform 0.7s ease-out;
+    }
+    .fade-word.fade-in {
+      opacity: 1;
+      filter: blur(0);
+      transform: translateY(0);
+    }
+    .fade-word.hidden {
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(15px);
+    }
+  `
+      document.head.appendChild(style)
+
       const fadeInWordsRandomly = (words) => {
         if (!isMounted) return
 
         const indices = Array.from(words.keys())
-        // Use a more efficient shuffling algorithm
         for (let i = indices.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1))
           ;[indices[i], indices[j]] = [indices[j], indices[i]]
         }
 
-        // Process in batches for better performance
-        const batchSize = 5
+        const batchSize = 3
         for (let batch = 0; batch < indices.length; batch += batchSize) {
           const timeoutId = setTimeout(() => {
             if (!isMounted) return
@@ -591,7 +529,7 @@ export function LandingEffects() {
             for (let i = batch; i < end; i++) {
               words[indices[i]].classList.add('fade-in')
             }
-          }, batch * 10) // Reduce timing between batches
+          }, batch * 40)
 
           timeouts.push(timeoutId)
         }
@@ -615,23 +553,23 @@ export function LandingEffects() {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               if (!statementContainer.classList.contains('visible')) {
-                statementContainer.classList.add('visible') // Ensure container becomes visible
-                resetWords(wordElements, false) // Reset without hiding
+                statementContainer.classList.add('visible')
+                resetWords(wordElements, false)
 
                 const timeoutId = setTimeout(() => {
                   if (!isMounted) return
                   fadeInWordsRandomly(wordElements)
-                }, 200)
+                }, 300)
 
                 timeouts.push(timeoutId)
               }
             } else {
               statementContainer.classList.remove('visible')
-              resetWords(wordElements, true) // Hide words on exit
+              resetWords(wordElements, true)
             }
           })
         },
-        { threshold: 0.5 },
+        { threshold: 0.4 },
       )
 
       observer.observe(statementContainer)
@@ -644,7 +582,6 @@ export function LandingEffects() {
       const introPara = document.querySelector('.intro-para')
       const factoidsSection = document.querySelector('.factoids-complete')
 
-      // Ensure sphereContainer starts with opacity 0
       if (sphereContainer) {
         sphereContainer.style.opacity = '0'
         sphereContainer.style.transition = 'opacity 0.4s ease-in-out'
@@ -652,7 +589,6 @@ export function LandingEffects() {
 
       if (!sphereContainer || !introPara || !factoidsSection) return
 
-      // Using the exact same logic as the original code
       const handleScroll = () => {
         if (!isMounted) return
 
@@ -666,7 +602,6 @@ export function LandingEffects() {
           if (introParaRect.bottom <= viewportHeight * 0.8) {
             sphereContainer.style.opacity = '1'
           } else {
-            // If intro para is not in correct position, hide sphere
             sphereContainer.style.opacity = '0'
           }
 
@@ -678,12 +613,10 @@ export function LandingEffects() {
         })
       }
 
-      // Ensure smooth animation with throttling
       const throttledScrollHandler = throttle(handleScroll, 16) // 60fps
       window.addEventListener('scroll', throttledScrollHandler)
       eventListeners.push({ element: window, event: 'scroll', handler: throttledScrollHandler })
 
-      // Run initial check
       handleScroll()
     }
 
@@ -694,7 +627,6 @@ export function LandingEffects() {
       if (titles.length === 0) return
 
       titles.forEach((title) => {
-        // Only process if not already processed
         if (!title.dataset.processed) {
           const words = title.textContent.split(' ').map((word) => {
             const span = document.createElement('span')
@@ -756,7 +688,7 @@ export function LandingEffects() {
     // Setup individual animations and interactions
     setupIntroTextAnimation()
     setupForegroundPositionChange()
-    setupImagePositionAnimation()
+    // setupImagePositionAnimation() - Removed as requested
     setupParallaxMouseMovement()
     setupIntroOverlayFadeIn()
     setupIntroStatementFadeIn()

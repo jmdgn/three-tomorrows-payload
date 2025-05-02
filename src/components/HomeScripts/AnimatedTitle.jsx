@@ -1,119 +1,134 @@
 'use client'
 
 import React, { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
 
 const AnimatedTitle = ({ 
   children, 
-  staggerDelay = 0.03, // Reduced for quicker successive animations
-  duration = 0.7,      // Slightly faster animation
-  threshold = 0.2, 
+  staggerDelay = 0.25,
+  duration = 2,
+  initialDelay = 0.3,
+  threshold = 0,
+  rootMargin = '0px 0px 0px 0px',
+  debounceDelay = 1000,
   className = '',
   component = 'span'
 }) => {
   const titleRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
   const [words, setWords] = useState([]);
-  
-  // Use a more pronounced easing curve like the Altermind site
-  const easing = 'cubic-bezier(0.25, 0.1, 0.25, 1)';
-  
+  const wordRefs = useRef([]);
+  const lastPlayed = useRef(0);
+  const debounceTimeout = useRef(null);
+  const hasFullyExited = useRef(true);
+  const lastScrollY = useRef(window.scrollY);
+
   useEffect(() => {
     if (typeof children === 'string') {
-      setWords(children.split(' ').filter(word => word.length > 0));
+      setWords(children.split(' ').filter(Boolean));
     } else if (children) {
       const text = React.Children.toArray(children).join('');
-      setWords(text.split(' ').filter(word => word.length > 0));
+      setWords(text.split(' ').filter(Boolean));
     }
   }, [children]);
 
   useEffect(() => {
+    if (!words.length) return;
+
     const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
+      ([entry]) => {
+        const now = Date.now();
+        const currentScrollY = window.scrollY;
+        const scrollDirection = currentScrollY > lastScrollY.current ? 'down' : 'up';
+        lastScrollY.current = currentScrollY;
+
+        const rect = entry.target.getBoundingClientRect();
+
+        const isFarBelowViewport = rect.top > window.innerHeight + 500;
+        const isFarAboveViewport = rect.bottom < -500;
+
+        // Reset if fully out of view
+        if (!entry.isIntersecting && ((scrollDirection === 'down' && isFarBelowViewport) || (scrollDirection === 'up' && isFarAboveViewport))) {
+          hasFullyExited.current = true;
+          resetWords();
+        }
+
+        // Animate when re-entering from full exit
+        if (entry.isIntersecting && hasFullyExited.current) {
+          const timeSinceLast = now - lastPlayed.current;
+          if (timeSinceLast > debounceDelay) {
+            clearTimeout(debounceTimeout.current);
+            debounceTimeout.current = setTimeout(() => {
+              animateWords();
+              lastPlayed.current = Date.now();
+              hasFullyExited.current = false;
+            }, 100);
+          }
         }
       },
-      { threshold }
+      {
+        threshold,
+        rootMargin,
+      }
     );
 
-    const titleElement = titleRef.current;
-    if (titleElement) {
-      observer.observe(titleElement);
+    if (titleRef.current) {
+      observer.observe(titleRef.current);
     }
 
     return () => {
-      if (titleElement) {
-        observer.unobserve(titleElement);
-      }
+      if (titleRef.current) observer.unobserve(titleRef.current);
+      clearTimeout(debounceTimeout.current);
     };
-  }, [threshold]);
+  }, [words, threshold, rootMargin, debounceDelay]);
+
+  const animateWords = () => {
+    gsap.fromTo(
+      wordRefs.current,
+      { y: '120%', opacity: 0 },
+      {
+        y: '0%',
+        opacity: 1,
+        ease: 'cubic-bezier(0.19, 1, 0.22, 1)',
+        duration,
+        stagger: staggerDelay,
+        delay: initialDelay,
+      }
+    );
+  };
+
+  const resetWords = () => {
+    gsap.set(wordRefs.current, {
+      y: '120%',
+      opacity: 0,
+    });
+  };
 
   const Container = component;
-  
+
   return (
-    <Container 
-      ref={titleRef} 
+    <Container
+      ref={titleRef}
       className={`animated-title-container ${className}`}
       style={{
-        maxWidth: '100%',
-        width: '100%',
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'visible',
       }}
     >
-      {words.map((word, wordIndex) => (
-        <span 
-          key={`word-${wordIndex}`} 
-          className="word-wrapper"
-          style={{ 
-            display: 'inline-block', 
+      {words.map((word, i) => (
+        <span
+          key={`word-${i}`}
+          ref={(el) => (wordRefs.current[i] = el)}
+          style={{
+            display: 'inline-block',
             marginRight: '0.3em',
-            position: 'relative',
-            overflow: 'hidden'
+            transform: 'translateY(120%)',
+            opacity: 0,
+            whiteSpace: 'pre',
           }}
         >
-          <span
-            className="word-inner"
-            style={{
-              display: 'block',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            {word.split('').map((char, charIndex) => {
-              const globalCharIndex = words
-                .slice(0, wordIndex)
-                .reduce((sum, w) => sum + w.length, 0) + charIndex;
-                
-              return (
-                <span
-                  key={`${char}-${wordIndex}-${charIndex}`}
-                  className="animated-character"
-                  style={{
-                    display: 'inline-block',
-                    transform: isVisible
-                      ? 'translateY(0) scale(1)'
-                      : 'translateY(100%) scale(0.9)',
-                    opacity: isVisible ? 1 : 0,
-                    transition: `transform ${duration}s ${easing}, 
-                                opacity ${duration}s ${easing}`,
-                    transitionDelay: `${globalCharIndex * staggerDelay}s`,
-                    transformOrigin: 'center bottom',
-                    verticalAlign: 'baseline',
-                    willChange: 'transform, opacity',
-                  }}
-                >
-                  {char}
-                </span>
-              );
-            })}
-          </span>
+          {word}
         </span>
       ))}
-      {/* Add a space at the end to prevent layout shift */}
-      <span>&nbsp;</span>
     </Container>
   );
 };

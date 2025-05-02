@@ -52,7 +52,14 @@ export const Media: CollectionConfig = {
   },
   upload: {
     adminThumbnail: 'thumbnail',
-    mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'],
+    mimeTypes: [
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+      'image/svg+xml',
+      'video/webm',
+      'video/mp4',
+    ],
     imageSizes: [
       { name: 'thumbnail', width: 300 },
       { name: 'square', width: 500, height: 500 },

@@ -1005,7 +1005,8 @@ section.intro-section {
     display: flex;
     height: fit-content;
     justify-content: center;
-    padding: 1rem; }
+    padding: 1rem;
+    gap: 1rem; }
 
 .prompt-button {
     position: relative;
@@ -1026,6 +1027,13 @@ section.intro-section {
     line-height: normal;
     letter-spacing: 0.25px;
     transition: all 0.3s linear; }
+
+.prompt-button.iconOnly {
+    padding: 19px; }
+
+.prompt-button.iconOnly::after {
+    margin-left: 0;
+    transform: rotate(180deg) }
 
 .prompt-button::after {
     content: "";
@@ -1205,9 +1213,7 @@ section.factoids-complete {
     display: flex;
     width: 100%;
     justify-content: center;
-    background: #FFF;
-    border-radius: 2rem;
-    margin: 2rem;
+    padding: 2rem;
     overflow: hidden; }
 
 .introState-inner {
@@ -1236,21 +1242,6 @@ section.factoids-complete {
     color: #171744;
     margin-bottom: 0; }
 
-.introImage-supportTop,
-.introImage-supportBottom {
-    position: absolute;
-    width: fit-content;
-    height: fit-content;
-    z-index: 1; }
-
-.introImage-supportTop {
-    top: -25%;
-    right: -10%; }
-
-.introImage-supportBottom {
-    bottom: -30%;
-    left: -15%; }
-
 .fade-word {
     opacity: 0 !important;
     transform: translateY(10px);
@@ -1259,14 +1250,6 @@ section.factoids-complete {
 .fade-word.fade-in {
     opacity: 1 !important;
     transform: translateY(0); }
-
-img.compass-image {
-    width: 429px;
-    height: 405px; }
-
-img.forward-image {
-    width: 514px;
-    height: 502px; }
 /* End */
 
 
@@ -1283,7 +1266,7 @@ img.forward-image {
     position: relative;
     width: 100%;
     height: fit-content;
-    margin: 20rem 0;
+    margin: 12rem 0 20rem 0;
     border-top: 1px solid #ccc; }
 
 .serviceContent-inner .titleText.center,
@@ -1322,26 +1305,18 @@ img.forward-image {
 .serviceGrid-container {
     position: relative;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     grid-gap: 4rem;
     width: 100%;
-    max-width: 2060px;
     margin: 0 auto; }
 
 .servicePanel-container {
     position: relative;
     display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
-    overflow: hidden;
-    border-radius: 12px;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-    transition: box-shadow 0.4s ease-in-out, transform 0.3s ease-out;; }
-
-.servicePanel-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 6px 6px 32px rgba(0, 0, 0, 0.15);
-    transition: box-shadow 0.4s ease-in-out, transform 0.3s ease-out;; }
+    overflow: visible; }
 
 .serviceCard {
     position: relative;
@@ -1361,14 +1336,24 @@ img.forward-image {
     display: flex;
     width: 100%;
     height: auto;
-    justify-content: space-between; }
+    aspect-ratio: 5/4;
+    border-radius: 24px;
+    background: #FFF;
+    transform: translateY(0);
+    transition: all 0.3s linear;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0); }
+
+.serviceContent-panelTop:hover {
+    box-shadow: 6px 6px 32px 0px rgba(0, 0, 0, 0.15);
+    transform: translateY(-10px);
+    transition: all 0.3s linear;
+}
 
 .serviceFt-image {
     position: relative;
     width: 100%;
-    max-width: 442px;
-    height: auto;
-    margin-bottom: 3rem; }
+    max-width: 576px;
+    height: auto; }
 
 img.service-image {
     width: 100%;
@@ -1378,7 +1363,8 @@ img.service-image {
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 50%; }
+    width: 100%;
+    padding: 1.5rem .5rem 1rem .5rem; }
 
 .serviceCard h3 {
     color: #171744;
@@ -1520,10 +1506,10 @@ img.service-image {
     align-items: center;
     width: 100%;
     height: 20svh;
-    margin: 60svh 0; }
+    margin: 50svh 0; }
 
 .factoidSingle-container:first-child {
-    margin: 40svh 0 60svh 0; }
+    margin: 40svh 0 50svh 0; }
 
 .factoidSingle-container:last-child {
     padding-bottom: 80svh; }
@@ -1567,7 +1553,7 @@ img.service-image {
     position: relative;
     width: 100%;
     height: 100%;
-    padding-bottom: 20rem; }
+    padding-bottom: 16rem; }
 
 .expertise-title h4 {
     color: #FFF; }
@@ -1629,7 +1615,7 @@ img.service-image {
     min-width: fit-content;
     max-width: 19.2%;
     height: 100%;
-    max-height: 490px;
+    max-height: 400px;
     aspect-ratio: 1/1;
     padding: 0;
     margin: 0 1rem; }

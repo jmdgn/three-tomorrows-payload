@@ -3,15 +3,6 @@
 
 
 @media only screen and (max-width:2240px) {
-/* Introduction Paragraph Statement Styles */
-img.compass-image {
-    width: 400px;
-    height: auto; }
-
-img.forward-image {
-    width: 490px;
-    height: auto; }
-/* End: Introduction Paragraph Statement Styles */
 }
 
 
@@ -35,20 +26,12 @@ section.intro-para {
 /* End */
 
 
-/* Introduction Paragraph Statement Styles */
-img.compass-image {
-    width: 380px;
-    height: auto; }
-
-img.forward-image {
-    width: 440px;
-    height: auto; }
-/* End: Introduction Paragraph Statement Styles */
-
-
 /* Services Section Styles */
 .serviceCard {
 	padding: 3rem 3rem 2rem 3rem; }
+
+.serviceGrid-container {
+	grid-gap: 3rem; }
 /* End */
 
 
@@ -72,6 +55,9 @@ img.forward-image {
 /* Our Expertise Section Styles */
 .infinite-carousel .carousel-item {
 	min-width: 40%; }
+
+.infinite-carousel .carousel-item.square {
+	max-height: 360px; }
 /* End */
 
 
@@ -124,6 +110,9 @@ ul.menu-ribbon a li {
 
 @media only screen and (max-width:1740px) {
 /* Universal Styles */
+h1 {
+	font-size: clamp(50px, 20vw, 160px); }
+
 p.xlarge {
 	font-size: 76px; }
 /* End: Universal Styles */
@@ -147,8 +136,11 @@ p.body-intro {
 
 /* Factoid Section Styles */
 .factCard-container {
-	max-width: 1000px;
+	max-width: 960px;
 	padding: 1.5rem; }
+
+.factCard-container h2 {
+	font-size: 320%; }
 /* End */
 
 
@@ -156,8 +148,6 @@ p.body-intro {
 	min-width: 42%; }
 
 .infinite-carousel .carousel-item.square {
-	max-height: 420px;
-	max-width: 420px;
 	width: 100%; }
 
 /* Contact Home Styles */
@@ -183,24 +173,19 @@ p.body-large {
 	line-height: 24px; }
 /* End */
 
-
 .heroSupport-container {
 	gap: .5rem; }
-
 
 /* Introduction Panel */
 section.intro-para {
 	height: 100svh; }
-
-img.compass-image {
-	width: 320px; }
-
-img.forward-image {
-	width: 380px; }
 /* End: Introduction Panel */
 
 .serviceFt-image {
 	max-width: 350px; }
+
+.infinite-carousel .carousel-item.square {
+	max-width: 320px; }
 }
 
 
@@ -272,7 +257,6 @@ h5 {
 /* End */
 
 
-
 /* Introduction Panel */
 .intro-title h1 {
     text-shadow: rgba(0,0,0,0.3) 1px 1px 20px; }
@@ -282,17 +266,14 @@ h5 {
 	border-radius: 1.5rem; }
 /* End */
 
-img.compass-image {
-	width: 280px; }
-
-img.forward-image {
-	width: 320px; }
-
 .factCard-container {
 	max-width: 960px; }
 
 .factCard-container h2 {
-	font-size: 7svh; }
+	font-size: 300%; }
+
+.serviceGrid-container {
+	gap: 2rem; }
 
 /* Blog Page Styles */
 header.blog .header-container .logo-container {
@@ -325,8 +306,12 @@ header.blog .header-container .contactBtn-container {
 	min-width: 48%; }
 
 .infinite-carousel .carousel-item.square {
-	max-height: 400px;
-	max-width: 400px; }
+	max-height: 280px;
+	max-width: 280px; }
+
+.tech-card h3.thin {
+	font-size: 36px;
+	line-height: 36px; }
 
 .linkColumn-left,
 .socialColumn-left {
@@ -364,12 +349,6 @@ section.intro-para {
 
 .introState-inner {
 	max-width: 1060px; }
-
-img.compass-image {
-	width: 260px; }
-
-img.forward-image {
-	width: 300px; }
 /* End */
 
 
@@ -551,12 +530,6 @@ section.intro-para {
 
 .introState-inner {
 	max-width: 780px; }
-
-img.compass-image {
-	width: 240px; }
-
-img.forward-image {
-	width: 260px; }
 
 .serviceContent-inner {
 	margin: 10rem 0; }
@@ -750,12 +723,6 @@ section.intro-section {
 .introState-inner {
 	max-width: 100%;
 	padding: 1.5rem; }
-
-img.compass-image {
-	width: 180px; }
-
-img.forward-image {
-	width: 200px; }
 
 .serviceContent-outer {
 	padding: 1.5rem; }

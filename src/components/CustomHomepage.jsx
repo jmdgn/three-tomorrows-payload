@@ -167,6 +167,8 @@ const CustomHomepage = (props) => {
         waterContainerRef.current.style.position = "absolute";
         waterContainerRef.current.style.top = "0";
         waterContainerRef.current.style.left = "0";
+        waterContainerRef.current.style.opacity = "1"; // Add initial opacity
+        waterContainerRef.current.style.transition = "opacity 0.2s ease-out"; // Add transition for smooth fade
         
         if (window.initOceanScene && !window.renderer) {
           console.log("Manually initializing ocean scene");
@@ -325,7 +327,7 @@ const CustomHomepage = (props) => {
     waterContainerRef.current = waterContainer;
     
     if (waterContainer) {
-      waterContainer.style.transition = 'transform 0.2s ease-out';
+      waterContainer.style.transition = 'opacity 0.2s ease-out';
     }
     
     const movementFactor = 0.05;
@@ -339,7 +341,8 @@ const CustomHomepage = (props) => {
       const offsetX = (centerX - clientX) * movementFactor;
       const offsetY = (centerY - clientY) * movementFactor;
       
-      waterContainerRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${currentScaleRef.current})`;
+      // Remove scale from transform, only apply translation
+      waterContainerRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
     }, 16);
 
     const handleScroll = () => {
@@ -354,20 +357,24 @@ const CustomHomepage = (props) => {
         const scrollProgress = Math.min(scrollTop / (docHeight - windowHeight), 1);
     
         if (Math.abs(scrollProgress - lastScrollProgressRef.current) > 0.001) {
-          const startScaleAt = 0;
-          const endScaleAt = 0.1;
-          let scale = 1;
+          const startFadeAt = 0;
+          const endFadeAt = 0.1;
+          let opacity = 1;
     
-          if (scrollProgress > startScaleAt) {
+          if (scrollProgress > startFadeAt) {
             const normalizedProgress = Math.min(
-              (scrollProgress - startScaleAt) / (endScaleAt - startScaleAt),
+              (scrollProgress - startFadeAt) / (endFadeAt - startFadeAt),
               1
             );
-            scale = 1 - normalizedProgress;
+            opacity = 1 - normalizedProgress;
           }
     
-          currentScaleRef.current = scale;
-          window._waterScale = scale;
+          // Update opacity instead of scale
+          waterContainerRef.current.style.opacity = opacity;
+          
+          // Still keep the same values in refs for other parts of the code that might use them
+          currentScaleRef.current = opacity; // Using the same ref but for opacity now
+          window._waterScale = opacity;
           lastScrollProgressRef.current = scrollProgress;
     
           const startRadiusAt = 0;
@@ -390,11 +397,17 @@ const CustomHomepage = (props) => {
             canvas.style.transition = 'border-radius 0.2s ease-out';
           }
     
+          // Handle mouse movement separately
           const lastMouseEvent = window._lastMouseEvent;
           if (lastMouseEvent) {
-            handleMouseMove(lastMouseEvent);
-          } else {
-            waterContainerRef.current.style.transform = `scale(${scale})`;
+            // Apply transform without scale
+            const { clientX, clientY } = lastMouseEvent;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const offsetX = (centerX - clientX) * movementFactor;
+            const offsetY = (centerY - clientY) * movementFactor;
+            
+            waterContainerRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
           }
         }
       });
@@ -581,26 +594,6 @@ const CustomHomepage = (props) => {
             <div className="introState-inner">
               <h2>{introSection?.statement || "Our approach isn't about predicting tomorrow—it's about building your capability to shape it. We focus your attention on what truly matters, guiding teams to see possibility where others see only challenges."}</h2>
             </div>
-            <div className="introImage-supportTop">
-              <img
-                className="compass-image"
-                src="assets/images/home/compass.png"
-                width={429}
-                height={405}
-                alt="Compass Image"
-                loading="lazy"
-              />
-            </div>
-            <div className="introImage-supportBottom">
-              <img
-                className="forward-image"
-                src="assets/images/home/forward.png"
-                width={514}
-                height={502}
-                alt="Forward Image"
-                loading="lazy"
-              />
-            </div>
           </div>
         </section>
         <section id="section-second" className="service-panel">
@@ -674,17 +667,14 @@ const CustomHomepage = (props) => {
                 <div className="serviceGrid-container">
                   {serviceItems.map((service, index) => (
                     <div className="servicePanel-container" key={index}>
-                      <div className="serviceCard">
+
                         <div className="serviceContent-panelTop">
-                          <div className="serviceCat-panel">
-                            <p>{service.number}</p>
-                          </div>
                           <div className="serviceFt-image">
                             <img
                               className="service-image"
                               src={getImageSrc(service.image)}
-                              width={442}
-                              height={442}
+                              width={582}
+                              height={466}
                               alt={`${service.breakTitle} ${service.title} Image`}
                               loading="lazy"
                               onError={(e) => {
@@ -695,10 +685,10 @@ const CustomHomepage = (props) => {
                           </div>
                         </div>
                         <div className="serviceText-panelBottom">
-                          <h3><span className="break">{service.breakTitle}</span> {service.title}</h3>
+                          <h4>{service.title}</h4>
                           <p>{service.description}</p>
                         </div>
-                      </div>
+
                     </div>
                   ))}
                 </div>
@@ -742,6 +732,18 @@ const CustomHomepage = (props) => {
                       });
                     }
                   }}>{factoidsSection?.skipButtonText || 'Skip Industry Facts'}</div>
+                  <div className="prompt-button iconOnly" onClick={() => {
+                    const expertisePanel = document.getElementById('section-second');
+                    if (expertisePanel) {
+                      const headerHeight = document.querySelector("header")?.offsetHeight || 0.8;
+                      const offset = window.innerHeight * 0.8;
+                      const targetPosition = expertisePanel.offsetTop - headerHeight + offset;
+                      window.scrollTo({
+                        top: targetPosition,
+                        behavior: "smooth"
+                      });
+                    }
+                  }}></div>
                 </div>
 
               </div>

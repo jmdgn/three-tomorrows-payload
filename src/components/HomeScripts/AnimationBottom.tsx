@@ -159,7 +159,7 @@ export function useAnimationBottom() {
       }
 
       if (window.water && window.water.material && window.water.material.uniforms) {
-        window.water.material.uniforms.time.value += 1.0 / 60.0
+        window.water.material.uniforms.time.value += 0.3 / 60.0
       }
 
       if (window.controls) {
@@ -280,8 +280,6 @@ export function useAnimationBottom() {
       function updateStickyFromScroll() {
         if (!section || !stickyElem || !contentFull) return
 
-        // Get reference to the anchorBtn-container - specifically looking inside factoidContent-full
-        // This matches the structure in your CustomHomepage.jsx
         const anchorBtnContainer = contentFull.querySelector(
           '.anchorBtn-container',
         ) as HTMLElement | null
@@ -290,7 +288,7 @@ export function useAnimationBottom() {
         const windowHeight = window.innerHeight
         const windowWidth = window.innerWidth
 
-        const enterStart = windowHeight * 1.6 // Keeping your current value
+        const enterStart = windowHeight * 1.6
         const enterEnd = windowHeight * 0.1
 
         let enterProgress = (enterStart - rect.top) / (enterStart - enterEnd)
@@ -315,17 +313,12 @@ export function useAnimationBottom() {
 
         progress = Math.max(0, Math.min(1, progress))
 
-        // Handle the anchor button visibility
-        // Using a specific threshold to control exactly when it disappears
         if (anchorBtnContainer) {
           if (enterProgress >= 1 && exitProgress > 0.05) {
-            // We're in exit phase and past our threshold - hide the button
             anchorBtnContainer.style.opacity = '0'
 
-            // Adding pointer-events control to make it non-clickable when invisible
             anchorBtnContainer.style.pointerEvents = 'none'
           } else {
-            // Otherwise, make sure it's visible
             anchorBtnContainer.style.opacity = '1'
             anchorBtnContainer.style.pointerEvents = 'auto'
           }

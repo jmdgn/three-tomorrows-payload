@@ -101,9 +101,9 @@ function init() {
       '#include <begin_vertex>',
       `#include <begin_vertex>
       // Use a more complex wave pattern for realism
-      float waveHeight = 0.05;
-      float waveFreq = 0.02;
-      float wavePeriod = 2.0;
+      float waveHeight = 0.04;  // Changed from 0.05
+      float waveFreq = 0.015;   // Changed from 0.02
+      float wavePeriod = 1.2;   // Changed from 2.0
       
       // Create a subtle, varied wave pattern
       transformed.z -= waveHeight * sin(position.x * waveFreq + time * wavePeriod) * 
@@ -197,7 +197,7 @@ function animate() {
   camera.position.y = 30 - (mouseY - 0.5) * parallaxIntensity
   camera.lookAt(controls.target)
 
-  water.material.uniforms['time'].value += 0.06 / 60.0
+  water.material.uniforms['time'].value += 0.02 / 60.0
 }
 
 window.initOceanScene = function () {
