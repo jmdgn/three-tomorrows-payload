@@ -116,7 +116,7 @@ export function LandingEffects() {
         carouselElement.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
         const isReverse = carouselIndex === 1
-        const animationSpeed = isReverse ? -0.4 : 0.4
+        const animationSpeed = isReverse ? -0.6 : 0.6
 
         const cloneCount = 2
 

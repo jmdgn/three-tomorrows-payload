@@ -732,7 +732,7 @@ const CustomHomepage = (props) => {
                       });
                     }
                   }}>{factoidsSection?.skipButtonText || 'Skip Industry Facts'}</div>
-                  <div className="prompt-button iconOnly" onClick={() => {
+                  <div className="prompt-buttonIcon" onClick={() => {
                     const expertisePanel = document.getElementById('section-second');
                     if (expertisePanel) {
                       const headerHeight = document.querySelector("header")?.offsetHeight || 0.8;

@@ -1008,7 +1008,8 @@ section.intro-section {
     padding: 1rem;
     gap: 1rem; }
 
-.prompt-button {
+.prompt-button,
+.prompt-buttonIcon {
     position: relative;
     display: flex;
     width: fit-content;
@@ -1026,13 +1027,22 @@ section.intro-section {
     font-style: normal;
     line-height: normal;
     letter-spacing: 0.25px;
+    transform: translateY(0);
     transition: all 0.3s linear; }
 
-.prompt-button.iconOnly {
-    padding: 19px; }
+.prompt-buttonIcon {
+    padding: 19px 17px; }
 
-.prompt-button.iconOnly::after {
-    margin-left: 0;
+.prompt-buttonIcon::after {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 7px;
+    background-image: url('../assets/icons/arrow-down.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+    margin: 0;
     transform: rotate(180deg) }
 
 .prompt-button::after {
@@ -1048,7 +1058,12 @@ section.intro-section {
 
 .prompt-button:hover {
     cursor: pointer;
-    top: 8px;
+    transform: translateY(6px);
+    transition: all 0.3s linear; }
+
+.prompt-buttonIcon:hover {
+    cursor: pointer;
+    transform: translateY(-6px);
     transition: all 0.3s linear; }
 
 .body-button {
@@ -1558,9 +1573,6 @@ img.service-image {
 .expertise-title h4 {
     color: #FFF; }
 
-.expertise-title p.xlarge {
-    color: #015000; }
-
 .expertiseSubtitle-firstRow {
     position: relative;
     display: flex;
@@ -1606,7 +1618,7 @@ img.service-image {
 
 .infinite-carousel .carousel-item {
     flex: 0 0 auto;
-    min-width: 33.3%;
+    min-width: 30%;
     padding: 0 1rem;
     box-sizing: border-box;
     transition: transform 0.3s ease; }
@@ -1615,7 +1627,7 @@ img.service-image {
     min-width: fit-content;
     max-width: 19.2%;
     height: 100%;
-    max-height: 400px;
+    max-height: 380px;
     aspect-ratio: 1/1;
     padding: 0;
     margin: 0 1rem; }
