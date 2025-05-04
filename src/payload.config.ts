@@ -123,8 +123,8 @@ export default buildConfig({
     ensureUrlHasProtocol(process.env.NEXT_PUBLIC_SERVER_URL || ''),
     ensureUrlHasProtocol(process.env.PAYLOAD_PUBLIC_SERVER_URL || ''),
     'http://localhost:3000',
-    'https://threetomorrows.co',
-    'https://www.threetomorrows.co',
+    'https://threetomorrows.com',
+    'https://www.threetomorrows.com',
   ].filter(Boolean),
 
   globals: [Header, Footer],
