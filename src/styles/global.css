@@ -1330,45 +1330,34 @@ section.factoids-complete {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 100%;
-    overflow: visible; }
-
-.serviceCard {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: rgba(255,255,255,0.5);
+    height: fit-content;
+    overflow: visible;
     border-radius: 12px;
-    backdrop-filter: blur(10px);
-    padding: 2rem;
-    background-clip: padding-box;
-    border: 0.6px solid #CCC;
-    box-sizing: border-box;
-    transition: all 0.3s ease-out; }
+    background: #FFF;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
+    transform: translateY(0px);
+    transition: all 0.3s linear; }
+
+.servicePanel-container:hover {
+    box-shadow: 6px 6px 32px 0px rgba(0, 0, 0, 0.15);
+    transform: translateY(-10px);
+    transition: all 0.3s linear; }
 
 .serviceContent-panelTop {
     position: relative;
     display: flex;
     width: 100%;
     height: auto;
-    aspect-ratio: 5/4;
-    border-radius: 24px;
-    background: #FFF;
-    transform: translateY(0);
-    transition: all 0.3s linear;
-    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0); }
-
-.serviceContent-panelTop:hover {
-    box-shadow: 6px 6px 32px 0px rgba(0, 0, 0, 0.15);
-    transform: translateY(-10px);
-    transition: all 0.3s linear;
-}
+    aspect-ratio: 5/4; }
 
 .serviceFt-image {
     position: relative;
     width: 100%;
     max-width: 576px;
-    height: auto; }
+    height: auto;
+    margin: .5rem;
+    border-radius: 10px;
+    background: #F7F7F7; }
 
 img.service-image {
     width: 100%;
@@ -1378,14 +1367,16 @@ img.service-image {
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    padding: 1.5rem .5rem 1rem .5rem; }
+    width: fit-content;
+    padding: 1.5rem; }
 
-.serviceCard h3 {
-    color: #171744;
-    font-size: 62px;
-    font-style: normal;
-    line-height: 52px; }
+.serviceText-panelBottom h6 {
+    font-family: 'Neue Montreal Medium'; }
+
+.serviceText-panelBottom p {
+    font-size: 14px;
+    line-height: 22px;
+    color: #AAA; }
 
 .service-carousel-container {
     position: relative;

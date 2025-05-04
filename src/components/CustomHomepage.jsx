@@ -685,7 +685,7 @@ const CustomHomepage = (props) => {
                           </div>
                         </div>
                         <div className="serviceText-panelBottom">
-                          <h4>{service.title}</h4>
+                          <h6>{service.title}</h6>
                           <p>{service.description}</p>
                         </div>
 
