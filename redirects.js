@@ -12,7 +12,19 @@ const redirects = async () => {
     source: '/:path((?!ie-incompatible.html$).*)', // all pages except the incompatibility page
   }
 
-  const redirects = [internetExplorerRedirect]
+  const wwwRedirect = {
+    source: '/:path*',
+    has: [
+      {
+        type: 'host',
+        value: 'www.threetomorrows.com',
+      },
+    ],
+    destination: 'https://threetomorrows.com/:path*',
+    permanent: true,
+  }
+
+  const redirects = [internetExplorerRedirect, wwwRedirect]
 
   return redirects
 }
