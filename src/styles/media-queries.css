@@ -709,6 +709,12 @@ section.intro-section {
 .anchorBtn-container {
 	padding: 1rem; }
 
+.factText-container .anchorBtn-container {
+	bottom: 1rem; }
+
+.prompt-buttonIcon {
+	padding: 16px 14px; }
+
 .introSupport-text {
 	max-width: 100%;
 	width: auto; }
@@ -1078,7 +1084,7 @@ p.body-intro {
 	line-height: 20px; }
 
 p.xlarge {
-	font-size: 42px;
+	font-size: 38px;
 	line-height: 1.2; }
 
 .factCard-container h2 {

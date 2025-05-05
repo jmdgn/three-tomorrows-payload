@@ -94,7 +94,7 @@ export function LandingEffects() {
             if (!isMounted) return
 
             mainElement.style.display = 'block'
-            mainElement.style.opacity = '1' // Ensure it's visible
+            mainElement.style.opacity = '1'
           }, 1000)
 
           timeouts.push(timeoutId)
@@ -240,7 +240,6 @@ export function LandingEffects() {
             (carouselElement.scrollLeft / originalSetWidth) * newOriginalSetWidth
         }
 
-        // --- Event Listeners ---
         carouselElement.addEventListener('mouseenter', onMouseEnter)
         carouselElement.addEventListener('mouseleave', onMouseLeave)
         carouselElement.addEventListener('mousedown', onMouseDown)
@@ -252,7 +251,6 @@ export function LandingEffects() {
         carouselElement.addEventListener('touchmove', onTouchMove)
         window.addEventListener('resize', onResize)
 
-        // --- Visibility Handling ---
         document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') {
             if (animationRef.current === null) startAutoScroll()
@@ -262,7 +260,6 @@ export function LandingEffects() {
           }
         })
 
-        // --- Scroll Trigger: In View ---
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
@@ -280,7 +277,6 @@ export function LandingEffects() {
         observer.observe(carouselElement)
       })
 
-      // Store all animation refs if needed later
       if (typeof carouselAnimationRef !== 'undefined') {
         carouselAnimationRef.current = carouselAnimationRefs
       }
@@ -291,38 +287,33 @@ export function LandingEffects() {
       const elementsToAnimate = [
         document.querySelector('.intro-title'),
         document.querySelector('.intro-subtitle'),
-        document.querySelector('.body-intro'),
+        ...document.querySelectorAll('.body-intro'),
         document.querySelector('.anchorBtn-container'),
       ].filter(Boolean)
 
       const handleScroll = () => {
         if (!isMounted) return
 
-        // Use requestAnimationFrame for smoother updates
         requestAnimationFrame(() => {
           const scrollPosition = window.scrollY
           const windowHeight = window.innerHeight
-          const maxScroll = windowHeight * 0.5 // Adjust this value to control when elements disappear
+          const maxScroll = windowHeight * 0.5
 
-          // Calculate animation progress (0 to 1)
           const progress = Math.min(scrollPosition / maxScroll, 1)
 
           elementsToAnimate.forEach((element) => {
-            // Move elements up and fade out
             element.style.transform = `translateY(-${progress * 10}%)`
             element.style.opacity = 1 - progress
           })
         })
       }
 
-      // Use throttled version for better performance while keeping smooth feel
       const throttledHandleScroll = throttle(handleScroll, 10)
 
       if (elementsToAnimate.length > 0) {
         window.addEventListener('scroll', throttledHandleScroll)
         eventListeners.push({ element: window, event: 'scroll', handler: throttledHandleScroll })
 
-        // Trigger initial check
         handleScroll()
       }
     }
@@ -338,7 +329,6 @@ export function LandingEffects() {
             if (!isMounted) return
 
             entries.forEach((entry) => {
-              // Only update style if it's changed
               const newZIndex = entry.isIntersecting ? '2' : '-1'
               if (foregroundElements.style.zIndex !== newZIndex) {
                 foregroundElements.style.zIndex = newZIndex
@@ -654,7 +644,6 @@ export function LandingEffects() {
               if (entry.isIntersecting && !title.dataset.animated) {
                 title.dataset.animated = 'true'
 
-                // Use fewer timeouts by processing in batches
                 const batchSize = 3
                 for (let i = 0; i < words.length; i += batchSize) {
                   const timeoutId = setTimeout(() => {
@@ -665,7 +654,7 @@ export function LandingEffects() {
                       words[j].style.opacity = '1'
                       words[j].style.transform = 'translateY(0)'
                     }
-                  }, i * 100) // Faster animation
+                  }, i * 100)
 
                   timeouts.push(timeoutId)
                 }
@@ -685,10 +674,8 @@ export function LandingEffects() {
     handleAnchorLinks()
     delayMainLoad()
 
-    // Setup individual animations and interactions
     setupIntroTextAnimation()
     setupForegroundPositionChange()
-    // setupImagePositionAnimation() - Removed as requested
     setupParallaxMouseMovement()
     setupIntroOverlayFadeIn()
     setupIntroStatementFadeIn()
@@ -696,10 +683,8 @@ export function LandingEffects() {
     setupTitleAnimation()
     setupInfiniteCarousel()
 
-    // Start consolidated animation loop - replacing multiple loops
     animationRef.current = requestAnimationFrame(animate)
 
-    // Return cleanup function to remove event listeners and observers
     return () => {
       isMounted = false
 
@@ -723,10 +708,8 @@ export function LandingEffects() {
         clearInterval(carouselIntervalRef.current)
       }
 
-      // Clean up timeouts
       timeouts.forEach((timeoutId) => clearTimeout(timeoutId))
 
-      // Clean up observers
       observers.forEach(({ observer, element }) => {
         if (observer && element) {
           observer.unobserve(element)
@@ -734,12 +717,11 @@ export function LandingEffects() {
         }
       })
 
-      // Clean up event listeners
       eventListeners.forEach(({ element, event, handler }) => {
         element.removeEventListener(event, handler)
       })
     }
-  }, []) // Empty dependency array means this effect runs once on mount
+  }, [])
 
-  return null // This hook doesn't render anything
+  return null
 }
