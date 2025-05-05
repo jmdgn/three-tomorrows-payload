@@ -116,8 +116,7 @@ export function LandingEffects() {
         carouselElement.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
         const isReverse = carouselIndex === 1
-        const animationSpeed =
-          window.innerWidth <= 880 ? (isReverse ? -0.4 : 0.4) : isReverse ? -0.6 : 0.6
+        const animationSpeed = isReverse ? -0.8 : 0.8
 
         const cloneCount = 2
 
@@ -279,27 +278,7 @@ export function LandingEffects() {
 
         observer.observe(carouselElement)
 
-        const startAutoScrollInterval = () => {
-          if (window.innerWidth <= 880) {
-            startAutoScroll()
-          }
-        }
-
-        startAutoScrollInterval()
-
-        const handleResize = () => {
-          if (window.innerWidth <= 880) {
-            if (animationRef.current === null) {
-              startAutoScroll()
-            }
-          }
-        }
-
-        window.addEventListener('resize', handleResize)
-
-        return () => {
-          window.removeEventListener('resize', handleResize)
-        }
+        startAutoScroll()
       })
 
       if (typeof carouselAnimationRef !== 'undefined') {

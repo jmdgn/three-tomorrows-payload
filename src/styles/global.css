@@ -1394,6 +1394,10 @@ img.service-image {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     overscroll-behavior-x: contain; }
     
 .service-carousel::-webkit-scrollbar {
@@ -1401,6 +1405,10 @@ img.service-image {
     
 .service-carousel.active {
     cursor: grabbing; }
+
+.service-carousel.dragging {
+    cursor: grabbing;
+    scroll-behavior: auto !important; }
     
 .carousel-slide {
     flex: 0 0 100%;
@@ -1408,6 +1416,14 @@ img.service-image {
     scroll-snap-stop: always;
     padding: 0 1rem;
     box-sizing: border-box; }
+
+.service-carousel .carousel-slide img,
+.service-carousel .carousel-slide * {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none; }
     
 .carousel-dots {
     display: flex;

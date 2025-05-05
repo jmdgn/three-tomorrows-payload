@@ -211,86 +211,88 @@ const CustomHomepage = (props) => {
       
       let isDragging = false;
       let startX = 0;
-      let currentX = 0;
-      let startScrollLeft = 0;
-      let startTime = 0;
+      let initialScroll = 0;
+      let isHovering = false;
       
-      carousel.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        carousel.classList.add('active');
-        startX = e.pageX - carousel.offsetLeft;
-        startScrollLeft = carousel.scrollLeft;
-        startTime = Date.now();
+      carousel.addEventListener('mouseenter', () => {
+        isHovering = true;
       });
       
       carousel.addEventListener('mouseleave', () => {
-        isDragging = false;
-        carousel.classList.remove('active');
+        isHovering = false;
+        carousel.classList.remove('dragging');
+      });
+      
+      carousel.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.pageX - carousel.offsetLeft;
+        initialScroll = carousel.scrollLeft;
+        carousel.classList.add('dragging');
       });
       
       carousel.addEventListener('mouseup', () => {
         isDragging = false;
-        carousel.classList.remove('active');
-        handleSwipeEnd();
+        carousel.classList.remove('dragging');
+        snapToNearestSlide();
       });
       
       carousel.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
         e.preventDefault();
-        currentX = e.pageX - carousel.offsetLeft;
-        const walk = (currentX - startX) * 1.5;
-        carousel.scrollLeft = startScrollLeft - walk;
+        const x = e.pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 2;
+        carousel.scrollLeft = initialScroll - walk;
       });
       
       carousel.addEventListener('touchstart', (e) => {
         isDragging = true;
         startX = e.touches[0].pageX - carousel.offsetLeft;
-        startScrollLeft = carousel.scrollLeft;
-        startTime = Date.now();
-      }, { passive: false });
+        initialScroll = carousel.scrollLeft;
+        carousel.classList.add('dragging');
+      });
       
       carousel.addEventListener('touchend', () => {
         isDragging = false;
-        handleSwipeEnd();
+        carousel.classList.remove('dragging');
+        snapToNearestSlide();
       });
       
       carousel.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
-        currentX = e.touches[0].pageX - carousel.offsetLeft;
-        const walk = (currentX - startX) * 1;
-        carousel.scrollLeft = startScrollLeft - walk;
-      }, { passive: false });
-      
-      const handleSwipeEnd = () => {
-        const endTime = Date.now();
-        const swipeTime = endTime - startTime;
-        const distance = Math.abs(currentX - startX);
-        const velocity = distance / swipeTime;
-        
-        const swipeDirection = startX < currentX ? 'right' : 'left';
-        
-        if ((velocity > 0.2 && distance > 30) || distance > slideWidth * 0.2) {
-          if (swipeDirection === 'left' && currentSlide < totalSlides - 1) {
-            goToSlide(currentSlide + 1);
-          } else if (swipeDirection === 'right' && currentSlide > 0) {
-            goToSlide(currentSlide - 1);
-          } else {
-            snapToNearestSlide();
-          }
-        } else {
-          snapToNearestSlide();
-        }
-      };
+        const x = e.touches[0].pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 2;
+        carousel.scrollLeft = initialScroll - walk;
+      });
       
       carousel.addEventListener('scroll', throttle(() => {
         const currentIndex = Math.round(carousel.scrollLeft / slideWidth);
         setCurrentSlide(currentIndex);
       }, 100));
       
+      const handleResize = () => {
+        const newContainerWidth = carousel.parentElement.offsetWidth;
+        const newSlideWidth = newContainerWidth - slidePeekAmount;
+        
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        slides.forEach(slide => {
+          slide.style.width = `${newSlideWidth}px`;
+          slide.style.flex = `0 0 ${newSlideWidth}px`;
+        });
+        
+        const currentIndex = Math.round(carousel.scrollLeft / slideWidth);
+        carousel.scrollLeft = currentIndex * newSlideWidth;
+      };
+      
+      window.addEventListener('resize', handleResize);
+      
       carousel.scrollTo({
         left: 0,
         behavior: 'auto'
       });
+      
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
     };
     
     if (isMobile) {
