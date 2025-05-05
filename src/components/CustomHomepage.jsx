@@ -624,9 +624,6 @@ const CustomHomepage = (props) => {
                         <div className="carousel-slide" key={index}>
                           <div className="serviceCard">
                             <div className="serviceContent-panelTop">
-                              <div className="serviceCat-panel">
-                                <p>{service.number}</p>
-                              </div>
                               <div className="serviceFt-image">
                                 <img
                                   className="service-image"
@@ -643,7 +640,7 @@ const CustomHomepage = (props) => {
                               </div>
                             </div>
                             <div className="serviceText-panelBottom">
-                              <h3><span className="break">{service.breakTitle}</span> {service.title}</h3>
+                              <h6>{service.title}</h6>
                               <p>{service.description}</p>
                             </div>
                           </div>

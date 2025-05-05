@@ -657,7 +657,7 @@ p.body-intro.mobile {
 
 .titleText.center {
 	padding-top: 1rem;
-	padding-bottom: 8rem; }
+	padding-bottom: 6rem; }
 
 .header-container {
 	padding: .5rem; }
@@ -718,11 +718,11 @@ section.intro-section {
 	padding: 12px 20px; }
 
 .introStatement-outer {
-	margin: 1rem; }
+	margin: 1rem;
+	padding: 0; }
 
 .introState-inner {
-	max-width: 100%;
-	padding: 1.5rem; }
+	max-width: 100%; }
 
 .serviceContent-outer {
 	padding: 1.5rem; }
@@ -753,6 +753,15 @@ section.service-panel {
 .factCard-container h2 {
 	font-size: 5svh; }
 
+.factoidContent-full {
+	top: -60svh; }
+
+.factoidSingle-container:first-child {
+	margin: 40svh 0 30svh 0; }
+
+.factoidSingle-container {
+	margin: 30svh 0; }
+
 .stickyContent-title {
 	max-width: 100%; }
 
@@ -762,6 +771,11 @@ section.service-panel {
 
 .expertise-title .titleText.center {
 	margin: 12rem 1.5rem 0 1.5rem; }
+
+.expertiseSubtitle-firstRow h6 {
+	padding: 1rem;
+	width: 100%;
+	font-size: 20px; }
 
 .infinite-carousel .carousel-item {
 	min-width: 80%; }
@@ -775,6 +789,9 @@ section.service-panel {
 
 .contactContent-outer {
 	padding: 1.5rem; }
+
+.contactPanel-home {
+	width: 100%; }
 
 .category-alley,
 .blogSpace-left,
@@ -873,7 +890,8 @@ img.article-image {
 	height: 100%; }
 
 .serviceText-panelBottom {
-	width: 100%; 	}
+	width: fit-content;
+	padding: 1.5rem 1rem .5rem 1rem; }
 
 .service-carousel-container {
 	position: relative;
@@ -912,22 +930,24 @@ img.article-image {
 	  
 .serviceCard {
 	width: 100%;
-	margin: 0;
-	box-sizing: border-box;
-	height: 100%; }
+    margin: 0;
+    box-sizing: border-box;
+    height: 100%;
+    background: #FFF;
+    border-radius: 12px;
+	padding: .5rem; }
 
 .serviceCard:hover {
 	box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.15); }
 	  
-.serviceText-panelBottom {
-	width: 100%; }
-	  
 .serviceFt-image {
-	max-width: 100%; }
+	max-width: fit-content;
+	margin: 0; }
 	  
 .serviceText-panelBottom h3 {
 	font-size: 36px;
-	line-height: 36px; }
+	line-height: 36px;
+	margin-bottom: 0; }
 	  
 .carousel-dots {
 	display: flex;
@@ -947,35 +967,12 @@ img.article-image {
 .carousel-dot.active {
 	background-color: #171744;
 	transform: scale(1.1); }
-	  
-.serviceCard {
-	width: 100%;
-	margin: 0;
-	box-sizing: border-box;
-	height: 100%; }
-	  
-.serviceText-panelBottom {
-	width: 100%; }
-	  
-.serviceFt-image {
-	max-width: 100%; }
-	  
-.serviceText-panelBottom h3 {
-	font-size: 36px;
-	line-height: 36px; }
 
 .carousel-slide {
 	width: 100%; }
 
 .serviceContent-outer {
 	padding: 0; }
-
-.serviceText-panelBottom h3 {
-	font-size: 36px;
-	line-height: 36px; }
-
-.serviceFt-image {
-	max-width: 100%; }
 
 .footerContent-outer {
 	padding: 4rem 1.5rem 1rem 1.5rem; }
@@ -1035,6 +1032,9 @@ article.pt-16.pb-24 {
 	justify-content: space-between;
 	align-items: center;
 	width: 100%; }
+
+.expertise-carousel {
+	padding-bottom: 2rem; }
 	
 .contactBtn-container {
 	display: flex;
@@ -1068,10 +1068,6 @@ h4 {
 section.intro-para {
 	height: calc(var(--vh, 1vh) * 100); }
 
-.serviceFt-image {
-	max-width: 200px;
-	margin-bottom: 2rem; }
-
 .txtContent-container p.xlarge {
 	width: auto;
 	max-width: 100%;
@@ -1082,7 +1078,8 @@ p.body-intro {
 	line-height: 20px; }
 
 p.xlarge {
-	font-size: 4.5svh; }
+	font-size: 42px;
+	line-height: 1.2; }
 
 .factCard-container h2 {
 	font-size: 3.5svh; }
@@ -1094,12 +1091,12 @@ p.xlarge {
 	padding-bottom: 4rem; }
 
 .infinite-carousel .carousel-item.square {
-	max-height: 320px;
-	max-width: 320px; }
+	max-height: 280px;
+	max-width: 280px; }
 
 .tech-card h3.thin {
-	font-size: 32px;
-	line-height: 32px; }
+	font-size: 28px;
+	line-height: 28px; }
 
 .contactContent-outer {
 	padding: 1rem; }
