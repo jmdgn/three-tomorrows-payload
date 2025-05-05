@@ -209,49 +209,78 @@ const CustomHomepage = (props) => {
         slide.style.flex = `0 0 ${slideWidth}px`;
       });
       
+      let isDragging = false;
+      let startX = 0;
+      let currentX = 0;
+      let startScrollLeft = 0;
+      let startTime = 0;
+      
       carousel.addEventListener('mousedown', (e) => {
-        isDownRef.current = true;
+        isDragging = true;
         carousel.classList.add('active');
-        startXRef.current = e.pageX - carousel.offsetLeft;
-        scrollLeftRef.current = carousel.scrollLeft;
+        startX = e.pageX - carousel.offsetLeft;
+        startScrollLeft = carousel.scrollLeft;
+        startTime = Date.now();
       });
       
       carousel.addEventListener('mouseleave', () => {
-        isDownRef.current = false;
+        isDragging = false;
         carousel.classList.remove('active');
       });
       
       carousel.addEventListener('mouseup', () => {
-        isDownRef.current = false;
+        isDragging = false;
         carousel.classList.remove('active');
-        snapToNearestSlide();
+        handleSwipeEnd();
       });
       
       carousel.addEventListener('mousemove', (e) => {
-        if (!isDownRef.current) return;
+        if (!isDragging) return;
         e.preventDefault();
-        const x = e.pageX - carousel.offsetLeft;
-        const walk = (x - startXRef.current) * 2;
-        carousel.scrollLeft = scrollLeftRef.current - walk;
+        currentX = e.pageX - carousel.offsetLeft;
+        const walk = (currentX - startX) * 1.5;
+        carousel.scrollLeft = startScrollLeft - walk;
       });
       
       carousel.addEventListener('touchstart', (e) => {
-        isDownRef.current = true;
-        startXRef.current = e.touches[0].pageX - carousel.offsetLeft;
-        scrollLeftRef.current = carousel.scrollLeft;
-      });
+        isDragging = true;
+        startX = e.touches[0].pageX - carousel.offsetLeft;
+        startScrollLeft = carousel.scrollLeft;
+        startTime = Date.now();
+      }, { passive: false });
       
       carousel.addEventListener('touchend', () => {
-        isDownRef.current = false;
-        snapToNearestSlide();
+        isDragging = false;
+        handleSwipeEnd();
       });
       
       carousel.addEventListener('touchmove', (e) => {
-        if (!isDownRef.current) return;
-        const x = e.touches[0].pageX - carousel.offsetLeft;
-        const walk = (x - startXRef.current) * 2;
-        carousel.scrollLeft = scrollLeftRef.current - walk;
-      });
+        if (!isDragging) return;
+        currentX = e.touches[0].pageX - carousel.offsetLeft;
+        const walk = (currentX - startX) * 1;
+        carousel.scrollLeft = startScrollLeft - walk;
+      }, { passive: false });
+      
+      const handleSwipeEnd = () => {
+        const endTime = Date.now();
+        const swipeTime = endTime - startTime;
+        const distance = Math.abs(currentX - startX);
+        const velocity = distance / swipeTime;
+        
+        const swipeDirection = startX < currentX ? 'right' : 'left';
+        
+        if ((velocity > 0.2 && distance > 30) || distance > slideWidth * 0.2) {
+          if (swipeDirection === 'left' && currentSlide < totalSlides - 1) {
+            goToSlide(currentSlide + 1);
+          } else if (swipeDirection === 'right' && currentSlide > 0) {
+            goToSlide(currentSlide - 1);
+          } else {
+            snapToNearestSlide();
+          }
+        } else {
+          snapToNearestSlide();
+        }
+      };
       
       carousel.addEventListener('scroll', throttle(() => {
         const currentIndex = Math.round(carousel.scrollLeft / slideWidth);

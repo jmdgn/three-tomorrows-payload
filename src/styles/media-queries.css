@@ -753,6 +753,15 @@ section.service-panel {
 .serviceGrid-container > div {
 	flex: 1 1 calc(100%); }
 
+#sphere-container {
+	z-index: 1; }
+	
+.factoidBkgnd-sticky {
+	z-index: 0; }
+	
+.factoidContent-full {
+	z-index: 2; }
+
 .factAssets-container {
 	transform: translate(-50%, -50%) scale(1.4) rotate(0deg); }
 
