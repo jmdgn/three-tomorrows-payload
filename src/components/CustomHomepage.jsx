@@ -9,6 +9,7 @@ import { StaticGradientBackground } from '@/components/HomeScripts/StaticGradien
 import BackgroundTransition from "@/components/HomeScripts/BackgroundTransition";
 import AnimatedTitle from '@/components/HomeScripts/AnimatedTitle';
 import { getMediaUrl } from '../utilities/media-utils';
+import MobileServiceCarousel from '@/components/MobileServiceCarousel';
 
 function throttle(func, limit) {
   let inThrottle;
@@ -44,11 +45,6 @@ const CustomHomepage = (props) => {
   const currentScaleRef = useRef(1);
   const currentBorderRadiusRef = useRef(0);
   
-  const carouselRef = useRef(null);
-  const startXRef = useRef(0);
-  const scrollLeftRef = useRef(0);
-  const isDownRef = useRef(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
   const servicesLinkUrl = servicesSection?.ctaLink || '/services';
@@ -63,8 +59,6 @@ const CustomHomepage = (props) => {
       image: 'assets/images/services/trend.png',
     },
   ];
-  
-  const totalSlides = serviceItems.length;
 
   const factoidItems = factoidsSection?.factoids || [
     { text: '70% of small businesses will transition to new ownership in the next decade' },
@@ -191,174 +185,6 @@ const CustomHomepage = (props) => {
       clearTimeout(timeoutId);
     };
   }, []);
-
-  useEffect(() => {
-    const initializeCarousel = () => {
-      const carousel = document.querySelector('.service-carousel');
-      if (!carousel) return;
-      
-      carouselRef.current = carousel;
-      
-      const containerWidth = carousel.parentElement.offsetWidth;
-      const slidePeekAmount = 16;
-      const slideWidth = containerWidth - slidePeekAmount;
-      
-      const slides = carousel.querySelectorAll('.carousel-slide');
-      slides.forEach(slide => {
-        slide.style.width = `${slideWidth}px`;
-        slide.style.flex = `0 0 ${slideWidth}px`;
-      });
-      
-      let isDragging = false;
-      let startX = 0;
-      let initialScroll = 0;
-      let isHovering = false;
-      
-      carousel.addEventListener('mouseenter', () => {
-        isHovering = true;
-      });
-      
-      carousel.addEventListener('mouseleave', () => {
-        isHovering = false;
-        carousel.classList.remove('dragging');
-      });
-      
-      carousel.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        startX = e.pageX - carousel.offsetLeft;
-        initialScroll = carousel.scrollLeft;
-        carousel.classList.add('dragging');
-      });
-      
-      carousel.addEventListener('mouseup', () => {
-        isDragging = false;
-        carousel.classList.remove('dragging');
-        snapToNearestSlide();
-      });
-      
-      carousel.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        const x = e.pageX - carousel.offsetLeft;
-        const walk = (x - startX) * 2;
-        carousel.scrollLeft = initialScroll - walk;
-      });
-      
-      let touchStartY = 0;
-
-      carousel.addEventListener('touchstart', (e) => {
-        isDragging = true;
-        startX = e.touches[0].pageX - carousel.offsetLeft;
-        touchStartY = e.touches[0].clientY;
-        initialScroll = carousel.scrollLeft;
-        carousel.classList.add('dragging');
-      }, { passive: true });
-      
-      carousel.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-      
-        const x = e.touches[0].pageX - carousel.offsetLeft;
-        const y = e.touches[0].clientY;
-        const xDiff = Math.abs(x - startX);
-        const yDiff = Math.abs(y - touchStartY);
-      
-        // Only scroll horizontally if horizontal movement is dominant
-        if (xDiff > yDiff) {
-          e.preventDefault(); // prevent vertical scroll
-          const walk = (x - startX) * 1.2; // reduce multiplier for mobile
-          carousel.scrollLeft = initialScroll - walk;
-        }
-      }, { passive: false });
-      
-      carousel.addEventListener('touchend', () => {
-        isDragging = false;
-        carousel.classList.remove('dragging');
-        snapToNearestSlide();
-      }, { passive: true });
-      
-      carousel.addEventListener('scroll', throttle(() => {
-        const currentIndex = Math.round(carousel.scrollLeft / slideWidth);
-        setCurrentSlide(currentIndex);
-      }, 100));
-      
-      const handleResize = () => {
-        const newContainerWidth = carousel.parentElement.offsetWidth;
-        const newSlideWidth = newContainerWidth - slidePeekAmount;
-        
-        const slides = carousel.querySelectorAll('.carousel-slide');
-        slides.forEach(slide => {
-          slide.style.width = `${newSlideWidth}px`;
-          slide.style.flex = `0 0 ${newSlideWidth}px`;
-        });
-        
-        const currentIndex = Math.round(carousel.scrollLeft / slideWidth);
-        carousel.scrollLeft = currentIndex * newSlideWidth;
-      };
-      
-      window.addEventListener('resize', handleResize);
-      
-      carousel.scrollTo({
-        left: 0,
-        behavior: 'auto'
-      });
-      
-      return () => {
-        window.removeEventListener('resize', handleResize);
-      };
-    };
-    
-    if (isMobile) {
-      setTimeout(initializeCarousel, 500);
-    }
-    
-    return () => {
-      if (carouselRef.current) {
-        const carousel = carouselRef.current;
-        carousel.removeEventListener('mousedown', () => {});
-        carousel.removeEventListener('mouseleave', () => {});
-        carousel.removeEventListener('mouseup', () => {});
-        carousel.removeEventListener('mousemove', () => {});
-        carousel.removeEventListener('touchstart', () => {});
-        carousel.removeEventListener('touchend', () => {});
-        carousel.removeEventListener('touchmove', () => {});
-        carousel.removeEventListener('scroll', () => {});
-      }
-    };
-  }, [isMobile]);
-  
-  const snapToNearestSlide = () => {
-    if (!carouselRef.current) return;
-    
-    const carousel = carouselRef.current;
-    const containerWidth = carousel.parentElement.offsetWidth;
-    const slidePeekAmount = 16;
-    const slideWidth = containerWidth - slidePeekAmount;
-    
-    const currentIndex = Math.round(carousel.scrollLeft / slideWidth);
-    
-    carousel.scrollTo({
-      left: currentIndex * slideWidth,
-      behavior: 'smooth'
-    });
-    
-    setCurrentSlide(currentIndex);
-  };
-  
-  const goToSlide = (index) => {
-    if (!carouselRef.current || index < 0 || index >= totalSlides) return;
-    
-    const carousel = carouselRef.current;
-    const containerWidth = carousel.parentElement.offsetWidth;
-    const slidePeekAmount = 16;
-    const slideWidth = containerWidth - slidePeekAmount;
-    
-    carousel.scrollTo({
-      left: index * slideWidth,
-      behavior: 'smooth'
-    });
-    
-    setCurrentSlide(index);
-  };
 
   useEffect(() => {
     let isMounted = true;
@@ -660,75 +486,35 @@ const CustomHomepage = (props) => {
               </div>
               
               {isMobile ? (
-                <>
-                  <div className="service-carousel-container">
-                    <div className="service-carousel">
-                      {serviceItems.map((service, index) => (
-                        <div className="carousel-slide" key={index}>
-                          <div className="serviceCard">
-                            <div className="serviceContent-panelTop">
-                              <div className="serviceFt-image">
-                                <img
-                                  className="service-image"
-                                  src={getImageSrc(service.image)}
-                                  width={442}
-                                  height={442}
-                                  alt={`${service.breakTitle} ${service.title} Image`}
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    console.error('Image failed to load:', e.target.src);
-                                    e.target.src = 'assets/images/services/trend.png';
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            <div className="serviceText-panelBottom">
-                              <h6>{service.title}</h6>
-                              <p>{service.description}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="carousel-dots">
-                      {Array.from({ length: totalSlides }).map((_, index) => (
-                        <div 
-                          key={index} 
-                          className={`carousel-dot ${currentSlide === index ? 'active' : ''}`}
-                          onClick={() => goToSlide(index)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </>
+                <MobileServiceCarousel 
+                  serviceItems={serviceItems}
+                  getImageSrc={getImageSrc}
+                />
               ) : (
                 /* Desktop Grid View - Original Layout */
                 <div className="serviceGrid-container">
                   {serviceItems.map((service, index) => (
                     <div className="servicePanel-container" key={index}>
-
-                        <div className="serviceContent-panelTop">
-                          <div className="serviceFt-image">
-                            <img
-                              className="service-image"
-                              src={getImageSrc(service.image)}
-                              width={582}
-                              height={466}
-                              alt={`${service.breakTitle} ${service.title} Image`}
-                              loading="lazy"
-                              onError={(e) => {
-                                console.error('Image failed to load:', e.target.src);
-                                e.target.src = 'assets/images/services/trend.png'; // Fallback on error
-                              }}
-                            />
-                          </div>
+                      <div className="serviceContent-panelTop">
+                        <div className="serviceFt-image">
+                          <img
+                            className="service-image"
+                            src={getImageSrc(service.image)}
+                            width={582}
+                            height={466}
+                            alt={`${service.breakTitle} ${service.title} Image`}
+                            loading="lazy"
+                            onError={(e) => {
+                              console.error('Image failed to load:', e.target.src);
+                              e.target.src = 'assets/images/services/trend.png'; // Fallback on error
+                            }}
+                          />
                         </div>
-                        <div className="serviceText-panelBottom">
-                          <h6>{service.title}</h6>
-                          <p>{service.description}</p>
-                        </div>
-
+                      </div>
+                      <div className="serviceText-panelBottom">
+                        <h6>{service.title}</h6>
+                        <p>{service.description}</p>
+                      </div>
                     </div>
                   ))}
                 </div>

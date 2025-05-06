@@ -1378,71 +1378,66 @@ img.service-image {
     line-height: 22px;
     color: #AAA; }
 
-.service-carousel-container {
-    position: relative;
+    .service-carousel-wrapper {
     width: 100%;
+    position: relative;
     overflow: hidden;
-    margin: 2rem 0; }
-    
-.service-carousel {
+    border-radius: 8px;
+    margin: 1rem 0 2rem 0;
+    }
+
+    .service-carousel {
     display: flex;
     width: 100%;
-    overflow-x: scroll;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    cursor: grab;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    overscroll-behavior-x: contain;
-    touch-action: pan-y; }
-    
-.service-carousel::-webkit-scrollbar {
-    display: none; }
-    
-.service-carousel.active {
-    cursor: grabbing; }
+    touch-action: pan-y;
+    will-change: transform;
+    }
 
-.service-carousel.dragging {
+    .service-carousel.dragging {
     cursor: grabbing;
-    scroll-behavior: auto !important; }
-    
-.carousel-slide {
-    flex-shrink: 0;
-    scroll-snap-align: center;
-    scroll-snap-stop: always;
-    padding: 0 1rem;
-    box-sizing: border-box; }
+    }
 
-.service-carousel .carousel-slide img,
-.service-carousel .carousel-slide * {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    pointer-events: none; }
-    
-.carousel-dots {
+    .carousel-slide {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 0 8px;
+    box-sizing: border-box;
+    }
+
+    .carousel-dots {
     display: flex;
     justify-content: center;
-    margin-top: 2rem;
-    gap: 10px; }
-    
-.carousel-dot {
-    width: 10px;
-    height: 10px;
+    margin: 1rem 0;
+    gap: 8px;
+    }
+
+    .carousel-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.2);
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease; }
-    
-.carousel-dot.active {
+    transition: all 0.3s ease;
+    }
+
+    .carousel-dot.active {
     background-color: #3BE494;
-    transform: scale(1.3); }
+    transform: scale(1.3);
+    }
+
+    /* Enhance the service card for better interaction */
+    .serviceCard {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #FFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .serviceCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
 
 @keyframes fadeIn {
     from {
