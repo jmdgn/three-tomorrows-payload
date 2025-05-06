@@ -244,25 +244,37 @@ const CustomHomepage = (props) => {
         carousel.scrollLeft = initialScroll - walk;
       });
       
+      let touchStartY = 0;
+
       carousel.addEventListener('touchstart', (e) => {
         isDragging = true;
         startX = e.touches[0].pageX - carousel.offsetLeft;
+        touchStartY = e.touches[0].clientY;
         initialScroll = carousel.scrollLeft;
         carousel.classList.add('dragging');
-      });
+      }, { passive: true });
+      
+      carousel.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+      
+        const x = e.touches[0].pageX - carousel.offsetLeft;
+        const y = e.touches[0].clientY;
+        const xDiff = Math.abs(x - startX);
+        const yDiff = Math.abs(y - touchStartY);
+      
+        // Only scroll horizontally if horizontal movement is dominant
+        if (xDiff > yDiff) {
+          e.preventDefault(); // prevent vertical scroll
+          const walk = (x - startX) * 1.2; // reduce multiplier for mobile
+          carousel.scrollLeft = initialScroll - walk;
+        }
+      }, { passive: false });
       
       carousel.addEventListener('touchend', () => {
         isDragging = false;
         carousel.classList.remove('dragging');
         snapToNearestSlide();
-      });
-      
-      carousel.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        const x = e.touches[0].pageX - carousel.offsetLeft;
-        const walk = (x - startX) * 2;
-        carousel.scrollLeft = initialScroll - walk;
-      });
+      }, { passive: true });
       
       carousel.addEventListener('scroll', throttle(() => {
         const currentIndex = Math.round(carousel.scrollLeft / slideWidth);
