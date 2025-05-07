@@ -1258,13 +1258,18 @@ section.factoids-complete {
     margin-bottom: 0; }
 
 .fade-word {
-    opacity: 0 !important;
-    transform: translateY(10px);
-    transition: opacity 0.5s ease, transform 0.5s ease; }
-
+    opacity: 0;
+    filter: blur(25px);
+    display: inline-block;
+    color: #171744;
+    will-change: opacity, filter;
+    position: relative;
+    transition: opacity 0.7s cubic-bezier(0.19, 1, 0.22, 1), filter 1.2s cubic-bezier(0.19, 1, 0.22, 1) 0.15s; }
+    
 .fade-word.fade-in {
-    opacity: 1 !important;
-    transform: translateY(0); }
+    opacity: 1;
+    filter: blur(0);
+    transition: opacity 0.7s cubic-bezier(0.19, 1, 0.22, 1), filter 1.2s cubic-bezier(0.19, 1, 0.22, 1) 0.15s; }
 /* End */
 
 

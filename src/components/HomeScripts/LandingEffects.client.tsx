@@ -108,6 +108,7 @@ export function LandingEffects() {
       if (carouselElements.length === 0) return
 
       const carouselAnimationRefs = []
+      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
       carouselElements.forEach((carouselElement, carouselIndex) => {
         const carouselItems = carouselElement.querySelectorAll('.carousel-item')
@@ -116,7 +117,7 @@ export function LandingEffects() {
         carouselElement.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
         const isReverse = carouselIndex === 1
-        const animationSpeed = isReverse ? -0.8 : 0.8
+        const animationSpeed = isMobileDevice ? (isReverse ? -0.4 : 0.4) : isReverse ? -0.8 : 0.8
 
         const cloneCount = 2
 
@@ -150,6 +151,10 @@ export function LandingEffects() {
         let startX = 0
         let initialScroll = 0
         let isHovering = false
+        let lastTouchTime = 0
+
+        let isUserScrolling = false
+        let resumeScrollTimer = null
 
         const animationRef = { current: null }
         carouselAnimationRefs.push(animationRef)
@@ -180,7 +185,7 @@ export function LandingEffects() {
           }
 
           const autoScroll = () => {
-            if (!isHovering && !isDragging) {
+            if (!isUserScrolling && !isHovering && !isDragging) {
               carouselElement.scrollLeft += animationSpeed
               adjustScrollPosition()
             }
@@ -190,18 +195,39 @@ export function LandingEffects() {
           animationRef.current = requestAnimationFrame(autoScroll)
         }
 
-        const onMouseEnter = () => (isHovering = true)
-        const onMouseLeave = () => (isHovering = false)
+        const resumeAutoScrollAfterDelay = () => {
+          clearTimeout(resumeScrollTimer)
+          resumeScrollTimer = setTimeout(() => {
+            isUserScrolling = false
+          }, 1500)
+        }
+
+        const onMouseEnter = () => {
+          isHovering = true
+        }
+
+        const onMouseLeave = () => {
+          isHovering = false
+        }
+
         const onMouseDown = (e) => {
           isDragging = true
+          isUserScrolling = true
           startX = e.pageX - carouselElement.offsetLeft
           initialScroll = carouselElement.scrollLeft
           carouselElement.classList.add('dragging')
+
+          if (window.getSelection) {
+            window.getSelection().removeAllRanges()
+          }
         }
+
         const onMouseUp = () => {
           isDragging = false
           carouselElement.classList.remove('dragging')
+          resumeAutoScrollAfterDelay()
         }
+
         const onMouseMove = (e) => {
           if (!isDragging) return
           e.preventDefault()
@@ -213,16 +239,22 @@ export function LandingEffects() {
 
         const onTouchStart = (e) => {
           isDragging = true
+          isUserScrolling = true
           startX = e.touches[0].pageX - carouselElement.offsetLeft
           initialScroll = carouselElement.scrollLeft
+          lastTouchTime = Date.now()
           carouselElement.classList.add('dragging')
         }
+
         const onTouchEnd = () => {
           isDragging = false
           carouselElement.classList.remove('dragging')
+          resumeAutoScrollAfterDelay()
         }
+
         const onTouchMove = (e) => {
           if (!isDragging) return
+          lastTouchTime = Date.now()
           const x = e.touches[0].pageX - carouselElement.offsetLeft
           const walk = (x - startX) * 2
           carouselElement.scrollLeft = initialScroll - walk
@@ -230,7 +262,21 @@ export function LandingEffects() {
         }
 
         const onScroll = () => {
-          if (isDragging) adjustScrollPosition()
+          if (isDragging) {
+            isUserScrolling = true
+            adjustScrollPosition()
+          }
+        }
+
+        const onVisibilityChange = () => {
+          if (document.visibilityState === 'visible') {
+            if (animationRef.current === null) {
+              startAutoScroll()
+            }
+          } else if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current)
+            animationRef.current = null
+          }
         }
 
         const onResize = () => {
@@ -240,45 +286,88 @@ export function LandingEffects() {
             (carouselElement.scrollLeft / originalSetWidth) * newOriginalSetWidth
         }
 
-        carouselElement.addEventListener('mouseenter', onMouseEnter)
-        carouselElement.addEventListener('mouseleave', onMouseLeave)
+        carouselElement.addEventListener('mouseenter', onMouseEnter, { passive: true })
+        carouselElement.addEventListener('mouseleave', onMouseLeave, { passive: true })
         carouselElement.addEventListener('mousedown', onMouseDown)
         carouselElement.addEventListener('mouseup', onMouseUp)
         carouselElement.addEventListener('mousemove', onMouseMove)
-        carouselElement.addEventListener('scroll', onScroll)
-        carouselElement.addEventListener('touchstart', onTouchStart)
-        carouselElement.addEventListener('touchend', onTouchEnd)
-        carouselElement.addEventListener('touchmove', onTouchMove)
-        window.addEventListener('resize', onResize)
+        carouselElement.addEventListener('scroll', onScroll, { passive: true })
 
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
-            if (animationRef.current === null) startAutoScroll()
-          } else if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current)
-            animationRef.current = null
-          }
-        })
+        carouselElement.addEventListener('touchstart', onTouchStart, { passive: true })
+        carouselElement.addEventListener('touchend', onTouchEnd, { passive: true })
+        carouselElement.addEventListener('touchmove', onTouchMove, { passive: false })
+
+        window.addEventListener('resize', onResize, { passive: true })
+        document.addEventListener('visibilitychange', onVisibilityChange)
 
         const observer = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
               if (entry.isIntersecting) {
                 if (animationRef.current === null) {
+                  console.log(`Starting auto-scroll for carousel ${carouselIndex}`)
                   startAutoScroll()
                 }
               } else if (animationRef.current) {
+                console.log(`Stopping auto-scroll for carousel ${carouselIndex} - not visible`)
                 cancelAnimationFrame(animationRef.current)
                 animationRef.current = null
               }
             })
           },
-          { threshold: 0.1 },
+          {
+            threshold: 0.1,
+            rootMargin: '0px 0px 100px 0px',
+          },
         )
 
         observer.observe(carouselElement)
 
+        console.log(`Initial auto-scroll start for carousel ${carouselIndex}`)
         startAutoScroll()
+
+        const checkInterval = setInterval(() => {
+          if (
+            document.visibilityState === 'visible' &&
+            !isDragging &&
+            !isUserScrolling &&
+            animationRef.current === null
+          ) {
+            console.log(`Restarting stalled carousel ${carouselIndex}`)
+            startAutoScroll()
+          }
+        }, 5000)
+
+        eventListeners.push({
+          element: carouselElement,
+          event: 'mouseenter',
+          handler: onMouseEnter,
+        })
+        eventListeners.push({
+          element: carouselElement,
+          event: 'mouseleave',
+          handler: onMouseLeave,
+        })
+        eventListeners.push({ element: carouselElement, event: 'mousedown', handler: onMouseDown })
+        eventListeners.push({ element: carouselElement, event: 'mouseup', handler: onMouseUp })
+        eventListeners.push({ element: carouselElement, event: 'mousemove', handler: onMouseMove })
+        eventListeners.push({ element: carouselElement, event: 'scroll', handler: onScroll })
+        eventListeners.push({
+          element: carouselElement,
+          event: 'touchstart',
+          handler: onTouchStart,
+        })
+        eventListeners.push({ element: carouselElement, event: 'touchend', handler: onTouchEnd })
+        eventListeners.push({ element: carouselElement, event: 'touchmove', handler: onTouchMove })
+        eventListeners.push({ element: window, event: 'resize', handler: onResize })
+        eventListeners.push({
+          element: document,
+          event: 'visibilitychange',
+          handler: onVisibilityChange,
+        })
+
+        timeouts.push(checkInterval)
+        observers.push({ observer, element: carouselElement })
       })
 
       if (typeof carouselAnimationRef !== 'undefined') {
@@ -484,26 +573,40 @@ export function LandingEffects() {
 
       const wordElements = document.querySelectorAll('.fade-word')
 
-      const style = document.createElement('style')
-      style.textContent = `
-    .fade-word {
-      opacity: 0;
-      filter: blur(8px);
-      transform: translateY(15px);
-      transition: opacity 0.7s ease-out, filter 0.8s ease-out, transform 0.7s ease-out;
-    }
-    .fade-word.fade-in {
-      opacity: 1;
-      filter: blur(0);
-      transform: translateY(0);
-    }
-    .fade-word.hidden {
-      opacity: 0;
-      filter: blur(8px);
-      transform: translateY(15px);
-    }
-  `
-      document.head.appendChild(style)
+      const styleId = 'enhanced-fade-word-style'
+      let styleElement = document.getElementById(styleId)
+
+      if (!styleElement) {
+        styleElement = document.createElement('style')
+        styleElement.id = styleId
+        document.head.appendChild(styleElement)
+      }
+
+      styleElement.textContent = `
+        .fade-word {
+          opacity: 0;
+          filter: blur(25px); /* Strong blur effect */
+          display: inline-block;
+          color: #171744;
+          will-change: opacity, filter;
+          position: relative;
+          
+          /* Faster opacity, much longer blur transition */
+          transition: 
+            opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+            filter 1.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        
+        .fade-word.fade-in {
+          opacity: 1;
+          filter: blur(0);
+        }
+        
+        .fade-word.hidden {
+          opacity: 0;
+          filter: blur(25px);
+        }
+      `
 
       const fadeInWordsRandomly = (words) => {
         if (!isMounted) return
@@ -514,16 +617,22 @@ export function LandingEffects() {
           ;[indices[i], indices[j]] = [indices[j], indices[i]]
         }
 
-        const batchSize = 3
+        const batchSize = 2
+
         for (let batch = 0; batch < indices.length; batch += batchSize) {
           const timeoutId = setTimeout(() => {
             if (!isMounted) return
 
             const end = Math.min(batch + batchSize, indices.length)
             for (let i = batch; i < end; i++) {
-              words[indices[i]].classList.add('fade-in')
+              const randomDelay = Math.random() * 180
+
+              setTimeout(() => {
+                if (!isMounted) return
+                words[indices[i]].classList.add('fade-in')
+              }, randomDelay)
             }
-          }, batch * 40)
+          }, batch * 75)
 
           timeouts.push(timeoutId)
         }
@@ -553,17 +662,22 @@ export function LandingEffects() {
                 const timeoutId = setTimeout(() => {
                   if (!isMounted) return
                   fadeInWordsRandomly(wordElements)
-                }, 300)
+                }, 500)
 
                 timeouts.push(timeoutId)
               }
             } else {
-              statementContainer.classList.remove('visible')
-              resetWords(wordElements, true)
+              if (entry.intersectionRatio < 0.1) {
+                statementContainer.classList.remove('visible')
+                resetWords(wordElements, true)
+              }
             }
           })
         },
-        { threshold: 0.4 },
+        {
+          threshold: [0, 0.1, 0.5, 1],
+          rootMargin: '0px 0px 10% 0px',
+        },
       )
 
       observer.observe(statementContainer)
