@@ -103,25 +103,71 @@ export function LandingEffects() {
     }
 
     /* Infinite Carousel Setup */
+    function addMobileCarouselStyles() {
+      if (typeof document === 'undefined') return null
+
+      const styleElement = document.createElement('style')
+      styleElement.textContent = `
+    .infinite-carousel {
+      -webkit-overflow-scrolling: touch !important;
+      scroll-behavior: auto !important;
+      will-change: transform !important;
+    }
+    
+    .infinite-carousel .carousel-item {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+    
+    @supports (-webkit-touch-callout: none) {
+      /* iOS Safari specific fixes */
+      .infinite-carousel {
+        -webkit-mask-image: -webkit-radial-gradient(white, black);
+      }
+    }
+  `
+
+      document.head.appendChild(styleElement)
+      return styleElement
+    }
+
     const setupInfiniteCarousel = () => {
+      const styleElement = addMobileCarouselStyles()
+
       const carouselElements = document.querySelectorAll('.infinite-carousel')
       if (carouselElements.length === 0) return
 
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
       const carouselAnimationRefs = []
+
+      let iosScrollNudgeInterval = null
+      if (isIOS) {
+        iosScrollNudgeInterval = setInterval(() => {
+          carouselElements.forEach((carousel) => {
+            if (!carousel.isConnected) return
+            const currentScroll = carousel.scrollLeft
+            carousel.scrollLeft = currentScroll + 0.1
+            setTimeout(() => {
+              if (carousel.isConnected) carousel.scrollLeft = currentScroll
+            }, 50)
+          })
+        }, 3000)
+        timeouts.push(iosScrollNudgeInterval)
+      }
 
       carouselElements.forEach((carouselEl, index) => {
         const items = carouselEl.querySelectorAll('.carousel-item')
         if (items.length === 0) return
 
-        // Remove previous clones
         carouselEl.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
         const isReverse = index === 1
-        const speed = isMobile ? (isReverse ? -0.4 : 0.4) : isReverse ? -0.8 : 0.8
+        const speed = isMobile ? (isReverse ? -0.3 : 0.3) : isReverse ? -0.8 : 0.8
         const cloneCount = 2
 
-        // Clone items
         for (let i = 0; i < cloneCount; i++) {
           const target = isReverse ? Array.from(items).reverse() : items
           target.forEach((item) => {
@@ -142,11 +188,14 @@ export function LandingEffects() {
         let startX = 0
         let initialScroll = 0
         let resumeScrollTimer = null
+        let frameSkipCounter = 0
 
         const animationRef = { current: null }
         carouselAnimationRefs.push(animationRef)
 
         const adjustScroll = () => {
+          if (!carouselEl || !carouselEl.isConnected) return
+
           const currentScroll = carouselEl.scrollLeft
           const max = originalSetWidth * (cloneCount + 1)
           const min = originalSetWidth * (cloneCount - 1)
@@ -158,10 +207,30 @@ export function LandingEffects() {
             if (currentScroll <= min) carouselEl.scrollLeft += originalSetWidth * 2
             else if (currentScroll >= max) carouselEl.scrollLeft -= originalSetWidth * 2
           }
+
+          if (isIOS) {
+            void carouselEl.offsetHeight
+          }
         }
 
         const autoScroll = () => {
+          if (!carouselEl || !carouselEl.isConnected) {
+            if (animationRef.current) {
+              cancelAnimationFrame(animationRef.current)
+              animationRef.current = null
+            }
+            return
+          }
+
           if (!isUserScrolling && !isHovering && !isDragging) {
+            if (isMobile) {
+              frameSkipCounter = (frameSkipCounter + 1) % 3
+              if (frameSkipCounter !== 0) {
+                animationRef.current = requestAnimationFrame(autoScroll)
+                return
+              }
+            }
+
             carouselEl.scrollLeft += speed
             adjustScroll()
           }
@@ -169,7 +238,8 @@ export function LandingEffects() {
         }
 
         const startAutoScroll = () => {
-          if (!animationRef.current) {
+          if (!animationRef.current && carouselEl && carouselEl.isConnected) {
+            console.log(`Starting auto-scroll for carousel ${index}`)
             animationRef.current = requestAnimationFrame(autoScroll)
           }
         }
@@ -190,18 +260,23 @@ export function LandingEffects() {
 
         const setDragging = (val) => {
           isDragging = val
-          carouselEl.classList.toggle('dragging', val)
+          if (carouselEl && carouselEl.isConnected) {
+            carouselEl.classList.toggle('dragging', val)
+          }
         }
 
         const handleDrag = (clientX) => {
+          if (!carouselEl || !carouselEl.isConnected) return
+
           const x = clientX - carouselEl.offsetLeft
           const walk = (x - startX) * 2
           carouselEl.scrollLeft = initialScroll - walk
           adjustScroll()
         }
 
-        // Mouse / touch handlers
         const onMouseDown = (e) => {
+          if (!carouselEl || !carouselEl.isConnected) return
+
           setDragging(true)
           isUserScrolling = true
           startX = e.pageX - carouselEl.offsetLeft
@@ -209,7 +284,7 @@ export function LandingEffects() {
         }
 
         const onMouseMove = (e) => {
-          if (!isDragging) return
+          if (!isDragging || !carouselEl || !carouselEl.isConnected) return
           e.preventDefault()
           handleDrag(e.pageX)
         }
@@ -220,6 +295,8 @@ export function LandingEffects() {
         }
 
         const onTouchStart = (e) => {
+          if (!carouselEl || !carouselEl.isConnected) return
+
           setDragging(true)
           isUserScrolling = true
           startX = e.touches[0].pageX - carouselEl.offsetLeft
@@ -227,7 +304,8 @@ export function LandingEffects() {
         }
 
         const onTouchMove = (e) => {
-          if (!isDragging) return
+          if (!isDragging || !carouselEl || !carouselEl.isConnected) return
+
           handleDrag(e.touches[0].pageX)
         }
 
@@ -236,8 +314,9 @@ export function LandingEffects() {
           resumeScrollAfterDelay()
         }
 
-        // Other handlers
         const onScroll = () => {
+          if (!carouselEl || !carouselEl.isConnected) return
+
           if (isDragging) {
             isUserScrolling = true
             adjustScroll()
@@ -245,17 +324,30 @@ export function LandingEffects() {
         }
 
         const onVisibilityChange = () => {
-          document.visibilityState === 'visible' ? startAutoScroll() : stopAutoScroll()
+          if (document.visibilityState === 'visible') {
+            if (carouselEl && carouselEl.isConnected) {
+              startAutoScroll()
+            }
+          } else {
+            stopAutoScroll()
+          }
         }
 
-        const onResize = () => {
+        const onResize = throttle(() => {
+          if (!carouselEl || !carouselEl.isConnected) return
+
           const newWidth = items[0].offsetWidth
           const newTotalWidth = items.length * newWidth
           carouselEl.scrollLeft = (carouselEl.scrollLeft / originalSetWidth) * newTotalWidth
-        }
+        }, 200)
 
         const observer = new IntersectionObserver(
           ([entry]) => {
+            if (!carouselEl || !carouselEl.isConnected) {
+              observer.disconnect()
+              return
+            }
+
             entry.isIntersecting ? startAutoScroll() : stopAutoScroll()
           },
           {
@@ -264,45 +356,65 @@ export function LandingEffects() {
           },
         )
 
-        observer.observe(carouselEl)
-        observers.push({ observer, element: carouselEl })
+        if (carouselEl) {
+          observer.observe(carouselEl)
+          observers.push({ observer, element: carouselEl })
 
-        // Event listeners
-        const bindings = [
-          ['mouseenter', () => (isHovering = true)],
-          ['mouseleave', () => (isHovering = false)],
-          ['mousedown', onMouseDown],
-          ['mousemove', onMouseMove],
-          ['mouseup', onMouseUp],
-          ['touchstart', onTouchStart],
-          ['touchmove', onTouchMove],
-          ['touchend', onTouchEnd],
-          ['scroll', onScroll],
-        ]
+          carouselEl.style.overflowX = 'scroll'
+          carouselEl.style.webkitOverflowScrolling = 'touch'
 
-        bindings.forEach(([event, handler]) => {
-          carouselEl.addEventListener(event, handler, { passive: event.includes('touch') })
-          eventListeners.push({ element: carouselEl, event, handler })
-        })
+          const newCarousel = carouselEl.cloneNode(false)
+          while (carouselEl.firstChild) {
+            newCarousel.appendChild(carouselEl.firstChild)
+          }
+          if (carouselEl.parentNode) {
+            carouselEl.parentNode.replaceChild(newCarousel, carouselEl)
+          }
+          carouselEl = newCarousel
 
-        const globalEvents = [
-          [window, 'resize', onResize],
-          [document, 'visibilitychange', onVisibilityChange],
-        ]
+          const mouseEnterHandler = () => (isHovering = true)
+          const mouseLeaveHandler = () => (isHovering = false)
 
-        globalEvents.forEach(([target, event, handler]) => {
-          target.addEventListener(event, handler, { passive: true })
-          eventListeners.push({ element: target, event, handler })
-        })
+          carouselEl.addEventListener('mouseenter', mouseEnterHandler)
+          carouselEl.addEventListener('mouseleave', mouseLeaveHandler)
+          carouselEl.addEventListener('mousedown', onMouseDown)
+          carouselEl.addEventListener('mousemove', onMouseMove)
+          carouselEl.addEventListener('mouseup', onMouseUp)
+          carouselEl.addEventListener('touchstart', onTouchStart, { passive: true })
+          carouselEl.addEventListener('touchmove', onTouchMove, { passive: true })
+          carouselEl.addEventListener('touchend', onTouchEnd, { passive: true })
+          carouselEl.addEventListener('scroll', onScroll, { passive: true })
 
-        // Recovery check
+          eventListeners.push(
+            { element: carouselEl, event: 'mouseenter', handler: mouseEnterHandler },
+            { element: carouselEl, event: 'mouseleave', handler: mouseLeaveHandler },
+            { element: carouselEl, event: 'mousedown', handler: onMouseDown },
+            { element: carouselEl, event: 'mousemove', handler: onMouseMove },
+            { element: carouselEl, event: 'mouseup', handler: onMouseUp },
+            { element: carouselEl, event: 'touchstart', handler: onTouchStart },
+            { element: carouselEl, event: 'touchmove', handler: onTouchMove },
+            { element: carouselEl, event: 'touchend', handler: onTouchEnd },
+            { element: carouselEl, event: 'scroll', handler: onScroll },
+          )
+        }
+
+        window.addEventListener('resize', onResize, { passive: true })
+        document.addEventListener('visibilitychange', onVisibilityChange)
+        eventListeners.push(
+          { element: window, event: 'resize', handler: onResize },
+          { element: document, event: 'visibilitychange', handler: onVisibilityChange },
+        )
+
         const interval = setInterval(() => {
           if (
             document.visibilityState === 'visible' &&
             !isDragging &&
             !isUserScrolling &&
-            animationRef.current === null
+            animationRef.current === null &&
+            carouselEl &&
+            carouselEl.isConnected
           ) {
+            console.log(`Recovery: Restarting auto-scroll for carousel ${index}`)
             startAutoScroll()
           }
         }, 5000)
@@ -314,6 +426,16 @@ export function LandingEffects() {
 
       if (typeof carouselAnimationRef !== 'undefined') {
         carouselAnimationRef.current = carouselAnimationRefs
+      }
+
+      return () => {
+        if (styleElement && styleElement.parentNode) {
+          styleElement.parentNode.removeChild(styleElement)
+        }
+
+        if (iosScrollNudgeInterval) {
+          clearInterval(iosScrollNudgeInterval)
+        }
       }
     }
 
