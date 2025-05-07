@@ -659,6 +659,9 @@ p.body-intro.mobile {
 	padding-top: 1rem;
 	padding-bottom: 6rem; }
 
+.heroSupport-container {
+	bottom: 1rem; }
+
 .header-container {
 	padding: .5rem; }
 
@@ -741,6 +744,7 @@ section.service-panel {
 	z-index: 10; }
 
 .serviceContent-inner {
+	margin: 5rem 0;
 	top: 0;
 	transform: translate(0, 0); }
 
@@ -789,7 +793,7 @@ section.service-panel {
 	margin: 12rem 1.5rem 0 1.5rem; }
 
 .expertiseSubtitle-firstRow h6 {
-	padding: 1rem;
+	padding: .5rem 1rem;
 	width: 100%;
 	font-size: 20px; }
 
@@ -1076,8 +1080,8 @@ p.xlarge {
 	padding-bottom: 4rem; }
 
 .infinite-carousel .carousel-item.square {
-	max-height: 280px;
-	max-width: 280px; }
+	max-height: 220px;
+	max-width: 220px; }
 
 .tech-card h3.thin {
 	font-size: 28px;
