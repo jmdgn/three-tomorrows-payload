@@ -47,7 +47,7 @@ export const NewHeader: React.FC<Props> = ({ header = {} as HeaderType }) => {
     return validItems.length > 0 ? validItems : FALLBACK_NAV_ITEMS
   }, [header])
 
-  const ctaLabel = header?.ctaLabel || 'Talk To Us'
+  const ctaLabel = header?.ctaLabel || "Let's Talk"
   const ctaLink = header?.ctaLink?.url || '/contact'
 
   return (

@@ -113,7 +113,7 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
     setMobileMenuOpen(!mobileMenuOpen)
   }
 
-  const ctaLabel = data?.ctaLabel || 'Talk To Us'
+  const ctaLabel = data?.ctaLabel || "Let's Talk"
   const ctaLink = data?.ctaLink?.url || '/contact'
 
   return (

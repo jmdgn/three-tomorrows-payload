@@ -50,7 +50,7 @@ const MOCK_HEADER_DATA = {
     },
   ],
   ctaLink: { url: '/contact' },
-  ctaLabel: 'Talk To Us',
+  ctaLabel: "Let's Talk",
 }
 
 export const HeaderNav: React.FC = () => {

@@ -35,12 +35,14 @@ export const Homepage: CollectionConfig = {
           name: 'description',
           type: 'textarea',
           label: 'Mobile Description',
-          defaultValue: "Disruption isn't just inevitable—it's necessary. Today's business models aren't future-fit in a world transformed by technology, values, and changing expectations.",
+          defaultValue:
+            "Disruption isn't just inevitable—it's necessary. Today's business models aren't future-fit in a world transformed by technology, values, and changing expectations.",
         },
         {
           name: 'desktopDescription',
           type: 'textarea',
-          defaultValue: "Disruption isn't just inevitable—it's necessary. Today's business models aren't future-fit in a world transformed by technology, values, and changing expectations. The organisations that will thrive are those redesigning their relationship with people and planet—creating purposeful disruption rather than merely responding to it.",
+          defaultValue:
+            "Disruption isn't just inevitable—it's necessary. Today's business models aren't future-fit in a world transformed by technology, values, and changing expectations. The organisations that will thrive are those redesigning their relationship with people and planet—creating purposeful disruption rather than merely responding to it.",
         },
         {
           name: 'ctaText',
@@ -56,7 +58,8 @@ export const Homepage: CollectionConfig = {
         {
           name: 'statement',
           type: 'textarea',
-          defaultValue: "Our approach isn't about predicting tomorrow—it's about building your capability to shape it. We focus your attention on what truly matters, guiding teams to see possibility where others see only challenges.",
+          defaultValue:
+            "Our approach isn't about predicting tomorrow—it's about building your capability to shape it. We focus your attention on what truly matters, guiding teams to see possibility where others see only challenges.",
         },
       ],
     },
@@ -104,7 +107,8 @@ export const Homepage: CollectionConfig = {
             {
               name: 'description',
               type: 'textarea',
-              defaultValue: 'Cutting through noise to identify the signals that matter most for your future. Helping you see beyond the horizon and prepare for multiple possible tomorrows.',
+              defaultValue:
+                'Cutting through noise to identify the signals that matter most for your future. Helping you see beyond the horizon and prepare for multiple possible tomorrows.',
             },
             {
               name: 'image',
@@ -120,27 +124,31 @@ export const Homepage: CollectionConfig = {
               number: '01',
               title: 'Intelligence',
               breakTitle: 'Trend',
-              description: 'Cutting through noise to identify the signals that matter most for your future. Helping you see beyond the horizon and prepare for multiple possible tomorrows.',
+              description:
+                'Cutting through noise to identify the signals that matter most for your future. Helping you see beyond the horizon and prepare for multiple possible tomorrows.',
             },
             {
               number: '02',
               title: 'Workshops',
               breakTitle: 'Foresight',
-              description: "Collaborative sessions that build your team's capacity to think differently about change and identify strategic opportunities within emerging trends.",
+              description:
+                "Collaborative sessions that build your team's capacity to think differently about change and identify strategic opportunities within emerging trends.",
             },
             {
               number: '03',
               title: 'Planning',
               breakTitle: 'Strategic',
-              description: 'Facilitation of strategy development processes that align teams, clarify purpose and create actionable roadmaps - independent of or informed by trend analysis.',
+              description:
+                'Facilitation of strategy development processes that align teams, clarify purpose and create actionable roadmaps - independent of or informed by trend analysis.',
             },
             {
               number: '04',
               title: 'Support',
               breakTitle: 'Implementation',
-              description: 'Converting insights and strategy into clear action plans that leverage your organisational strengths while building internal capability.',
-            }
-          ]
+              description:
+                'Converting insights and strategy into clear action plans that leverage your organisational strengths while building internal capability.',
+            },
+          ],
         },
       ],
     },
@@ -170,11 +178,13 @@ export const Homepage: CollectionConfig = {
           defaultValue: [
             { text: '70% of small businesses will transition to new ownership in the next decade' },
             { text: 'AI set to automate 25-40% of work activities by 2030' },
-            { text: 'Social media has evolved from marketing channel to critical business infrastructure' },
+            {
+              text: 'Social media has evolved from marketing channel to critical business infrastructure',
+            },
             { text: "Over 50% of the world's top 100 brands have experimented with Web3" },
             { text: 'AI could displace 83,000,000 jobs over the next 5 years' },
-            { text: '10,000 baby boomers retire daily' }
-          ]
+            { text: '10,000 baby boomers retire daily' },
+          ],
         },
       ],
     },
@@ -190,7 +200,8 @@ export const Homepage: CollectionConfig = {
         {
           name: 'subheading',
           type: 'text',
-          defaultValue: 'Beyond our core strategic approach, we offer specialised expertise in two transformative domains:',
+          defaultValue:
+            'Beyond our core strategic approach, we offer specialised expertise in two transformative domains:',
         },
         {
           name: 'techExpertise',
@@ -232,8 +243,8 @@ export const Homepage: CollectionConfig = {
                 { isImage: true },
                 { text: 'Digital Transformation', isImage: false },
                 { text: 'Tech Evaluation', isImage: false },
-                { isImage: true }
-              ]
+                { isImage: true },
+              ],
             },
           ],
         },
@@ -277,8 +288,8 @@ export const Homepage: CollectionConfig = {
                 { isImage: true },
                 { text: 'Social Impact', isImage: false },
                 { text: 'ESG Strategy', isImage: false },
-                { isImage: true }
-              ]
+                { isImage: true },
+              ],
             },
           ],
         },
@@ -296,12 +307,13 @@ export const Homepage: CollectionConfig = {
         {
           name: 'description',
           type: 'textarea',
-          defaultValue: "Let's talk about how we can implement strategy and transformation into your business so help you shape tomorrow.",
+          defaultValue:
+            "Let's talk about how we can implement strategy and transformation into your business so help you shape tomorrow.",
         },
         {
           name: 'ctaText',
           type: 'text',
-          defaultValue: 'Talk To Us',
+          defaultValue: "Let's Talk",
         },
       ],
     },
