@@ -12,7 +12,6 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
   const slideRefs = useRef([])
   const slideWidth = useRef(0)
   const isDraggingRef = useRef(false)
-  const autoplayTimerRef = useRef(null)
   const totalSlides = serviceItems.length
 
   // Initialize or reset slide references when items change
@@ -46,18 +45,11 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
 
     return () => {
       window.removeEventListener('resize', handleResize)
-      if (autoplayTimerRef.current) {
-        clearInterval(autoplayTimerRef.current)
-      }
     }
   }, [currentSlide])
 
   // Handle touch and mouse events
   const handleTouchStart = (e) => {
-    if (autoplayTimerRef.current) {
-      clearInterval(autoplayTimerRef.current)
-    }
-
     setIsTouching(true)
     isDraggingRef.current = true
     setTouchStartTime(Date.now())
@@ -93,7 +85,6 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
     }
 
     // Only prevent default for mouse events, not touch events
-    // This prevents the error "Unable to preventDefault inside passive event listener"
     if (e.type.includes('mouse')) {
       e.preventDefault()
     }
@@ -170,6 +161,7 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
           position: 'relative',
           overflow: 'hidden',
           width: '100%',
+          marginBottom: '16px',
         }}
       >
         <div
@@ -196,13 +188,12 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
           {serviceItems.map((service, index) => (
             <div
               className="carousel-slide"
-              ref={(el) => (slideRefs.current[index] = el)}
               key={index}
               style={{
                 flexShrink: 0,
                 width: '100%',
-                paddingLeft: '8px',
-                paddingRight: '8px',
+                paddingLeft: '12px',
+                paddingRight: '12px',
                 boxSizing: 'border-box',
                 userSelect: 'none',
                 pointerEvents: isTouching ? 'none' : 'auto',

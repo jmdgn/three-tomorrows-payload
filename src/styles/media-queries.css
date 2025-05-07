@@ -737,7 +737,8 @@ section.intro-section {
 	padding: 0; }
 
 section.service-panel {
-	margin-bottom: 10svh; }
+	margin-bottom: 10svh;
+	z-index: 10; }
 
 .serviceContent-inner {
 	top: 0;
@@ -905,43 +906,10 @@ img.article-image {
 	height: 100%; }
 
 .serviceText-panelBottom {
-	width: fit-content;
-	padding: 1.5rem 1rem .5rem 1rem; }
-
-.service-carousel-container {
-	position: relative;
-    width: 100%;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center; }
-
-.service-carousel {
-	display: flex;
-	width: 100%;
-	overflow-x: scroll;
-	scroll-snap-type: x mandatory;
-	scrollbar-width: none;
-	-ms-overflow-style: none;
-	scroll-behavior: smooth;
-	-webkit-overflow-scrolling: touch;
-	cursor: grab;
-	margin: 0;
-	padding: 1rem 0; }
-
-.service-carousel::-webkit-scrollbar {
-	display: none; }
+	padding: 1.5rem .75rem .5rem .75rem; }
 
 .carousel-slide {
-	flex: 0 0 calc(100% - 16px);
-	scroll-snap-align: start;
-	scroll-snap-stop: always;
-	padding: 0 8px;
-	box-sizing: border-box; }
+	padding: 0 4px; }
 	  
 .serviceCard {
 	width: 100%;
@@ -984,7 +952,8 @@ img.article-image {
 	transform: scale(1.1); }
 
 .carousel-slide {
-	width: 100%; }
+	width: 100%;
+	padding: 1rem; }
 
 .serviceContent-outer {
 	padding: 0; }
@@ -1116,9 +1085,6 @@ p.xlarge {
 
 .contactContent-outer {
 	padding: 1rem; }
-
-.carousel-slide {
-	flex: 0 0 calc(95% - 16px); }
 	
 .serviceText-panelBottom h3 {
 	font-size: 32px;
