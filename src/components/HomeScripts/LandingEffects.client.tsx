@@ -107,213 +107,156 @@ export function LandingEffects() {
       const carouselElements = document.querySelectorAll('.infinite-carousel')
       if (carouselElements.length === 0) return
 
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
       const carouselAnimationRefs = []
-      const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
-      carouselElements.forEach((carouselElement, carouselIndex) => {
-        const carouselItems = carouselElement.querySelectorAll('.carousel-item')
-        if (carouselItems.length === 0) return
+      carouselElements.forEach((carouselEl, index) => {
+        const items = carouselEl.querySelectorAll('.carousel-item')
+        if (items.length === 0) return
 
-        carouselElement.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
+        // Remove previous clones
+        carouselEl.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
-        const isReverse = carouselIndex === 1
-        const animationSpeed = isMobileDevice ? (isReverse ? -0.4 : 0.4) : isReverse ? -0.8 : 0.8
-
+        const isReverse = index === 1
+        const speed = isMobile ? (isReverse ? -0.4 : 0.4) : isReverse ? -0.8 : 0.8
         const cloneCount = 2
 
+        // Clone items
         for (let i = 0; i < cloneCount; i++) {
-          if (isReverse) {
-            Array.from(carouselItems)
-              .reverse()
-              .forEach((item) => {
-                const clone = item.cloneNode(true)
-                clone.classList.add('carousel-item-clone')
-                carouselElement.prepend(clone)
-              })
-          } else {
-            carouselItems.forEach((item) => {
-              const clone = item.cloneNode(true)
-              clone.classList.add('carousel-item-clone')
-              carouselElement.appendChild(clone)
-            })
-          }
+          const target = isReverse ? Array.from(items).reverse() : items
+          target.forEach((item) => {
+            const clone = item.cloneNode(true)
+            clone.classList.add('carousel-item-clone')
+            isReverse ? carouselEl.prepend(clone) : carouselEl.appendChild(clone)
+          })
         }
 
-        const originalCount = carouselItems.length
-        const itemWidth = carouselItems[0].offsetWidth
-        const originalSetWidth = originalCount * itemWidth
+        const itemWidth = items[0].offsetWidth
+        const originalSetWidth = items.length * itemWidth
 
-        carouselElement.scrollLeft = isReverse
-          ? originalSetWidth * (cloneCount - 1)
-          : originalSetWidth
+        carouselEl.scrollLeft = isReverse ? originalSetWidth * (cloneCount - 1) : originalSetWidth
 
         let isDragging = false
+        let isHovering = false
+        let isUserScrolling = false
         let startX = 0
         let initialScroll = 0
-        let isHovering = false
-        let lastTouchTime = 0
-
-        let isUserScrolling = false
         let resumeScrollTimer = null
 
         const animationRef = { current: null }
         carouselAnimationRefs.push(animationRef)
 
-        const adjustScrollPosition = () => {
-          const currentScroll = carouselElement.scrollLeft
-          const maxScroll = originalSetWidth * (cloneCount + 1)
-          const minScroll = originalSetWidth * (cloneCount - 1)
+        const adjustScroll = () => {
+          const currentScroll = carouselEl.scrollLeft
+          const max = originalSetWidth * (cloneCount + 1)
+          const min = originalSetWidth * (cloneCount - 1)
 
-          if (animationSpeed > 0) {
-            if (currentScroll >= maxScroll) {
-              carouselElement.scrollLeft = currentScroll - originalSetWidth
-            } else if (currentScroll <= minScroll) {
-              carouselElement.scrollLeft = currentScroll + originalSetWidth
-            }
+          if (speed > 0) {
+            if (currentScroll >= max) carouselEl.scrollLeft -= originalSetWidth
+            else if (currentScroll <= min) carouselEl.scrollLeft += originalSetWidth
           } else {
-            if (currentScroll <= minScroll) {
-              carouselElement.scrollLeft = currentScroll + originalSetWidth * 2
-            } else if (currentScroll >= maxScroll) {
-              carouselElement.scrollLeft = currentScroll - originalSetWidth * 2
-            }
+            if (currentScroll <= min) carouselEl.scrollLeft += originalSetWidth * 2
+            else if (currentScroll >= max) carouselEl.scrollLeft -= originalSetWidth * 2
           }
         }
 
-        const startAutoScroll = () => {
-          if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current)
+        const autoScroll = () => {
+          if (!isUserScrolling && !isHovering && !isDragging) {
+            carouselEl.scrollLeft += speed
+            adjustScroll()
           }
-
-          const autoScroll = () => {
-            if (!isUserScrolling && !isHovering && !isDragging) {
-              carouselElement.scrollLeft += animationSpeed
-              adjustScrollPosition()
-            }
-            animationRef.current = requestAnimationFrame(autoScroll)
-          }
-
           animationRef.current = requestAnimationFrame(autoScroll)
         }
 
-        const resumeAutoScrollAfterDelay = () => {
+        const startAutoScroll = () => {
+          if (!animationRef.current) {
+            animationRef.current = requestAnimationFrame(autoScroll)
+          }
+        }
+
+        const stopAutoScroll = () => {
+          if (animationRef.current) {
+            cancelAnimationFrame(animationRef.current)
+            animationRef.current = null
+          }
+        }
+
+        const resumeScrollAfterDelay = () => {
           clearTimeout(resumeScrollTimer)
           resumeScrollTimer = setTimeout(() => {
             isUserScrolling = false
           }, 1500)
         }
 
-        const onMouseEnter = () => {
-          isHovering = true
+        const setDragging = (val) => {
+          isDragging = val
+          carouselEl.classList.toggle('dragging', val)
         }
 
-        const onMouseLeave = () => {
-          isHovering = false
+        const handleDrag = (clientX) => {
+          const x = clientX - carouselEl.offsetLeft
+          const walk = (x - startX) * 2
+          carouselEl.scrollLeft = initialScroll - walk
+          adjustScroll()
         }
 
+        // Mouse / touch handlers
         const onMouseDown = (e) => {
-          isDragging = true
+          setDragging(true)
           isUserScrolling = true
-          startX = e.pageX - carouselElement.offsetLeft
-          initialScroll = carouselElement.scrollLeft
-          carouselElement.classList.add('dragging')
-
-          if (window.getSelection) {
-            window.getSelection().removeAllRanges()
-          }
-        }
-
-        const onMouseUp = () => {
-          isDragging = false
-          carouselElement.classList.remove('dragging')
-          resumeAutoScrollAfterDelay()
+          startX = e.pageX - carouselEl.offsetLeft
+          initialScroll = carouselEl.scrollLeft
         }
 
         const onMouseMove = (e) => {
           if (!isDragging) return
           e.preventDefault()
-          const x = e.pageX - carouselElement.offsetLeft
-          const walk = (x - startX) * 2
-          carouselElement.scrollLeft = initialScroll - walk
-          adjustScrollPosition()
+          handleDrag(e.pageX)
+        }
+
+        const onMouseUp = () => {
+          setDragging(false)
+          resumeScrollAfterDelay()
         }
 
         const onTouchStart = (e) => {
-          isDragging = true
+          setDragging(true)
           isUserScrolling = true
-          startX = e.touches[0].pageX - carouselElement.offsetLeft
-          initialScroll = carouselElement.scrollLeft
-          lastTouchTime = Date.now()
-          carouselElement.classList.add('dragging')
-        }
-
-        const onTouchEnd = () => {
-          isDragging = false
-          carouselElement.classList.remove('dragging')
-          resumeAutoScrollAfterDelay()
+          startX = e.touches[0].pageX - carouselEl.offsetLeft
+          initialScroll = carouselEl.scrollLeft
         }
 
         const onTouchMove = (e) => {
           if (!isDragging) return
-          lastTouchTime = Date.now()
-          const x = e.touches[0].pageX - carouselElement.offsetLeft
-          const walk = (x - startX) * 2
-          carouselElement.scrollLeft = initialScroll - walk
-          adjustScrollPosition()
+          handleDrag(e.touches[0].pageX)
         }
 
+        const onTouchEnd = () => {
+          setDragging(false)
+          resumeScrollAfterDelay()
+        }
+
+        // Other handlers
         const onScroll = () => {
           if (isDragging) {
             isUserScrolling = true
-            adjustScrollPosition()
+            adjustScroll()
           }
         }
 
         const onVisibilityChange = () => {
-          if (document.visibilityState === 'visible') {
-            if (animationRef.current === null) {
-              startAutoScroll()
-            }
-          } else if (animationRef.current) {
-            cancelAnimationFrame(animationRef.current)
-            animationRef.current = null
-          }
+          document.visibilityState === 'visible' ? startAutoScroll() : stopAutoScroll()
         }
 
         const onResize = () => {
-          const newItemWidth = carouselItems[0].offsetWidth
-          const newOriginalSetWidth = originalCount * newItemWidth
-          carouselElement.scrollLeft =
-            (carouselElement.scrollLeft / originalSetWidth) * newOriginalSetWidth
+          const newWidth = items[0].offsetWidth
+          const newTotalWidth = items.length * newWidth
+          carouselEl.scrollLeft = (carouselEl.scrollLeft / originalSetWidth) * newTotalWidth
         }
 
-        carouselElement.addEventListener('mouseenter', onMouseEnter, { passive: true })
-        carouselElement.addEventListener('mouseleave', onMouseLeave, { passive: true })
-        carouselElement.addEventListener('mousedown', onMouseDown)
-        carouselElement.addEventListener('mouseup', onMouseUp)
-        carouselElement.addEventListener('mousemove', onMouseMove)
-        carouselElement.addEventListener('scroll', onScroll, { passive: true })
-
-        carouselElement.addEventListener('touchstart', onTouchStart, { passive: true })
-        carouselElement.addEventListener('touchend', onTouchEnd, { passive: true })
-        carouselElement.addEventListener('touchmove', onTouchMove, { passive: false })
-
-        window.addEventListener('resize', onResize, { passive: true })
-        document.addEventListener('visibilitychange', onVisibilityChange)
-
         const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                if (animationRef.current === null) {
-                  console.log(`Starting auto-scroll for carousel ${carouselIndex}`)
-                  startAutoScroll()
-                }
-              } else if (animationRef.current) {
-                console.log(`Stopping auto-scroll for carousel ${carouselIndex} - not visible`)
-                cancelAnimationFrame(animationRef.current)
-                animationRef.current = null
-              }
-            })
+          ([entry]) => {
+            entry.isIntersecting ? startAutoScroll() : stopAutoScroll()
           },
           {
             threshold: 0.1,
@@ -321,53 +264,52 @@ export function LandingEffects() {
           },
         )
 
-        observer.observe(carouselElement)
+        observer.observe(carouselEl)
+        observers.push({ observer, element: carouselEl })
 
-        console.log(`Initial auto-scroll start for carousel ${carouselIndex}`)
-        startAutoScroll()
+        // Event listeners
+        const bindings = [
+          ['mouseenter', () => (isHovering = true)],
+          ['mouseleave', () => (isHovering = false)],
+          ['mousedown', onMouseDown],
+          ['mousemove', onMouseMove],
+          ['mouseup', onMouseUp],
+          ['touchstart', onTouchStart],
+          ['touchmove', onTouchMove],
+          ['touchend', onTouchEnd],
+          ['scroll', onScroll],
+        ]
 
-        const checkInterval = setInterval(() => {
+        bindings.forEach(([event, handler]) => {
+          carouselEl.addEventListener(event, handler, { passive: event.includes('touch') })
+          eventListeners.push({ element: carouselEl, event, handler })
+        })
+
+        const globalEvents = [
+          [window, 'resize', onResize],
+          [document, 'visibilitychange', onVisibilityChange],
+        ]
+
+        globalEvents.forEach(([target, event, handler]) => {
+          target.addEventListener(event, handler, { passive: true })
+          eventListeners.push({ element: target, event, handler })
+        })
+
+        // Recovery check
+        const interval = setInterval(() => {
           if (
             document.visibilityState === 'visible' &&
             !isDragging &&
             !isUserScrolling &&
             animationRef.current === null
           ) {
-            console.log(`Restarting stalled carousel ${carouselIndex}`)
             startAutoScroll()
           }
         }, 5000)
 
-        eventListeners.push({
-          element: carouselElement,
-          event: 'mouseenter',
-          handler: onMouseEnter,
-        })
-        eventListeners.push({
-          element: carouselElement,
-          event: 'mouseleave',
-          handler: onMouseLeave,
-        })
-        eventListeners.push({ element: carouselElement, event: 'mousedown', handler: onMouseDown })
-        eventListeners.push({ element: carouselElement, event: 'mouseup', handler: onMouseUp })
-        eventListeners.push({ element: carouselElement, event: 'mousemove', handler: onMouseMove })
-        eventListeners.push({ element: carouselElement, event: 'scroll', handler: onScroll })
-        eventListeners.push({
-          element: carouselElement,
-          event: 'touchstart',
-          handler: onTouchStart,
-        })
-        eventListeners.push({ element: carouselElement, event: 'touchend', handler: onTouchEnd })
-        eventListeners.push({ element: carouselElement, event: 'touchmove', handler: onTouchMove })
-        eventListeners.push({ element: window, event: 'resize', handler: onResize })
-        eventListeners.push({
-          element: document,
-          event: 'visibilitychange',
-          handler: onVisibilityChange,
-        })
-
-        timeouts.push(checkInterval)
-        observers.push({ observer, element: carouselElement })
+        timeouts.push(interval)
+        console.log(`Initial auto-scroll start for carousel ${index}`)
+        startAutoScroll()
       })
 
       if (typeof carouselAnimationRef !== 'undefined') {
