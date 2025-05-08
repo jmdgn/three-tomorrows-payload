@@ -1007,6 +1007,16 @@ article.pt-16.pb-24 {
 }
 
 
+@media (min-width: 769px) {
+	.mobile-menu-toggle {
+		display: none; }
+	
+	.mobile-menu {
+		display: none; }
+	}
+	
+
+
 @media (max-width: 768px) {
 .desktop-menu {
 	display: none; }
@@ -1021,6 +1031,9 @@ article.pt-16.pb-24 {
 	align-items: center;
 	width: 100%; }
 
+.factText-container {
+	padding: 0 1rem; }
+
 .expertise-carousel {
 	padding-bottom: 2rem; }
 	
@@ -1031,17 +1044,12 @@ article.pt-16.pb-24 {
 .contactCta.header {
 	padding: 8px 20px; }
 }
-  
-@media (min-width: 769px) {
-.mobile-menu-toggle {
-	display: none; }
-
-.mobile-menu {
-	display: none; }
-}
 
 
 @media only screen and (max-width:550px) {
+.intro-subtitle h4 {
+	font-size: 160%; }
+
 .introStatement-outer h2 {
 	font-size: 36px;
 	line-height: 38px; }
@@ -1069,6 +1077,9 @@ p.body-intro {
 p.xlarge {
 	font-size: 38px;
 	line-height: 1.2; }
+
+.service-carousel-container {
+	margin: 0 0 2rem; }
 
 .factCard-container h2 {
 	font-size: 3.5svh; }

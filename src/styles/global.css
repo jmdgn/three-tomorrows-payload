@@ -375,7 +375,8 @@ nav.mainNav {
     width: 100%;
     padding: 1rem 2rem;
     gap: 0px;
-    transition: gap 0.6s ease-out; }
+    transition: gap 0.6s ease-out;
+    z-index: 100; }
 
 .logo-container,
 .menu-container,
@@ -513,18 +514,22 @@ img.main-logo:hover {
     
 .mobile-menu {
     position: absolute;
-    top: 100%;
+    top: 0;
     left: 0;
     right: 0;
-    background: rgba(244,244,244,.64);
-    margin: .5rem;
-    border-radius: 8px;
+    height: 100svh;
+    background: #3BE494;
+    margin: 0;
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
-    box-shadow: 2px 2px 24px 0 rgba(0,0,0,.12);
     animation: fadeIn 0.3s ease-in-out;
     opacity: 1;
-    z-index: 100; }
+    z-index: 99; }
+
+.mobile-menu nav {
+    position: relative;
+    margin-top: 10rem;
+    margin-bottom: 1rem; }
 
 @keyframes fadeIn {
     from {
@@ -562,23 +567,136 @@ img.main-logo:hover {
     
 .mobile-menu-items li {
     padding: 0; }
-
-.mobile-menu-items li:first-child {
-    padding-top: .5rem;
-    border-radius: 8px 8px 0 0; }
-
-.mobile-menu-items li:last-child {
-    padding-bottom: .5rem;
-    border-radius: 0 0 8px 8px; }
     
 .mobile-menu-items li a {
     display: block;
-    padding: 15px 20px;
+    padding: .75rem 1rem;
     text-decoration: none;
-    color: inherit; }
+    color: #171744;
+    font-family: "NaNHoloX Condensed Black";
+    font-size: 52px;
+    line-height: 42px;
+    text-transform: uppercase; }
     
 .mobile-menu-items li a:hover {
     background-color: #f9f9f9; }
+
+.mobile-social-links {
+    position: relative;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box; }
+
+ul.social-menu-items {
+    display: block;
+    list-style-type: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0; }
+
+ul.social-menu-items li {
+    display: inline-block;
+    margin-right: 2rem; }
+
+ul.social-menu-items li a {
+    font-family: "Neue Montreal Medium";
+    font-size: 1rem;
+    line-height: 24px;
+    color: #191C1C; }
+
+.mobileMenu-ctaCon {
+    position: relative;
+    box-sizing: border-box;
+    padding: 2rem 1rem; }
+    
+.mobileMenu-ctaCon a {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 46px;
+    justify-content: center;
+    background: #2D33E0;
+    border-radius: 8px; }
+
+.mobileMenu-ctaCon a p {
+    color: #FFF; }
+
+.mobile-latest-post {
+    position: relative;
+    width: 100%;
+    height: inherit;
+    padding: 2rem 1rem;
+    background: #FFF;
+    border-radius: 8px 8px 0 0;
+    box-sizing: border-box; }
+
+.mobile-postInner h6.latest-post-heading {
+    color: #171744;
+    font-family: "NaNHoloX Condensed Black";
+    font-size: 22px;
+    line-height: 22px;
+    text-transform: uppercase; }
+
+.latest-post-card {
+    position: relative;
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0; }
+
+.latest-post-image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: 138px;
+    max-height: 139px;
+    overflow: hidden;
+    border-radius: 8px; }
+
+.latest-post-image img {
+    width: auto;
+    height: fit-content;
+    max-height: 138px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    left: 0;
+    right: 0; }
+
+.latest-post-content {
+    display: flex;
+    flex-direction: column; }
+
+.latest-post-content h5 {
+    font-family: "Neue Montreal Medium";
+    font-size: 1rem;
+    line-height: 22px;
+    color: #191C1C;
+    margin-bottom: .5rem; }
+
+.latest-post-date {
+    margin-bottom: 1.5rem; }
+
+.latest-post-date span {
+    font-family: "Neue Montreal Medium";
+    font-size: 12px;
+    line-height: 20px;
+    color: #929292;
+    letter-spacing: 0.48px; }
+
+.latest-post-category {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    color: rgb(23, 23, 68);
+    font-family: "Neue Montreal Medium";
+    font-size: 12px;
+    font-style: normal;
+    line-height: 18px;
+    letter-spacing: 0.48px;
+    padding: 5px 16px 6px;
+    gap: 10px;
+    border-radius: 3px;
+    background: rgb(219, 229, 237); }
     
 .mainNav {
     position: relative; }

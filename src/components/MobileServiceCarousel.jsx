@@ -8,20 +8,19 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
   const [startX, setStartX] = useState(0)
   const [currentX, setCurrentX] = useState(0)
   const [touchStartTime, setTouchStartTime] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
   const carouselRef = useRef(null)
   const slideRefs = useRef([])
   const slideWidth = useRef(0)
   const isDraggingRef = useRef(false)
   const totalSlides = serviceItems.length
 
-  // Initialize or reset slide references when items change
   useEffect(() => {
     slideRefs.current = serviceItems.map(
-      (_, index) => slideRefs.current[index] || React.createRef(),
+      (_, index) => slideRefs.current[index] || React.createRef()
     )
   }, [serviceItems])
 
-  // Setup carousel on mount and handle resize events
   useEffect(() => {
     const initializeCarousel = () => {
       if (!carouselRef.current) return
@@ -29,14 +28,11 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
       const containerWidth = carouselRef.current.offsetWidth
       slideWidth.current = containerWidth
 
-      // Set initial position
       goToSlide(currentSlide, false)
     }
 
-    // Initialize
     initializeCarousel()
 
-    // Handle window resize
     const handleResize = () => {
       initializeCarousel()
     }
@@ -48,13 +44,13 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
     }
   }, [currentSlide])
 
-  // Handle touch and mouse events
   const handleTouchStart = (e) => {
+    if (isAnimating) return
+    
     setIsTouching(true)
     isDraggingRef.current = true
     setTouchStartTime(Date.now())
 
-    // Get touch or mouse position
     const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX
 
     setStartX(clientX)
@@ -62,57 +58,50 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
   }
 
   const handleTouchMove = (e) => {
-    if (!isTouching || !isDraggingRef.current) return
+    if (!isTouching || !isDraggingRef.current || isAnimating) return
 
-    // Get the current X position
     const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX
 
     setCurrentX(clientX)
 
-    // Calculate the offset
     const deltaX = clientX - startX
 
-    // Apply transform to the carousel container with damping for smoother feel
     if (carouselRef.current) {
       let offset = -currentSlide * slideWidth.current + deltaX
       
-      // Add slight resistance at edges for a better feel
-      if ((currentSlide === 0 && deltaX > 0) || (currentSlide === totalSlides - 1 && deltaX < 0)) {
-        offset = -currentSlide * slideWidth.current + (deltaX * 0.5)
+      if (currentSlide === 0 && deltaX > 0) {
+        offset = -currentSlide * slideWidth.current + (deltaX * 0.3)
+      } else if (currentSlide === totalSlides - 1 && deltaX < 0) {
+        offset = -currentSlide * slideWidth.current + (deltaX * 0.3)
       }
       
       carouselRef.current.style.transform = `translateX(${offset}px)`
     }
 
-    // Only prevent default for mouse events, not touch events
     if (e.type.includes('mouse')) {
       e.preventDefault()
     }
   }
 
   const handleTouchEnd = (e) => {
-    if (!isTouching || !isDraggingRef.current) return
+    if (!isTouching || !isDraggingRef.current || isAnimating) return
 
     const touchDuration = Date.now() - touchStartTime
     const deltaX = currentX - startX
     const absDeltaX = Math.abs(deltaX)
 
-    // Determine if this is a swipe based on distance and time
     const isQuickSwipe = touchDuration < 250 && absDeltaX > 20
-    const isLongSwipe = absDeltaX > slideWidth.current * 0.25
+    const isLongSwipe = absDeltaX > slideWidth.current * 0.15
 
     if (isQuickSwipe || isLongSwipe) {
-      // If swiped left, go to next slide, if right, go to previous
       if (deltaX < 0 && currentSlide < totalSlides - 1) {
         goToSlide(currentSlide + 1)
       } else if (deltaX > 0 && currentSlide > 0) {
         goToSlide(currentSlide - 1)
       } else {
-        // If at the edge, snap back with animation
         goToSlide(currentSlide)
       }
     } else {
-      // Snap back to current slide
       goToSlide(currentSlide)
     }
 
@@ -120,36 +109,36 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
     isDraggingRef.current = false
   }
 
-  // Navigate to a specific slide with or without animation
   const goToSlide = (index, animate = true) => {
-    if (!carouselRef.current) return
+    if (!carouselRef.current || isAnimating) return
 
-    // Ensure index is within bounds
     const targetIndex = Math.max(0, Math.min(index, totalSlides - 1))
 
-    // Calculate the offset
     const offset = -targetIndex * slideWidth.current
 
-    // Apply transform with or without transition
+    if (animate) {
+      setIsAnimating(true)
+    }
+
     carouselRef.current.style.transition = animate
-      ? 'transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)'
+      ? 'transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)'
       : 'none'
     carouselRef.current.style.transform = `translateX(${offset}px)`
 
-    // Update state
     setCurrentSlide(targetIndex)
 
-    // Clear transition after animation completes
     if (animate) {
       setTimeout(() => {
         if (carouselRef.current) {
           carouselRef.current.style.transition = 'none'
+          setIsAnimating(false)
         }
-      }, 300)
+      }, 500)
     }
   }
 
   const handleDotClick = (index) => {
+    if (isAnimating) return
     goToSlide(index)
   }
 
@@ -159,14 +148,14 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
         className="service-carousel-wrapper"
         style={{
           position: 'relative',
-          overflow: 'hidden',
+          overflow: 'visible',
           width: '100%',
           marginBottom: '16px',
         }}
       >
         <div
           ref={carouselRef}
-          className={`service-carousel ${isTouching ? 'dragging' : ''}`}
+          className={`service-carousel ${isTouching ? 'dragging' : ''} ${isAnimating ? 'animating' : ''}`}
           style={{
             display: 'flex',
             transform: 'translateX(0)',
@@ -174,6 +163,7 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
             width: '100%',
             touchAction: 'pan-y',
             willChange: 'transform',
+            paddingBottom: '8px',
           }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -192,11 +182,13 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
               style={{
                 flexShrink: 0,
                 width: '100%',
-                paddingLeft: '12px',
-                paddingRight: '12px',
+                padding: '0 12px',
                 boxSizing: 'border-box',
                 userSelect: 'none',
-                pointerEvents: isTouching ? 'none' : 'auto',
+                pointerEvents: isTouching || isAnimating ? 'none' : 'auto',
+                opacity: isAnimating ? (index === currentSlide ? 1 : 0.8) : 1,
+                transform: `scale(${isAnimating ? (index === currentSlide ? 1 : 0.95) : 1})`,
+                transition: 'opacity 0.5s ease, transform 0.5s ease',
               }}
             >
               <div className="serviceCard">
@@ -232,6 +224,9 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
               key={index}
               className={`carousel-dot ${currentSlide === index ? 'active' : ''}`}
               onClick={() => handleDotClick(index)}
+              style={{
+                transition: 'all 0.4s ease',
+              }}
             />
           ))}
         </div>

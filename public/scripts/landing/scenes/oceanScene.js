@@ -11,6 +11,13 @@ const sphereEndY = -30
 const sphereStartScale = 1.0
 const sphereEndScale = 0.7
 
+const mobileSphereStartY = 18
+const mobileSphereEndY = -24
+const mobileSphereStartScale = 0.7
+const mobileSphereEndScale = 0.5
+
+const isMobile = window.innerWidth <= 768
+
 window.parallaxIntensity = parallaxIntensity
 window.mouseX = mouseX
 window.mouseY = mouseY
@@ -18,10 +25,10 @@ window.targetX = targetX
 window.targetY = targetY
 
 window.sphereAnimation = {
-  startY: sphereStartY,
-  endY: sphereEndY,
-  startScale: sphereStartScale,
-  endScale: sphereEndScale,
+  startY: isMobile ? mobileSphereStartY : sphereStartY,
+  endY: isMobile ? mobileSphereEndY : sphereEndY,
+  startScale: isMobile ? mobileSphereStartScale : sphereStartScale,
+  endScale: isMobile ? mobileSphereEndScale : sphereEndScale,
   scrollStartThreshold: 0.0,
   scrollEndThreshold: 0.25,
 }
@@ -149,7 +156,8 @@ function init() {
   }
   updateSun()
 
-  const sphereGeometry = new THREE.SphereGeometry(28, 32, 32)
+  const sphereRadius = isMobile ? 20 : 28
+  const sphereGeometry = new THREE.SphereGeometry(sphereRadius, 32, 32)
 
   const sphereMaterial = new THREE.MeshStandardMaterial({
     color: 0x000000,
@@ -159,7 +167,7 @@ function init() {
   })
 
   sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
-  sphere.position.set(0, sphereStartY, 0)
+  sphere.position.set(0, window.sphereAnimation.startY, 0)
   scene.add(sphere)
   window.sphere = sphere
 
@@ -176,6 +184,18 @@ function init() {
   controls.update()
 
   window.addEventListener('resize', onWindowResize)
+
+  window.addEventListener('resize', () => {
+    const isMobile = window.innerWidth <= 768
+
+    window.sphereAnimation.startY = isMobile ? mobileSphereStartY : sphereStartY
+    window.sphereAnimation.endY = isMobile ? mobileSphereEndY : sphereEndY
+    window.sphereAnimation.startScale = isMobile ? mobileSphereStartScale : sphereStartScale
+    window.sphereAnimation.endScale = isMobile ? mobileSphereEndScale : sphereEndScale
+
+    if (sphere) {
+    }
+  })
 
   console.log('Starting animation loop')
   animate()
