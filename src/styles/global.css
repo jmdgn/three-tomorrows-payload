@@ -524,7 +524,13 @@ img.main-logo:hover {
     backdrop-filter: blur(16px);
     animation: fadeIn 0.3s ease-in-out;
     opacity: 1;
+    overflow: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     z-index: 99; }
+
+.mobile-menu::-webkit-scrollbar {
+    display: none; }
 
 .mobile-menu nav {
     position: relative;
@@ -579,7 +585,7 @@ img.main-logo:hover {
     text-transform: uppercase; }
     
 .mobile-menu-items li a:hover {
-    background-color: #f9f9f9; }
+    color: #2D33E0 }
 
 .mobile-social-links {
     position: relative;

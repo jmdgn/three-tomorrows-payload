@@ -156,7 +156,7 @@ function init() {
   }
   updateSun()
 
-  const sphereRadius = isMobile ? 24 : 28
+  const sphereRadius = isMobile ? 25 : 28
   const sphereGeometry = new THREE.SphereGeometry(sphereRadius, 32, 32)
 
   const sphereMaterial = new THREE.MeshStandardMaterial({

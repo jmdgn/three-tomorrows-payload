@@ -415,131 +415,133 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
         {/* Mobile Navigation Menu */}
         {mobileMenuOpen && (
           <div className="mobile-menu">
-            <nav>
-              <ul className={`mobile-menu-items ${menuItemsVisible ? 'items-visible' : ''}`}>
-                {navItems.map((item, index) => (
-                  <li
-                    key={`mobile-nav-${index}`}
-                    className="menu-item"
-                    style={{
-                      animationDelay: `${0.1 + index * 0.05}s`,
-                    }}
-                  >
-                    {item.newTab ? (
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => {
-                          setMobileMenuOpen(false)
-                          lockBodyScroll(false) // Unlock when link clicked
-                        }}
-                      >
-                        {item.label}
-                      </a>
-                    ) : (
-                      <Link
-                        href={item.url}
-                        onClick={() => {
-                          setMobileMenuOpen(false)
-                          lockBodyScroll(false) // Unlock when link clicked
-                        }}
-                      >
-                        {item.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <div className="mobileMenu-inner">
+              <nav>
+                <ul className={`mobile-menu-items ${menuItemsVisible ? 'items-visible' : ''}`}>
+                  {navItems.map((item, index) => (
+                    <li
+                      key={`mobile-nav-${index}`}
+                      className="menu-item"
+                      style={{
+                        animationDelay: `${0.1 + index * 0.05}s`,
+                      }}
+                    >
+                      {item.newTab ? (
+                        <a
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => {
+                            setMobileMenuOpen(false)
+                            lockBodyScroll(false) // Unlock when link clicked
+                          }}
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link
+                          href={item.url}
+                          onClick={() => {
+                            setMobileMenuOpen(false)
+                            lockBodyScroll(false) // Unlock when link clicked
+                          }}
+                        >
+                          {item.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </nav>
 
-            <div className={`mobile-social-links ${menuItemsVisible ? 'section-visible' : ''}`}>
-              <ul className="social-menu-items">
-                {socialLinks.map((social, index) => (
-                  <li
-                    key={`social-${index}`}
-                    className="social-item"
-                    style={{
-                      animationDelay: `${0.3 + index * 0.05}s`,
-                    }}
-                  >
-                    <a
-                      href={social.url}
-                      target={social.openInNewTab ? '_blank' : '_self'}
-                      rel={social.openInNewTab ? 'noopener noreferrer' : undefined}
+              <div className={`mobile-social-links ${menuItemsVisible ? 'section-visible' : ''}`}>
+                <ul className="social-menu-items">
+                  {socialLinks.map((social, index) => (
+                    <li
+                      key={`social-${index}`}
+                      className="social-item"
+                      style={{
+                        animationDelay: `${0.3 + index * 0.05}s`,
+                      }}
+                    >
+                      <a
+                        href={social.url}
+                        target={social.openInNewTab ? '_blank' : '_self'}
+                        rel={social.openInNewTab ? 'noopener noreferrer' : undefined}
+                        onClick={() => {
+                          setMobileMenuOpen(false)
+                          lockBodyScroll(false) // Unlock when link clicked
+                        }}
+                      >
+                        {social.platform}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className={`mobileMenu-ctaCon ${menuItemsVisible ? 'section-visible' : ''}`}>
+                <a
+                  href={mobileCta.url}
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    lockBodyScroll(false) // Unlock when CTA clicked
+                  }}
+                >
+                  <p>{mobileCta.label}</p>
+                </a>
+              </div>
+
+              {latestPost && (
+                <div className={`mobile-latest-post ${menuItemsVisible ? 'section-visible' : ''}`}>
+                  <div className="mobile-postInner">
+                    <h6 className="latest-post-heading">Latest Article</h6>
+
+                    <Link
+                      href={`/posts/${latestPost.slug}`}
                       onClick={() => {
                         setMobileMenuOpen(false)
                         lockBodyScroll(false) // Unlock when link clicked
                       }}
                     >
-                      {social.platform}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                      <div className="latest-post-card">
+                        <div className="latest-post-top">
+                          {getPostImageUrl(latestPost) && (
+                            <div className="latest-post-image">
+                              <img
+                                src={getPostImageUrl(latestPost)}
+                                alt={latestPost.featuredImage?.alt || latestPost.title}
+                                width={300}
+                                height={150}
+                              />
+                            </div>
+                          )}
+                        </div>
 
-            <div className={`mobileMenu-ctaCon ${menuItemsVisible ? 'section-visible' : ''}`}>
-              <a
-                href={mobileCta.url}
-                onClick={() => {
-                  setMobileMenuOpen(false)
-                  lockBodyScroll(false) // Unlock when CTA clicked
-                }}
-              >
-                <p>{mobileCta.label}</p>
-              </a>
-            </div>
+                        <div className="latest-post-content">
+                          <h5 className="latest-post-title">{latestPost.title}</h5>
+                          {latestPost.publishedAt && (
+                            <div className="latest-post-date">
+                              <span>{formatDate(latestPost.publishedAt)}</span>
+                            </div>
+                          )}
 
-            {latestPost && (
-              <div className={`mobile-latest-post ${menuItemsVisible ? 'section-visible' : ''}`}>
-                <div className="mobile-postInner">
-                  <h6 className="latest-post-heading">Latest Article</h6>
+                          {latestPost.excerpt && (
+                            <p className="latest-post-excerpt">{latestPost.excerpt}</p>
+                          )}
 
-                  <Link
-                    href={`/posts/${latestPost.slug}`}
-                    onClick={() => {
-                      setMobileMenuOpen(false)
-                      lockBodyScroll(false) // Unlock when link clicked
-                    }}
-                  >
-                    <div className="latest-post-card">
-                      <div className="latest-post-top">
-                        {getPostImageUrl(latestPost) && (
-                          <div className="latest-post-image">
-                            <img
-                              src={getPostImageUrl(latestPost)}
-                              alt={latestPost.featuredImage?.alt || latestPost.title}
-                              width={300}
-                              height={150}
-                            />
-                          </div>
-                        )}
+                          {getPostCategories(latestPost).length > 0 && (
+                            <div className="latest-post-category">
+                              <span>{getPostCategories(latestPost)[0].title}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-
-                      <div className="latest-post-content">
-                        <h5 className="latest-post-title">{latestPost.title}</h5>
-                        {latestPost.publishedAt && (
-                          <div className="latest-post-date">
-                            <span>{formatDate(latestPost.publishedAt)}</span>
-                          </div>
-                        )}
-
-                        {latestPost.excerpt && (
-                          <p className="latest-post-excerpt">{latestPost.excerpt}</p>
-                        )}
-
-                        {getPostCategories(latestPost).length > 0 && (
-                          <div className="latest-post-category">
-                            <span>{getPostCategories(latestPost)[0].title}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
       </nav>

@@ -165,7 +165,7 @@ export function LandingEffects() {
         carouselEl.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
         const isReverse = index === 1
-        const speed = isMobile ? (isReverse ? -4.8 : 4.8) : isReverse ? -0.8 : 0.8
+        const speed = isMobile ? (isReverse ? -4.2 : 4.2) : isReverse ? -0.8 : 0.8
         const cloneCount = 2
 
         for (let i = 0; i < cloneCount; i++) {
@@ -187,8 +187,8 @@ export function LandingEffects() {
         let isUserScrolling = false
         let startX = 0
         let initialScroll = 0
-        let resumeScrollTimer = null
-        let frameSkipCounter = 0
+        const resumeScrollTimer = null
+        const frameSkipCounter = 0
 
         const animationRef = { current: null }
         carouselAnimationRefs.push(animationRef)
@@ -213,7 +213,8 @@ export function LandingEffects() {
           }
         }
 
-        const autoScroll = () => {
+        let lastTimestamp = null
+        const autoScroll = (timestamp) => {
           if (!carouselEl || !carouselEl.isConnected) {
             if (animationRef.current) {
               cancelAnimationFrame(animationRef.current)
@@ -222,24 +223,23 @@ export function LandingEffects() {
             return
           }
 
-          if (!isUserScrolling && !isHovering && !isDragging) {
-            if (isMobile) {
-              frameSkipCounter = (frameSkipCounter + 1) % 3
-              if (frameSkipCounter !== 0) {
-                animationRef.current = requestAnimationFrame(autoScroll)
-                return
-              }
-            }
+          if (!lastTimestamp) lastTimestamp = timestamp
+          const delta = timestamp - lastTimestamp
+          lastTimestamp = timestamp
 
-            carouselEl.scrollLeft += speed
+          if (!isUserScrolling && !isHovering && !isDragging) {
+            const pixelsPerFrame = speed * (delta / 16.67) // Normalize to 60fps
+            carouselEl.scrollLeft += pixelsPerFrame
             adjustScroll()
           }
+
           animationRef.current = requestAnimationFrame(autoScroll)
         }
 
         const startAutoScroll = () => {
           if (!animationRef.current && carouselEl && carouselEl.isConnected) {
             console.log(`Starting auto-scroll for carousel ${index}`)
+            lastTimestamp = null
             animationRef.current = requestAnimationFrame(autoScroll)
           }
         }
@@ -252,10 +252,8 @@ export function LandingEffects() {
         }
 
         const resumeScrollAfterDelay = () => {
-          clearTimeout(resumeScrollTimer)
-          resumeScrollTimer = setTimeout(() => {
-            isUserScrolling = false
-          }, 1500)
+          // Instead of resetting after delay, disable auto-scroll permanently
+          isUserScrolling = true
         }
 
         const setDragging = (val) => {
