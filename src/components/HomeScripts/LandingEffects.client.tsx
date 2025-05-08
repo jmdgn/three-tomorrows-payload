@@ -165,7 +165,7 @@ export function LandingEffects() {
         carouselEl.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
         const isReverse = index === 1
-        const speed = isMobile ? (isReverse ? -2.8 : 2.8) : isReverse ? -0.8 : 0.8
+        const speed = isMobile ? (isReverse ? -4.8 : 4.8) : isReverse ? -0.8 : 0.8
         const cloneCount = 2
 
         for (let i = 0; i < cloneCount; i++) {

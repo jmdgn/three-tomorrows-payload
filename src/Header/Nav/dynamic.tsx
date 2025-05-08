@@ -101,6 +101,29 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
   const [postsLoaded, setPostsLoaded] = useState(false)
   const [menuItemsVisible, setMenuItemsVisible] = useState(false)
 
+  // Add the lockBodyScroll function
+  const lockBodyScroll = (lock: boolean) => {
+    if (typeof document === 'undefined') return
+
+    if (lock) {
+      // Store current scroll position and lock body
+      const scrollY = window.scrollY
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.width = '100%'
+      document.body.style.overflow = 'hidden' // Important: prevents scrolling
+      document.body.dataset.scrollPosition = scrollY.toString()
+    } else {
+      // Restore scroll position when unlocking
+      const scrollY = parseInt(document.body.dataset.scrollPosition || '0')
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.width = ''
+      document.body.style.overflow = ''
+      window.scrollTo(0, scrollY)
+    }
+  }
+
   useEffect(() => {
     const fetchFooterData = async () => {
       try {
@@ -172,6 +195,15 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
 
     return () => {
       if (timer) clearTimeout(timer)
+    }
+  }, [mobileMenuOpen])
+
+  // Make sure to clean up scroll lock if component unmounts while menu is open
+  useEffect(() => {
+    return () => {
+      if (mobileMenuOpen) {
+        lockBodyScroll(false)
+      }
     }
   }, [mobileMenuOpen])
 
@@ -315,8 +347,11 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
     })
   }
 
+  // Update the toggleMobileMenu function to use lockBodyScroll
   const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen)
+    const newMenuState = !mobileMenuOpen
+    setMobileMenuOpen(newMenuState)
+    lockBodyScroll(newMenuState) // Lock/unlock based on menu state
   }
 
   const ctaLabel = data?.ctaLabel || "Let's Talk"
@@ -395,12 +430,21 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
                         href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={() => {
+                          setMobileMenuOpen(false)
+                          lockBodyScroll(false) // Unlock when link clicked
+                        }}
                       >
                         {item.label}
                       </a>
                     ) : (
-                      <Link href={item.url} onClick={() => setMobileMenuOpen(false)}>
+                      <Link
+                        href={item.url}
+                        onClick={() => {
+                          setMobileMenuOpen(false)
+                          lockBodyScroll(false) // Unlock when link clicked
+                        }}
+                      >
                         {item.label}
                       </Link>
                     )}
@@ -423,7 +467,10 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
                       href={social.url}
                       target={social.openInNewTab ? '_blank' : '_self'}
                       rel={social.openInNewTab ? 'noopener noreferrer' : undefined}
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={() => {
+                        setMobileMenuOpen(false)
+                        lockBodyScroll(false) // Unlock when link clicked
+                      }}
                     >
                       {social.platform}
                     </a>
@@ -433,7 +480,13 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
             </div>
 
             <div className={`mobileMenu-ctaCon ${menuItemsVisible ? 'section-visible' : ''}`}>
-              <a href={mobileCta.url}>
+              <a
+                href={mobileCta.url}
+                onClick={() => {
+                  setMobileMenuOpen(false)
+                  lockBodyScroll(false) // Unlock when CTA clicked
+                }}
+              >
                 <p>{mobileCta.label}</p>
               </a>
             </div>
@@ -443,7 +496,13 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
                 <div className="mobile-postInner">
                   <h6 className="latest-post-heading">Latest Article</h6>
 
-                  <Link href={`/posts/${latestPost.slug}`} onClick={() => setMobileMenuOpen(false)}>
+                  <Link
+                    href={`/posts/${latestPost.slug}`}
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                      lockBodyScroll(false) // Unlock when link clicked
+                    }}
+                  >
                     <div className="latest-post-card">
                       <div className="latest-post-top">
                         {getPostImageUrl(latestPost) && (
