@@ -10,110 +10,106 @@ export default function SceneInitializer() {
   const threeJsManagerRef = useRef(null);
   const pathname = usePathname();
   const isHomePage = pathname === '/';
+  const containerCreationAttemptsRef = useRef(0);
   
   const showDebugInfo = process.env.NODE_ENV === 'development';
   
-  useEffect(() => {
-    if (!isHomePage) {
-      console.log('Not on homepage, skipping Three.js initialization');
-      return;
+  // Create containers function - enhanced version
+  const ensureContainers = () => {
+    containerCreationAttemptsRef.current++;
+    console.log(`Container creation attempt ${containerCreationAttemptsRef.current}`);
+    
+    let sceneContainer = document.getElementById('scene-container');
+    let waterContainer = document.querySelector('.water-container');
+    let sphereContainer = document.getElementById('sphere-container');
+    
+    // Create scene container if needed
+    if (!sceneContainer) {
+      console.log('Creating missing scene container');
+      sceneContainer = document.createElement('div');
+      sceneContainer.id = 'scene-container';
+      sceneContainer.style.position = 'fixed';
+      sceneContainer.style.top = '0';
+      sceneContainer.style.left = '0';
+      sceneContainer.style.width = '100%';
+      sceneContainer.style.height = '100%';
+      sceneContainer.style.zIndex = '-1';
+      document.body.appendChild(sceneContainer);
     }
     
-    if (initAttemptedRef.current) {
-      console.log('Initialization already attempted');
-      return;
+    // Find proper parent elements
+    const introSection = document.querySelector('.intro-section');
+    const backgroundElements = document.querySelector('.background-elements');
+    const midgroundElements = document.querySelector('.midground-elements');
+    
+    // Create water container if needed
+    if (!waterContainer) {
+      console.log('Creating missing water container');
+      waterContainer = document.createElement('div');
+      waterContainer.className = 'water-container';
+      waterContainer.style.display = "block";
+      waterContainer.style.width = "100%";
+      waterContainer.style.height = "100%";
+      waterContainer.style.position = "absolute";
+      waterContainer.style.top = "0";
+      waterContainer.style.left = "0";
+      waterContainer.style.opacity = "1";
+      waterContainer.style.transition = "opacity 0.2s ease-out";
+      
+      // Try to place in the appropriate element
+      if (backgroundElements) {
+        backgroundElements.appendChild(waterContainer);
+      } else if (sceneContainer) {
+        sceneContainer.appendChild(waterContainer);
+      } else {
+        document.body.appendChild(waterContainer);
+      }
     }
     
-    initAttemptedRef.current = true;
+    // Create sphere container if needed
+    if (!sphereContainer) {
+      console.log('Creating missing sphere container');
+      sphereContainer = document.createElement('div');
+      sphereContainer.id = 'sphere-container';
+      sphereContainer.style.opacity = "0";
+      sphereContainer.style.transition = "opacity 0.4s ease-in-out";
+      
+      // Try to place in the appropriate element
+      if (midgroundElements) {
+        midgroundElements.appendChild(sphereContainer);
+      } else if (sceneContainer) {
+        sceneContainer.appendChild(sphereContainer);
+      } else {
+        document.body.appendChild(sphereContainer);
+      }
+    }
     
-    const loadManager = async () => {
+    return sceneContainer && waterContainer && sphereContainer;
+  };
+  
+  // Main initialization function with retries
+  const initializeThreeJs = async () => {
+    if (!threeJsManagerRef.current) {
       try {
         const { default: manager } = await import('@/utilities/ThreeJsManager.client.js');
         threeJsManagerRef.current = manager;
-        
-        if (document.readyState === 'complete') {
-          initializeThreeJs();
-        } else {
-          window.addEventListener('load', initializeThreeJs, { once: true });
-        }
       } catch (error) {
         console.error('Error loading ThreeJsManager:', error);
-      }
-    };
-    
-    const ensureContainers = () => {
-      let sceneContainer = document.getElementById('scene-container');
-      let waterContainer = document.querySelector('.water-container');
-      let sphereContainer = document.getElementById('sphere-container');
-      
-      if (!sceneContainer) {
-        console.log('Creating missing scene container');
-        sceneContainer = document.createElement('div');
-        sceneContainer.id = 'scene-container';
-        document.body.appendChild(sceneContainer);
-      }
-      
-      const backgroundElements = document.querySelector('.background-elements');
-      if (!waterContainer) {
-        console.log('Creating missing water container');
-        waterContainer = document.createElement('div');
-        waterContainer.className = 'water-container';
-        
-        if (backgroundElements) {
-          backgroundElements.appendChild(waterContainer);
-        } else {
-          document.body.appendChild(waterContainer);
-        }
-      }
-      
-      if (waterContainer) {
-        waterContainer.style.display = "block";
-        waterContainer.style.width = "100%";
-        waterContainer.style.height = "100%";
-        waterContainer.style.position = "absolute";
-        waterContainer.style.top = "0";
-        waterContainer.style.left = "0";
-        waterContainer.style.opacity = "1";
-        waterContainer.style.transition = "opacity 0.2s ease-out";
-      }
-      
-      if (!sphereContainer) {
-        console.log('Creating missing sphere container');
-        sphereContainer = document.createElement('div');
-        sphereContainer.id = 'sphere-container';
-        
-        if (backgroundElements) {
-          backgroundElements.appendChild(sphereContainer);
-        } else {
-          document.body.appendChild(sphereContainer);
-        }
-        
-        sphereContainer.style.opacity = "0";
-        sphereContainer.style.transition = "opacity 0.4s ease-in-out";
-      }
-      
-      return {
-        sceneContainer,
-        waterContainer,
-        sphereContainer
-      };
-    };
-    
-    const initializeThreeJs = async () => {
-      if (!scriptsLoadedRef.current) {
-        console.log('GSAP not loaded yet, deferring initialization');
         return;
       }
-      
-      if (!threeJsManagerRef.current) {
-        console.log('ThreeJsManager not available yet');
-        return;
-      }
-      
-      console.log('Starting Three.js initialization');
-      
-      ensureContainers();
-      
+    }
+    
+    if (!threeJsManagerRef.current) {
+      console.error('ThreeJsManager not available');
+      return;
+    }
+    
+    console.log('Starting Three.js initialization');
+    
+    // Ensure containers exist first
+    const containersExist = ensureContainers();
+    
+    if (containersExist) {
       threeJsManagerRef.current.setIsHomePage(true);
       
       if (showDebugInfo) {
@@ -121,16 +117,49 @@ export default function SceneInitializer() {
       }
       
       await threeJsManagerRef.current.initialize();
+    } else {
+      console.warn('Containers not available, could not initialize Three.js');
+    }
+  };
+  
+  useEffect(() => {
+    if (!isHomePage) return;
+    
+    // Setup initialization with multiple retries
+    const setupWithRetries = () => {
+      // First attempt after load
+      const initialDelayId = setTimeout(() => {
+        if (!initAttemptedRef.current) {
+          initAttemptedRef.current = true;
+          initializeThreeJs();
+        }
+      }, 500);
+      
+      // Second attempt after 2 seconds
+      const secondDelayId = setTimeout(() => {
+        ensureContainers();
+        if (scriptsLoadedRef.current) {
+          initializeThreeJs();
+        }
+      }, 2000);
+      
+      // Final attempt after 5 seconds
+      const finalDelayId = setTimeout(() => {
+        ensureContainers();
+        initializeThreeJs();
+      }, 5000);
+      
+      return [initialDelayId, secondDelayId, finalDelayId];
     };
     
-    loadManager();
+    const timeoutIds = setupWithRetries();
     
     return () => {
+      timeoutIds.forEach(id => clearTimeout(id));
+      
       if (isHomePage && threeJsManagerRef.current) {
         threeJsManagerRef.current.cleanup();
       }
-      
-      window.removeEventListener('load', initializeThreeJs);
     };
   }, [isHomePage]);
   
@@ -154,6 +183,12 @@ export default function SceneInitializer() {
         onLoad={() => {
           console.log('GSAP loaded');
           scriptsLoadedRef.current = true;
+          
+          // Try initialization after scripts are loaded
+          if (!initAttemptedRef.current) {
+            initAttemptedRef.current = true;
+            initializeThreeJs();
+          }
         }}
       />
       
@@ -179,6 +214,7 @@ export default function SceneInitializer() {
           <div>Homepage: {isHomePage ? '✅' : '❌'}</div>
           <div>Scripts Loaded: {scriptsLoadedRef.current ? '✅' : '❌'}</div>
           <div>Manager: {threeJsManagerRef.current ? '✅' : '❌'}</div>
+          <div>Container Attempts: {containerCreationAttemptsRef.current}</div>
         </div>
       )}
     </>

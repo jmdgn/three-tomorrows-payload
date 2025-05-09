@@ -516,9 +516,12 @@ class ThreeJsManager {
     })
 
     if (!sceneContainer || !waterContainer) {
-      console.warn('Required containers not found, deferring scene initialization')
+      console.warn('Required containers not found, creating containers and retrying')
 
-      // Setup retry mechanism
+      // Create containers if needed
+      this._createMissingContainers()
+
+      // Setup retry with increasing delays
       setTimeout(() => {
         if (this.initialized && !this.scenes.ocean.initialized) {
           this._initializeScenes()
@@ -590,6 +593,76 @@ class ThreeJsManager {
     setTimeout(() => {
       this._ensureCorrectSpherePosition()
     }, 1000)
+  }
+
+  /**
+   * Create missing containers when needed
+   */
+  _createMissingContainers() {
+    let sceneContainer = document.getElementById('scene-container')
+    let waterContainer = document.querySelector('.water-container')
+    let sphereContainer = document.getElementById('sphere-container')
+
+    // Create scene container if needed
+    if (!sceneContainer) {
+      console.log('Creating missing scene container')
+      sceneContainer = document.createElement('div')
+      sceneContainer.id = 'scene-container'
+      sceneContainer.style.position = 'fixed'
+      sceneContainer.style.top = '0'
+      sceneContainer.style.left = '0'
+      sceneContainer.style.width = '100%'
+      sceneContainer.style.height = '100%'
+      sceneContainer.style.zIndex = '-1'
+      document.body.appendChild(sceneContainer)
+    }
+
+    // Find parent elements
+    const introSection = document.querySelector('.intro-section')
+    const backgroundElements = document.querySelector('.background-elements')
+    const midgroundElements = document.querySelector('.midground-elements')
+
+    // Create water container if needed
+    if (!waterContainer) {
+      console.log('Creating missing water container')
+      waterContainer = document.createElement('div')
+      waterContainer.className = 'water-container'
+      waterContainer.style.display = 'block'
+      waterContainer.style.width = '100%'
+      waterContainer.style.height = '100%'
+      waterContainer.style.position = 'absolute'
+      waterContainer.style.top = '0'
+      waterContainer.style.left = '0'
+      waterContainer.style.opacity = '1'
+      waterContainer.style.transition = 'opacity 0.2s ease-out'
+
+      // Add to appropriate parent
+      if (backgroundElements) {
+        backgroundElements.appendChild(waterContainer)
+      } else if (sceneContainer) {
+        sceneContainer.appendChild(waterContainer)
+      } else {
+        document.body.appendChild(waterContainer)
+      }
+    }
+
+    // Create sphere container if needed
+    if (!sphereContainer) {
+      console.log('Creating missing sphere container')
+      sphereContainer = document.createElement('div')
+      sphereContainer.id = 'sphere-container'
+      sphereContainer.style.opacity = '0'
+      sphereContainer.style.transition = 'opacity 0.4s ease-in-out'
+
+      // Add to appropriate parent
+      if (midgroundElements) {
+        midgroundElements.appendChild(sphereContainer)
+      } else if (sceneContainer) {
+        sceneContainer.appendChild(sphereContainer)
+      } else {
+        document.body.appendChild(sphereContainer)
+      }
+    }
   }
 
   /**
