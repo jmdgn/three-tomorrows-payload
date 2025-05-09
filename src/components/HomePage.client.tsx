@@ -1,16 +1,29 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import CustomHomepage from '@/components/CustomHomepage'
 import Script from 'next/script'
-import SceneInitializer from '@/components/SceneInitializer.client'
+import dynamic from 'next/dynamic'
+
+// Dynamic import ThreeJsManager to avoid SSR issues
+// FIXED: Use the correct path with .client.js extension
+const loadThreeJsManager = async () => {
+  try {
+    const module = await import('@/utilities/ThreeJsManager.client.js')
+    return module.default
+  } catch (error) {
+    console.error('Error loading ThreeJsManager:', error)
+    return null
+  }
+}
 
 export default function HomePage() {
   const [homepageData, setHomepageData] = useState({})
   const [loading, setLoading] = useState(true)
   const [apiBaseUrl, setApiBaseUrl] = useState('')
-  const [threeJsAttempted, setThreeJsAttempted] = useState(false)
+  const threeJsManagerRef = useRef(null)
 
+  // Environment variables for client-side
   const envScript = `
     window.ENV = {
       SERVER_URL: "${process.env.NEXT_PUBLIC_SERVER_URL || ''}"
@@ -19,6 +32,16 @@ export default function HomePage() {
   `
 
   useEffect(() => {
+    // Safely load ThreeJsManager only on client-side
+    if (typeof window !== 'undefined') {
+      loadThreeJsManager().then((manager) => {
+        if (manager) {
+          threeJsManagerRef.current = manager
+          manager.setIsHomePage(true)
+        }
+      })
+    }
+
     function determineApiUrl() {
       if (typeof window !== 'undefined' && window.ENV?.SERVER_URL) {
         return window.ENV.SERVER_URL
@@ -84,10 +107,15 @@ export default function HomePage() {
     }
 
     fetchHomepageData()
-  }, [])
 
-  // Remove ThreeJS initialization from here since SceneInitializer handles it all
-  // This reduces potential race conditions or multiple initialization attempts
+    // Cleanup when component unmounts
+    return () => {
+      // Only run cleanup if manager was initialized
+      if (threeJsManagerRef.current) {
+        threeJsManagerRef.current.setIsHomePage(false)
+      }
+    }
+  }, [])
 
   if (loading) {
     return <div>Loading...</div>
@@ -100,9 +128,6 @@ export default function HomePage() {
         strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: envScript }}
       />
-
-      {/* SceneInitializer handles all Three.js initialization */}
-      <SceneInitializer />
 
       <CustomHomepage {...homepageData} />
     </>

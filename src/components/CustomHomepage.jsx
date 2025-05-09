@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { HomepageScripts, HomepageSceneContainer } from '@/components/HomeScripts/HomepageScripts.tsx'
 import { LandingScripts } from '@/components/HomeScripts/LandingScripts.tsx'
 import { LandingEffects } from '@/components/HomeScripts/LandingEffects.client.tsx'
-import { AnimationBottom } from '@/components/HomeScripts/AnimationBottom.tsx'
+import { AnimationBottom } from '@/components/HomeScripts/AnimationBottom.client.tsx'
 import { StaticGradientBackground } from '@/components/HomeScripts/StaticGradientBackground';
 import BackgroundTransition from "@/components/HomeScripts/BackgroundTransition";
 import AnimatedTitle from '@/components/HomeScripts/AnimatedTitle';

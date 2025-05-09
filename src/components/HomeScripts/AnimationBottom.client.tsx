@@ -1,12 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { getThree } from '../../components/HomeScripts/ThreeProvider'
-
-export function AnimationBottom() {
-  useAnimationBottom()
-  return null
-}
+import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import threeJsManager from '@/utilities/ThreeJsManager'
 
 function debounce(func: (...args: any[]) => void, wait: number) {
   let timeout: ReturnType<typeof setTimeout>
@@ -27,154 +23,21 @@ function throttle(func: (...args: any[]) => void, limit: number) {
   }
 }
 
-interface EventListenerItem {
-  target: Window | Element
-  event: string
-  handler: EventListener | ((...args: any[]) => void)
-}
-
-interface ObserverItem {
-  observer: IntersectionObserver
-  element: Element
-}
-
-export function useAnimationBottom() {
-  const animationRef = useRef<number | null>(null)
-  const scrollListenerRef = useRef<((...args: any[]) => void) | null>(null)
-  const observersRef = useRef<ObserverItem[]>([])
-  const eventListenersRef = useRef<EventListenerItem[]>([])
-  const timeoutsRef = useRef<number[]>([])
+export function AnimationBottom() {
+  const pathname = usePathname()
+  const isHomePage = pathname === '/'
 
   useEffect(() => {
-    const isMounted = true
+    // Skip if not on homepage
+    if (!isHomePage) return
 
-    const threeModules = getThree()
-    const THREE = threeModules ? threeModules.THREE : window.THREE || null
+    // Initialize event cleanup array
+    const eventListeners: { target: Window | Element; event: string; handler: EventListener }[] = []
+    const observers: { observer: IntersectionObserver; element: Element }[] = []
+    const timeouts: number[] = []
+    let isMounted = true
 
-    const handleScroll = () => {
-      if (!isMounted) return
-
-      const scrollY = window.scrollY
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      const scrollProgress = Math.min(scrollY / maxScroll, 1)
-      window.scrollProgress = scrollProgress
-    }
-
-    const debouncedHandleScroll = debounce(handleScroll, 10)
-    window.addEventListener('scroll', debouncedHandleScroll)
-    scrollListenerRef.current = debouncedHandleScroll
-    eventListenersRef.current.push({
-      target: window,
-      event: 'scroll',
-      handler: debouncedHandleScroll,
-    })
-
-    function animate() {
-      if (!isMounted) return
-
-      if (window._isServicePanelVisible === true || !isMounted) {
-        if (window._frameCount === undefined) window._frameCount = 0
-        window._frameCount++
-
-        if (window._frameCount % 3 !== 0) {
-          animationRef.current = requestAnimationFrame(animate)
-          return
-        }
-      }
-
-      const time = performance.now() * 0.0005
-      const sp = window.scrollProgress || 0
-
-      if (window.mouseX !== undefined && window.targetX !== undefined) {
-        window.mouseX = window.mouseX + (window.targetX - window.mouseX) * 0.05
-        window.mouseY = (window.mouseY || 0) + ((window.targetY || 0) - (window.mouseY || 0)) * 0.05
-      }
-
-      if (window.camera) {
-        window.camera.fov = THREE ? THREE.MathUtils.lerp(55, 75, sp) : 55 + (75 - 55) * sp
-        window.camera.updateProjectionMatrix()
-      }
-
-      if (window.sphere && window.water) {
-        window.water.position.y = THREE ? THREE.MathUtils.lerp(0, 60, sp) : 0 + 60 * sp
-
-        if (window.mouseX !== undefined && window.parallaxIntensity !== undefined) {
-          const _dynamicIntensity = window.parallaxIntensity * (1 - sp)
-        }
-
-        const sphereStartY = 18
-        const sphereEndY = -30
-        const sphereStartScale = 1.0
-        const sphereEndScale = 0.7
-
-        const scrollStartThreshold = 0.0
-        const scrollEndThreshold = 0.25
-
-        function easeOutCubic(x: number) {
-          return 1 - Math.pow(1 - x, 3)
-        }
-
-        let sphereY: number, sphereScale: number
-
-        if (sp >= scrollStartThreshold && sp <= scrollEndThreshold) {
-          const normalizedProgress =
-            (sp - scrollStartThreshold) / (scrollEndThreshold - scrollStartThreshold)
-
-          const easedProgress = easeOutCubic(normalizedProgress)
-
-          sphereY = sphereStartY * (1 - easedProgress) + sphereEndY * easedProgress
-          sphereScale = sphereStartScale * (1 - easedProgress) + sphereEndScale * easedProgress
-
-          if (normalizedProgress > 0.5) {
-            const waveIntensity = (normalizedProgress - 0.5) * 2 * 5.0
-            sphereY += Math.sin(time * 0.5) * waveIntensity
-          }
-        } else if (sp < scrollStartThreshold) {
-          sphereY = sphereStartY
-          sphereScale = sphereStartScale
-
-          sphereY += Math.sin(time) * 2.5
-        } else {
-          sphereY = sphereEndY
-          sphereScale = sphereEndScale
-
-          sphereY += Math.sin(time * 0.5) * 5.0
-        }
-
-        window.sphere.position.y = sphereY
-        window.sphere.scale.setScalar(sphereScale)
-
-        if (window.camera) {
-          window.camera.position.y = THREE
-            ? THREE.MathUtils.lerp(30, 5, sp * 1.2)
-            : 30 - 25 * (sp * 1.2)
-          window.camera.position.z = THREE
-            ? THREE.MathUtils.lerp(100, 40, sp * 1.1)
-            : 100 - 60 * (sp * 1.1)
-        }
-
-        if (window.controls) {
-          window.controls.target.y = THREE ? THREE.MathUtils.lerp(12, -10, sp) : 12 - 22 * sp
-        }
-      }
-
-      if (window.water && window.water.material && window.water.material.uniforms) {
-        window.water.material.uniforms.time.value += 0.3 / 60.0
-      }
-
-      if (window.controls) {
-        window.controls.update()
-      }
-
-      if (window.renderer && window.scene && window.camera) {
-        window.renderer.render(window.scene, window.camera)
-      }
-
-      animationRef.current = requestAnimationFrame(animate)
-    }
-
-    animate()
-
+    // Setup Bubble Container Scroll Fade
     const setupBubbleContainerScrollFade = () => {
       const bubbleContainer = document.querySelector('.bubble-container') as HTMLElement | null
       const servicePanel = document.querySelector('.service-panel')
@@ -196,7 +59,7 @@ export function useAnimationBottom() {
 
       const debouncedScrollDirectionHandler = debounce(scrollDirectionHandler, 50)
       window.addEventListener('scroll', debouncedScrollDirectionHandler)
-      eventListenersRef.current.push({
+      eventListeners.push({
         target: window,
         event: 'scroll',
         handler: debouncedScrollDirectionHandler,
@@ -210,6 +73,7 @@ export function useAnimationBottom() {
             const targetId = entry.target.id || entry.target.className
 
             if (targetId.includes('service-panel') && bubbleContainer) {
+              // Set flag on window for Three.js manager
               if (window._isServicePanelVisible !== undefined) {
                 window._isServicePanelVisible = entry.isIntersecting
               }
@@ -242,20 +106,20 @@ export function useAnimationBottom() {
 
       if (servicePanel) {
         combinedObserver.observe(servicePanel)
-        observersRef.current.push({ observer: combinedObserver, element: servicePanel })
+        observers.push({ observer: combinedObserver, element: servicePanel })
       }
 
       if (factoidsSection) {
         combinedObserver.observe(factoidsSection)
-        observersRef.current.push({ observer: combinedObserver, element: factoidsSection })
+        observers.push({ observer: combinedObserver, element: factoidsSection })
       }
 
       return () => {
-        window.removeEventListener('scroll', debouncedScrollDirectionHandler)
         combinedObserver.disconnect()
       }
     }
 
+    // Setup Factoid Frame Script
     const setupFactoidFrameScript = () => {
       const section = document.querySelector('.factoids-complete')
       const stickyElem = document.querySelector('.factoidBkgnd-sticky') as HTMLElement | null
@@ -277,8 +141,9 @@ export function useAnimationBottom() {
         return Math.pow(x, 0.6)
       }
 
-      function updateStickyFromScroll() {
-        if (!section || !stickyElem || !contentFull) return
+      // Throttle this function to improve performance
+      const updateStickyFromScroll = throttle(() => {
+        if (!section || !stickyElem || !contentFull || !isMounted) return
 
         const anchorBtnContainer = contentFull.querySelector(
           '.anchorBtn-container',
@@ -316,7 +181,6 @@ export function useAnimationBottom() {
         if (anchorBtnContainer) {
           if (enterProgress >= 1 && exitProgress > 0.05) {
             anchorBtnContainer.style.opacity = '0'
-
             anchorBtnContainer.style.pointerEvents = 'none'
           } else {
             anchorBtnContainer.style.opacity = '1'
@@ -340,7 +204,6 @@ export function useAnimationBottom() {
         stickyElem.style.height = `${height}px`
         stickyElem.style.borderRadius = `${borderRadius}px`
         stickyElem.style.top = `${topOffset}px`
-
         stickyElem.style.left = `${(windowWidth - width) / 2}px`
 
         const opacityStartThreshold = 0.75
@@ -356,30 +219,50 @@ export function useAnimationBottom() {
         }
 
         contentFull.style.opacity = Math.max(0, Math.min(1, contentOpacity)).toString()
-      }
+      }, 16) // Throttle to ~60fps
 
-      function onAnimationFrame() {
-        if (!section || !stickyElem || !contentFull) return
+      // Use requestAnimationFrame for smoother updates
+      let animationId: number | null = null
+
+      const updateFrame = () => {
         updateStickyFromScroll()
-        requestAnimationFrame(onAnimationFrame)
+        if (isMounted) {
+          animationId = requestAnimationFrame(updateFrame)
+        }
       }
 
-      requestAnimationFrame(onAnimationFrame)
+      animationId = requestAnimationFrame(updateFrame)
 
-      return () => {}
+      // Setup scroll event for backup
+      window.addEventListener('scroll', updateStickyFromScroll, { passive: true })
+      eventListeners.push({
+        target: window,
+        event: 'scroll',
+        handler: updateStickyFromScroll as unknown as EventListener,
+      })
+
+      return () => {
+        if (animationId) {
+          cancelAnimationFrame(animationId)
+        }
+        window.removeEventListener('scroll', updateStickyFromScroll)
+      }
     }
 
+    // Setup Factoid Cards Fade
     const setupFactoidCardsFade = () => {
       const elements = document.querySelectorAll('.stickyContent-title, .factoidSingle-container')
 
       if (elements.length === 0) return null
 
+      // Add styles for factoid containers
       document.querySelectorAll('.factoidSingle-container').forEach((factoid) => {
         if (factoid instanceof HTMLElement) {
           factoid.style.transition = 'opacity 0.5s ease-out, transform 0.4s ease-out'
         }
       })
 
+      // Add styles for title
       document.querySelectorAll('.stickyContent-title').forEach((title) => {
         if (!(title instanceof HTMLElement) || !title.textContent) return
 
@@ -396,6 +279,7 @@ export function useAnimationBottom() {
         title.style.transition = 'opacity 0.5s ease-out'
       })
 
+      // Setup color cache for better performance
       const colorCache: { [key: string]: string } = {}
       function getInterpolatedColor(color1: string, color2: string, progress: number) {
         const roundedProgress = Math.round(progress * 100) / 100
@@ -419,7 +303,8 @@ export function useAnimationBottom() {
         return result
       }
 
-      function updateOpacity() {
+      // Throttled update function
+      const updateOpacity = throttle(() => {
         if (!isMounted) return
 
         requestAnimationFrame(() => {
@@ -431,123 +316,141 @@ export function useAnimationBottom() {
           const staggerDivisor = 1
           const colorStartMultiplier = 4.5
 
-          elements.forEach((element) => {
-            if (!(element instanceof HTMLElement)) return
+          // Use batch processing for better performance
+          const elementCount = elements.length
+          const batchSize = 5
 
-            const rect = element.getBoundingClientRect()
-            const distanceFromTop = rect.top
+          for (let i = 0; i < elementCount; i += batchSize) {
+            const endIndex = Math.min(i + batchSize, elementCount)
 
-            if (element.classList.contains('factoidSingle-container')) {
-              const opacity =
-                1 -
-                Math.min(
-                  1,
-                  Math.max(
-                    0,
-                    (factoidFadeStart - distanceFromTop) / (factoidFadeStart - factoidFadeEnd),
-                  ),
-                )
+            for (let j = i; j < endIndex; j++) {
+              const element = elements[j]
+              if (!(element instanceof HTMLElement)) continue
 
-              const translateY = 20 * (1 - opacity)
-              element.style.transform = `translateY(${translateY}px)`
-              element.style.opacity = opacity.toString()
-            } else {
-              const opacity = Math.min(1, Math.max(0, distanceFromTop / titleThreshold))
-              element.style.opacity = opacity.toString()
-            }
+              const rect = element.getBoundingClientRect()
+              const distanceFromTop = rect.top
 
-            if (
-              element.classList.contains('stickyContent-title') &&
-              parseFloat(element.style.opacity) > 0.1
-            ) {
-              const letters = element.querySelectorAll('span')
-              const totalLetters = letters.length
-
-              const colorProgress = Math.min(
-                1,
-                Math.max(
-                  0,
-                  ((titleThreshold * colorStartMultiplier - distanceFromTop) / titleThreshold) *
-                    colorSpeed,
-                ),
-              )
-
-              const batchSize = 5
-              for (let i = 0; i < totalLetters; i += batchSize) {
-                const endIdx = Math.min(i + batchSize, totalLetters)
-                for (let j = i; j < endIdx; j++) {
-                  const letter = letters[j] as HTMLElement
-                  if (!letter) continue
-
-                  const letterProgress = Math.min(
+              if (element.classList.contains('factoidSingle-container')) {
+                const opacity =
+                  1 -
+                  Math.min(
                     1,
                     Math.max(
                       0,
-                      (colorProgress - j / (totalLetters * staggerDivisor)) * totalLetters,
+                      (factoidFadeStart - distanceFromTop) / (factoidFadeStart - factoidFadeEnd),
                     ),
                   )
-                  const color = getInterpolatedColor('#929292', '#FFFFFF', letterProgress)
-                  letter.style.color = color
+
+                const translateY = 20 * (1 - opacity)
+                element.style.transform = `translateY(${translateY}px)`
+                element.style.opacity = opacity.toString()
+              } else {
+                const opacity = Math.min(1, Math.max(0, distanceFromTop / titleThreshold))
+                element.style.opacity = opacity.toString()
+              }
+
+              if (
+                element.classList.contains('stickyContent-title') &&
+                parseFloat(element.style.opacity) > 0.1
+              ) {
+                const letters = element.querySelectorAll('span')
+                const totalLetters = letters.length
+
+                const colorProgress = Math.min(
+                  1,
+                  Math.max(
+                    0,
+                    ((titleThreshold * colorStartMultiplier - distanceFromTop) / titleThreshold) *
+                      colorSpeed,
+                  ),
+                )
+
+                // Optimize by processing letters in batches
+                const letterBatchSize = 5
+                for (let i = 0; i < totalLetters; i += letterBatchSize) {
+                  const endIdx = Math.min(i + letterBatchSize, totalLetters)
+
+                  // Calculate common values once per batch
+                  const baseProgress = colorProgress - i / (totalLetters * staggerDivisor)
+
+                  for (let j = i; j < endIdx; j++) {
+                    const letter = letters[j] as HTMLElement
+                    if (!letter) continue
+
+                    const letterProgress = Math.min(1, Math.max(0, baseProgress * totalLetters))
+                    const color = getInterpolatedColor('#929292', '#FFFFFF', letterProgress)
+                    letter.style.color = color
+                  }
                 }
               }
             }
-          })
+          }
         })
-      }
+      }, 16) // ~60fps
 
-      updateOpacity()
-
-      const throttledUpdateOpacity = throttle(updateOpacity, 16)
-      window.addEventListener('scroll', throttledUpdateOpacity)
-      window.addEventListener('resize', throttledUpdateOpacity)
-      eventListenersRef.current.push({
+      window.addEventListener('scroll', updateOpacity, { passive: true })
+      window.addEventListener('resize', updateOpacity, { passive: true })
+      eventListeners.push({
         target: window,
         event: 'scroll',
-        handler: throttledUpdateOpacity,
+        handler: updateOpacity as unknown as EventListener,
       })
-      eventListenersRef.current.push({
+      eventListeners.push({
         target: window,
         event: 'resize',
-        handler: throttledUpdateOpacity,
+        handler: updateOpacity as unknown as EventListener,
       })
 
+      // Initial update
+      updateOpacity()
+
       return () => {
-        window.removeEventListener('scroll', throttledUpdateOpacity)
-        window.removeEventListener('resize', throttledUpdateOpacity)
+        window.removeEventListener('scroll', updateOpacity)
+        window.removeEventListener('resize', updateOpacity)
       }
     }
 
+    // Initialize all UI effects
     const cleanupFunctions = [
       setupBubbleContainerScrollFade(),
       setupFactoidFrameScript(),
       setupFactoidCardsFade(),
     ].filter(Boolean) as (() => void)[]
 
+    // Clean up on unmount
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
+      isMounted = false
 
-      window.removeEventListener('scroll', debouncedHandleScroll)
-
-      cleanupFunctions.forEach((cleanup) => {
-        if (cleanup) cleanup()
-      })
-
-      timeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId))
-
-      eventListenersRef.current.forEach(({ target, event, handler }) => {
+      // Clean up event listeners
+      eventListeners.forEach(({ target, event, handler }) => {
         target.removeEventListener(event, handler)
       })
 
-      observersRef.current.forEach(({ observer, element }) => {
+      // Clean up observers
+      observers.forEach(({ observer, element }) => {
         if (observer && element) {
           observer.unobserve(element)
           observer.disconnect()
         }
       })
-    }
-  }, [])
 
+      // Clear timeouts
+      timeouts.forEach((timeoutId) => clearTimeout(timeoutId))
+
+      // Run specific cleanup functions
+      cleanupFunctions.forEach((cleanup) => {
+        if (cleanup) cleanup()
+      })
+    }
+  }, [isHomePage])
+
+  // Skip rendering if not on homepage
+  if (!isHomePage) return null
+
+  return null
+}
+
+export function useAnimationBottom() {
+  // This hook is maintained for backward compatibility
   return null
 }

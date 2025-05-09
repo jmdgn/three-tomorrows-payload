@@ -1,68 +1,44 @@
 let camera, scene, renderer, controls, water, sun, sphere
-let scrollProgress = 0
-const parallaxIntensity = 15
+let animationId = null
+let initialized = false
+
+const SPHERE_START_Y = 18
+const SPHERE_END_Y = -30
+const SPHERE_START_SCALE = 1.0
+const SPHERE_END_SCALE = 0.7
+
+const MOBILE_SPHERE_START_Y = 18
+const MOBILE_SPHERE_END_Y = -24
+const MOBILE_SPHERE_START_SCALE = 0.7
+const MOBILE_SPHERE_END_SCALE = 0.5
+
+const SCROLL_START = 0.0
+const SCROLL_END = 0.25
+
+const PARALLAX_INTENSITY = 15
 let mouseX = 0.5,
   mouseY = 0.5
 let targetX = 0.5,
   targetY = 0.5
 
-const sphereStartY = 18
-const sphereEndY = -30
-const sphereStartScale = 1.0
-const sphereEndScale = 0.7
-
-const mobileSphereStartY = 18
-const mobileSphereEndY = -24
-const mobileSphereStartScale = 0.7
-const mobileSphereEndScale = 0.5
-
-const isMobile = window.innerWidth <= 768
-
-window.parallaxIntensity = parallaxIntensity
-window.mouseX = mouseX
-window.mouseY = mouseY
-window.targetX = targetX
-window.targetY = targetY
-
-window.sphereAnimation = {
-  startY: isMobile ? mobileSphereStartY : sphereStartY,
-  endY: isMobile ? mobileSphereEndY : sphereEndY,
-  startScale: isMobile ? mobileSphereStartScale : sphereStartScale,
-  endScale: isMobile ? mobileSphereEndScale : sphereEndScale,
-  scrollStartThreshold: 0.0,
-  scrollEndThreshold: 0.25,
-}
-
-window.addEventListener('mousemove', (e) => {
-  window.targetX = e.clientX / window.innerWidth
-  window.targetY = e.clientY / window.innerHeight
-})
-
-const scrollStartThreshold = 0.0
-const scrollEndThreshold = 0.25
-
-window.addEventListener('scroll', () => {
-  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
-  scrollProgress = Math.min(window.scrollY / scrollHeight, 1)
-  window.scrollProgress = scrollProgress
-})
-
-function easeOutCubic(x) {
-  return 1 - Math.pow(1 - x, 3)
-}
-
-function lerp(start, end, t) {
-  return start * (1 - t) + end * t
-}
+let scrollProgress = 0
+let isMobile = false
 
 function init() {
-  console.log('Initializing scene')
+  console.log('Initializing ocean scene')
+
+  if (initialized) {
+    console.warn('Ocean scene already initialized')
+    return
+  }
 
   const container = document.querySelector('.water-container')
   if (!container) {
     console.error('Water container not found. Scene cannot initialize.')
     return
   }
+
+  isMobile = window.innerWidth <= 768
 
   scene = new THREE.Scene()
   window.scene = scene
@@ -75,9 +51,11 @@ function init() {
     antialias: true,
   })
   window.renderer = renderer
+
   renderer.setSize(window.innerWidth, window.innerHeight)
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 0.5
+
   container.appendChild(renderer.domElement)
 
   const waterGeometry = new THREE.PlaneGeometry(10000, 10000, 100, 100)
@@ -87,7 +65,7 @@ function init() {
     textureHeight: 512,
     waterNormals: new THREE.TextureLoader().load(
       'https://threejs.org/examples/textures/waternormals.jpg',
-      (texture) => {
+      function (texture) {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping
         texture.repeat.set(4, 4)
       },
@@ -103,7 +81,7 @@ function init() {
 
   water.rotation.x = -Math.PI / 2
 
-  water.material.onBeforeCompile = (shader) => {
+  water.material.onBeforeCompile = function (shader) {
     shader.vertexShader = shader.vertexShader.replace(
       '#include <begin_vertex>',
       `#include <begin_vertex>
@@ -158,7 +136,6 @@ function init() {
 
   const sphereRadius = isMobile ? 25 : 28
   const sphereGeometry = new THREE.SphereGeometry(sphereRadius, 32, 32)
-
   const sphereMaterial = new THREE.MeshStandardMaterial({
     color: 0x000000,
     roughness: 0.01,
@@ -167,11 +144,9 @@ function init() {
   })
 
   sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
-  sphere.position.set(0, window.sphereAnimation.startY, 0)
+  sphere.position.set(0, isMobile ? MOBILE_SPHERE_START_Y : SPHERE_START_Y, 0)
   scene.add(sphere)
   window.sphere = sphere
-
-  sphere.material.needsUpdate = true
 
   console.log('Sphere created at position:', sphere.position)
 
@@ -185,39 +160,130 @@ function init() {
 
   window.addEventListener('resize', onWindowResize)
 
-  window.addEventListener('resize', () => {
-    const isMobile = window.innerWidth <= 768
+  window.addEventListener('scroll', handleScroll)
 
-    window.sphereAnimation.startY = isMobile ? mobileSphereStartY : sphereStartY
-    window.sphereAnimation.endY = isMobile ? mobileSphereEndY : sphereEndY
-    window.sphereAnimation.startScale = isMobile ? mobileSphereStartScale : sphereStartScale
-    window.sphereAnimation.endScale = isMobile ? mobileSphereEndScale : sphereEndScale
-
-    if (sphere) {
-    }
+  window.addEventListener('mousemove', (e) => {
+    targetX = e.clientX / window.innerWidth
+    targetY = e.clientY / window.innerHeight
+    window.targetX = targetX
+    window.targetY = targetY
   })
 
-  console.log('Starting animation loop')
-  animate()
+  window.scrollProgress = 0
+  window.parallaxIntensity = PARALLAX_INTENSITY
+  window.mouseX = mouseX
+  window.mouseY = mouseY
+  window.targetX = targetX
+  window.targetY = targetY
+
+  window.sphereAnimation = {
+    startY: isMobile ? MOBILE_SPHERE_START_Y : SPHERE_START_Y,
+    endY: isMobile ? MOBILE_SPHERE_END_Y : SPHERE_END_Y,
+    startScale: isMobile ? MOBILE_SPHERE_START_SCALE : SPHERE_START_SCALE,
+    endScale: isMobile ? MOBILE_SPHERE_END_SCALE : SPHERE_END_SCALE,
+    scrollStartThreshold: SCROLL_START,
+    scrollEndThreshold: SCROLL_END,
+  }
+
+  initialized = true
+
+  startStaticAnimation()
+
+  handleScroll()
 }
 
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight
-  camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  const wasMobile = isMobile
+  isMobile = window.innerWidth <= 768
+
+  if (camera) {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+  }
+
+  if (renderer) {
+    renderer.setSize(window.innerWidth, window.innerHeight)
+  }
+
+  if (wasMobile !== isMobile) {
+    window.sphereAnimation = {
+      startY: isMobile ? MOBILE_SPHERE_START_Y : SPHERE_START_Y,
+      endY: isMobile ? MOBILE_SPHERE_END_Y : SPHERE_END_Y,
+      startScale: isMobile ? MOBILE_SPHERE_START_SCALE : SPHERE_START_SCALE,
+      endScale: isMobile ? MOBILE_SPHERE_END_SCALE : SPHERE_END_SCALE,
+      scrollStartThreshold: SCROLL_START,
+      scrollEndThreshold: SCROLL_END,
+    }
+
+    handleScroll()
+  }
+}
+
+function handleScroll() {
+  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight
+  scrollProgress = Math.min(window.scrollY / scrollHeight, 1)
+  window.scrollProgress = scrollProgress
+
+  const normalizedProgress = Math.min(
+    1,
+    Math.max(0, (scrollProgress - SCROLL_START) / (SCROLL_END - SCROLL_START)),
+  )
+
+  const easedProgress = easeOutCubic(normalizedProgress)
+
+  const startY = isMobile ? MOBILE_SPHERE_START_Y : SPHERE_START_Y
+  const endY = isMobile ? MOBILE_SPHERE_END_Y : SPHERE_END_Y
+  const startScale = isMobile ? MOBILE_SPHERE_START_SCALE : SPHERE_START_SCALE
+  const endScale = isMobile ? MOBILE_SPHERE_END_SCALE : SPHERE_END_SCALE
+
+  if (sphere) {
+    sphere.position.y = startY * (1 - easedProgress) + endY * easedProgress
+    sphere.scale.setScalar(startScale * (1 - easedProgress) + endScale * easedProgress)
+  }
+
+  renderScene()
 }
 
 function animate() {
-  requestAnimationFrame(animate)
+  animationId = requestAnimationFrame(animate)
 
   mouseX += (targetX - mouseX) * 0.05
   mouseY += (targetY - mouseY) * 0.05
 
-  camera.position.x = 30 - (mouseX - 0.5) * parallaxIntensity
-  camera.position.y = 30 - (mouseY - 0.5) * parallaxIntensity
-  camera.lookAt(controls.target)
+  if (camera) {
+    camera.position.x = 30 - (mouseX - 0.5) * PARALLAX_INTENSITY
+    camera.position.y = 30 - (mouseY - 0.5) * PARALLAX_INTENSITY
+    camera.lookAt(controls.target)
+  }
 
-  water.material.uniforms['time'].value += 0.02 / 60.0
+  if (water && water.material && water.material.uniforms) {
+    water.material.uniforms['time'].value += 0.02 / 60.0
+  }
+
+  renderScene()
+}
+
+function renderScene() {
+  if (renderer && scene && camera) {
+    renderer.render(scene, camera)
+  }
+}
+
+function startStaticAnimation() {
+  if (!animationId) {
+    animationId = requestAnimationFrame(animate)
+  }
+}
+
+function stopAnimation() {
+  if (animationId) {
+    cancelAnimationFrame(animationId)
+    animationId = null
+  }
+}
+
+function easeOutCubic(x) {
+  return 1 - Math.pow(1 - x, 3)
 }
 
 window.initOceanScene = function () {
