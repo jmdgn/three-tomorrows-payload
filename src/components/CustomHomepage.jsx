@@ -1,5 +1,4 @@
 'use client'
-
 import React, { useEffect, useRef, useState } from 'react';
 import { HomepageScripts, HomepageSceneContainer } from '@/components/HomeScripts/HomepageScripts.tsx'
 import { LandingScripts } from '@/components/HomeScripts/LandingScripts.tsx'
@@ -10,6 +9,7 @@ import BackgroundTransition from "@/components/HomeScripts/BackgroundTransition"
 import AnimatedTitle from '@/components/HomeScripts/AnimatedTitle';
 import { getMediaUrl } from '../utilities/media-utils';
 import MobileServiceCarousel from '@/components/MobileServiceCarousel';
+import SceneInitializer from '@/components/SceneInitializer.client'
 
 function throttle(func, limit) {
   let inThrottle;
@@ -73,38 +73,23 @@ const CustomHomepage = (props) => {
   ];
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.initThreeJS && !window.threeJSInitialized) {
-      console.log('CustomHomepage: Initializing Three.js');
-      window.threeJSInitialized = true;
-      window.initThreeJS().catch(err => {
-        console.error('Error initializing Three.js:', err);
-        window.threeJSInitialized = false;
-      });
+    if (typeof window !== 'undefined') {
+      const checkScenes = () => {
+        console.log('Checking Three.js scenes status')
+        
+        const sceneContainer = document.getElementById('scene-container')
+        const waterContainer = document.querySelector('.water-container')
+        const sphereContainer = document.getElementById('sphere-container')
+        
+        console.log('Scene containers:', {
+          scene: !!sceneContainer,
+          water: !!waterContainer,
+          sphere: !!sphereContainer
+        })
+      }
+      
+      setTimeout(checkScenes, 2000)
     }
-
-    const checkContainers = () => {
-      const sceneContainer = document.getElementById('scene-container');
-      const waterContainer = document.querySelector('.water-container');
-      
-      if (sceneContainer) {
-        console.log('Scene container found');
-      } else {
-        console.warn('Scene container not found');
-      }
-      
-      if (waterContainer) {
-        console.log('Water container found');
-        waterContainerRef.current = waterContainer;
-      } else {
-        console.warn('Water container not found');
-      }
-    };
-    
-    const timeoutId = setTimeout(checkContainers, 500);
-    
-    return () => {
-      clearTimeout(timeoutId);
-    };
   }, []);
 
   const getImageSrc = (image) => {
@@ -149,41 +134,44 @@ const CustomHomepage = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log("Initializing water container...");
+    console.log("Initializing water container...")
     
     const ensureWaterContainer = () => {
-      if (waterContainerRef.current) {
-        console.log("Water container found, ensuring it's properly styled");
-        
-        waterContainerRef.current.style.display = "block";
-        waterContainerRef.current.style.width = "100%";
-        waterContainerRef.current.style.height = "100%";
-        waterContainerRef.current.style.position = "absolute";
-        waterContainerRef.current.style.top = "0";
-        waterContainerRef.current.style.left = "0";
-        waterContainerRef.current.style.opacity = "1"; // Add initial opacity
-        waterContainerRef.current.style.transition = "opacity 0.2s ease-out"; // Add transition for smooth fade
-        
-        if (window.initOceanScene && !window.renderer) {
-          console.log("Manually initializing ocean scene");
-          setTimeout(() => {
-            if (typeof window.initOceanScene === 'function') {
-              window.initOceanScene();
-            }
-          }, 300);
-        }
-      } else {
-        console.warn("Water container ref not available yet");
+      let container = document.querySelector('.water-container')
+      
+      if (!container) {
+        console.log("Water container not found yet, waiting...")
+        return false
       }
-    };
+      
+      console.log("Water container found, ensuring it's properly styled")
+      
+      container.style.display = "block"
+      container.style.width = "100%"
+      container.style.height = "100%"
+      container.style.position = "absolute"
+      container.style.top = "0"
+      container.style.left = "0"
+      container.style.opacity = "1"
+      container.style.transition = "opacity 0.2s ease-out"
+      
+      waterContainerRef.current = container
+      return true
+    }
     
-    ensureWaterContainer();
+    const success = ensureWaterContainer()
     
-    const timeoutId = setTimeout(ensureWaterContainer, 1000);
-    
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    if (!success) {
+      const timeoutId = setTimeout(() => {
+        ensureWaterContainer()
+        
+        if (!waterContainerRef.current) {
+          setTimeout(ensureWaterContainer, 1000)
+        }
+      }, 500)
+      
+      return () => clearTimeout(timeoutId)
+    }
   }, []);
 
   useEffect(() => {
@@ -210,7 +198,6 @@ const CustomHomepage = (props) => {
       const offsetX = (centerX - clientX) * movementFactor;
       const offsetY = (centerY - clientY) * movementFactor;
       
-      // Remove scale from transform, only apply translation
       waterContainerRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
     }, 16);
 
@@ -238,11 +225,9 @@ const CustomHomepage = (props) => {
             opacity = 1 - normalizedProgress;
           }
     
-          // Update opacity instead of scale
           waterContainerRef.current.style.opacity = opacity;
           
-          // Still keep the same values in refs for other parts of the code that might use them
-          currentScaleRef.current = opacity; // Using the same ref but for opacity now
+          currentScaleRef.current = opacity;
           window._waterScale = opacity;
           lastScrollProgressRef.current = scrollProgress;
     
@@ -266,10 +251,8 @@ const CustomHomepage = (props) => {
             canvas.style.transition = 'border-radius 0.2s ease-out';
           }
     
-          // Handle mouse movement separately
           const lastMouseEvent = window._lastMouseEvent;
           if (lastMouseEvent) {
-            // Apply transform without scale
             const { clientX, clientY } = lastMouseEvent;
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
@@ -418,9 +401,59 @@ const CustomHomepage = (props) => {
     };
   }, []);
 
+  useEffect(() => {
+    const ensureAnimation = () => {
+      if (typeof window === 'undefined') return;
+      
+      if (window.renderer && window.scene && window.camera && !window.animationId) {
+        console.log('Animation detected as stopped, attempting to restart');
+        
+        if (typeof window.animate !== 'function') {
+          window.animate = function() {
+            if (window.water && window.water.material && window.water.material.uniforms) {
+              window.water.material.uniforms.time.value += 0.3 / 60.0;
+            }
+            
+            if (window.controls) {
+              window.controls.update();
+            }
+            
+            if (window.renderer && window.scene && window.camera) {
+              window.renderer.render(window.scene, window.camera);
+            }
+            
+            window.animationId = requestAnimationFrame(window.animate);
+          };
+        }
+        
+        window.animationId = requestAnimationFrame(window.animate);
+        console.log('Animation restarted');
+      }
+    };
+    
+    const timeoutId = setTimeout(ensureAnimation, 3000);
+    
+    const intervalId = setInterval(ensureAnimation, 5000);
+    
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        ensureAnimation();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   return (
     <div className="homeBody">
       <>
+      <SceneInitializer />
       <StaticGradientBackground />
       <HomepageScripts />
       <LandingScripts />
