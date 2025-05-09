@@ -9,24 +9,25 @@ export function HomepageScripts() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const isCurrentlyHomePage = window.location.pathname === '/'
+    // Only initialize on the homepage
+    const isCurrentlyHomePage = pathname === '/'
     setIsHomePage(isCurrentlyHomePage)
-    
+
     if (isCurrentlyHomePage) {
       console.log('HomepageScripts: On homepage, preparing environment')
-      
+
       if (window._sceneInitialized) {
         window._sceneInitialized = false
       }
-      
+
       const shouldInitialize = !window.threeJSInitialized
-      
+
       if (shouldInitialize && typeof window.initThreeJS === 'function') {
-        console.log('HomepageScripts: Initializing Three.js')
+        console.log('HomepageScripts: Initializing Three.js on homepage')
         window.threeJSInitialized = true
-        
+
         setTimeout(() => {
-          window.initThreeJS().catch(err => {
+          window.initThreeJS().catch((err) => {
             console.error('Error initializing Three.js:', err)
             window.threeJSInitialized = false
           })
@@ -39,14 +40,10 @@ export function HomepageScripts() {
 
   return (
     <>
-      <Script 
-        src="https://code.jquery.com/jquery-3.6.4.min.js" 
-        strategy="afterInteractive" 
-        async
-      />
-      
-      <Script 
-        id="three-js-loader" 
+      <Script src="https://code.jquery.com/jquery-3.6.4.min.js" strategy="afterInteractive" async />
+
+      <Script
+        id="three-js-loader"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
@@ -232,7 +229,7 @@ export function HomepageScripts() {
               setupPerformanceManagement();
               setupMemoryManagement();
             }
-          `
+          `,
         }}
       />
     </>
@@ -242,8 +239,8 @@ export function HomepageScripts() {
 export function HomepageSceneContainer() {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
-  
+
   if (!isHomePage) return null
-  
+
   return <div id="scene-container" />
 }

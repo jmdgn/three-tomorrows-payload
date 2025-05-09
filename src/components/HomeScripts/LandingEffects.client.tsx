@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { getThree } from '@/components/HomeScripts/ThreeProvider'
+import { usePathname } from 'next/navigation'
 
 function throttle(func, limit) {
   let inThrottle
@@ -15,6 +16,9 @@ function throttle(func, limit) {
 }
 
 export function LandingEffects() {
+  const pathname = usePathname()
+  const isHomePage = pathname === '/'
+
   const animationRef = useRef(null)
   const mouseRef = useRef({ x: 0.5, y: 0.5 })
   const targetRef = useRef({ x: 0.5, y: 0.5 })
@@ -23,6 +27,9 @@ export function LandingEffects() {
   const carouselIntervalRef = useRef(null)
 
   useEffect(() => {
+    // Skip all effects if not on homepage
+    if (!isHomePage) return
+
     const threeModules = getThree()
     const THREE = threeModules ? threeModules.THREE : window.THREE || null
 
@@ -108,26 +115,26 @@ export function LandingEffects() {
 
       const styleElement = document.createElement('style')
       styleElement.textContent = `
-    .infinite-carousel {
-      -webkit-overflow-scrolling: touch !important;
-      scroll-behavior: auto !important;
-      will-change: transform !important;
-    }
-    
-    .infinite-carousel .carousel-item {
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-      will-change: transform;
-      backface-visibility: hidden;
-    }
-    
-    @supports (-webkit-touch-callout: none) {
-      /* iOS Safari specific fixes */
-      .infinite-carousel {
-        -webkit-mask-image: -webkit-radial-gradient(white, black);
-      }
-    }
-  `
+        .infinite-carousel {
+          -webkit-overflow-scrolling: touch !important;
+          scroll-behavior: auto !important;
+          will-change: transform !important;
+        }
+        
+        .infinite-carousel .carousel-item {
+          -webkit-transform: translateZ(0);
+          transform: translateZ(0);
+          will-change: transform;
+          backface-visibility: hidden;
+        }
+        
+        @supports (-webkit-touch-callout: none) {
+          /* iOS Safari specific fixes */
+          .infinite-carousel {
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+          }
+        }
+      `
 
       document.head.appendChild(styleElement)
       return styleElement
@@ -903,7 +910,10 @@ export function LandingEffects() {
         element.removeEventListener(event, handler)
       })
     }
-  }, [])
+  }, [isHomePage])
+
+  // Only render on homepage
+  if (!isHomePage) return null
 
   return null
 }

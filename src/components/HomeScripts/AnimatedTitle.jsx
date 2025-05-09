@@ -20,7 +20,13 @@ const AnimatedTitle = ({
   const lastPlayed = useRef(0);
   const debounceTimeout = useRef(null);
   const hasFullyExited = useRef(true);
-  const lastScrollY = useRef(window.scrollY);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      lastScrollY.current = window.scrollY;
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof children === 'string') {
@@ -32,7 +38,7 @@ const AnimatedTitle = ({
   }, [children]);
 
   useEffect(() => {
-    if (!words.length) return;
+    if (!words.length || typeof window === 'undefined') return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -46,13 +52,11 @@ const AnimatedTitle = ({
         const isFarBelowViewport = rect.top > window.innerHeight + 500;
         const isFarAboveViewport = rect.bottom < -500;
 
-        // Reset if fully out of view
         if (!entry.isIntersecting && ((scrollDirection === 'down' && isFarBelowViewport) || (scrollDirection === 'up' && isFarAboveViewport))) {
           hasFullyExited.current = true;
           resetWords();
         }
 
-        // Animate when re-entering from full exit
         if (entry.isIntersecting && hasFullyExited.current) {
           const timeSinceLast = now - lastPlayed.current;
           if (timeSinceLast > debounceDelay) {
