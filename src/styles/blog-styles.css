@@ -556,14 +556,14 @@ button.copyLink span {
     position: relative;
     width: 100%;
     height: 100%;
-    aspect-ratio: 21/9;
+    aspect-ratio: 16/9;
     overflow: hidden;
     border-radius: 8px; }
 
 .related-post-image img {
     position: absolute;
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
     top: 0;
     left: 50%;
     transform: translate(-50%, 0) scale(1.0);
@@ -656,6 +656,7 @@ header.blog .header-container .contactBtn-container {
     gap: 4rem; }
 
 .article-inner {
+    margin: 14vh 0 2rem 0;
     padding: 1.5rem; }
     
 .blogFrame-container {
@@ -787,7 +788,6 @@ button.copyLink p {
 
 /* Related Post Styles */
 .related-posts-section {
-    margin-top: 4rem;
     padding: 2rem 0; }
 
 .related-posts-section h4 {
@@ -801,6 +801,9 @@ button.copyLink p {
     gap: 1.5rem; }
 
 .related-post-card {
+    position: relative;
+    display: block;
+    height: fit-content;
     transition: all 0.3s ease; }
 
 .related-post-card h5 {

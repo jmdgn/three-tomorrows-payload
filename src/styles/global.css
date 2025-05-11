@@ -882,7 +882,7 @@ select,
 textarea {
     width: 100%;
     padding: 1rem 1.25rem;
-    background-color: #F5F7F7;
+    background-color: #FFF;
     border: 1px solid #CCC;
     border-radius: 6px;
     font-family: "Neue Montreal";
@@ -1502,7 +1502,7 @@ img.service-image {
 .serviceText-panelBottom p {
     font-size: 14px;
     line-height: 22px;
-    color: #A7A4A4; }
+    color: #878484; }
 
 .service-carousel-container {
     position: relative;

@@ -15,6 +15,7 @@ import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { TitleIntroductionBlock } from '../../blocks/Titles/config'
+import { CardStack } from '../../blocks/CardStack/config'
 
 import {
   MetaDescriptionField,
@@ -75,7 +76,6 @@ export const Pages: CollectionConfig<'pages'> = {
         },
         {
           fields: [
-            // Add a rich text field with text alignment before the layout blocks
             {
               name: 'introduction',
               type: 'richText',
@@ -87,7 +87,15 @@ export const Pages: CollectionConfig<'pages'> = {
             {
               name: 'layout',
               type: 'blocks',
-              blocks: [CallToAction, Content, MediaBlock, Archive, FormBlock, TitleIntroductionBlock],
+              blocks: [
+                CallToAction,
+                Content,
+                MediaBlock,
+                Archive,
+                FormBlock,
+                TitleIntroductionBlock,
+                CardStack,
+              ],
               required: true,
               admin: {
                 initCollapsed: true,
@@ -114,10 +122,8 @@ export const Pages: CollectionConfig<'pages'> = {
 
             MetaDescriptionField({}),
             PreviewField({
-              // if the `generateUrl` function is configured
               hasGenerateFn: true,
 
-              // field paths to match the target field for data
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
             }),
@@ -142,7 +148,7 @@ export const Pages: CollectionConfig<'pages'> = {
   versions: {
     drafts: {
       autosave: {
-        interval: 100, // We set this interval for optimal live preview
+        interval: 100,
       },
       schedulePublish: true,
     },
