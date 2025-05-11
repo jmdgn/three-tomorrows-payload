@@ -7,7 +7,7 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
-import { CardStackBlock } from '@/blocks/CardStack'
+import { CardStackBlock } from '@/blocks/CardStack/Component'
 
 const blockComponents = {
   titleIntroduction: TitleIntroduction,
