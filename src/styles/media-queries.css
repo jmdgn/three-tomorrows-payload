@@ -61,8 +61,13 @@ section.intro-para {
 /* End */
 
 
-
 /* Blog Panel Homepage Styles */
+/* End */
+
+
+/* Card Stack Component Styles */
+.stackCard__body {
+	padding: 3rem; }
 /* End */
 }
 
@@ -316,6 +321,11 @@ header.blog .header-container .contactBtn-container {
 .linkColumn-left,
 .socialColumn-left {
 	width: 16%; }
+
+/* Card Stack Component Styles */
+.stackCard__body {
+	padding: 2rem; }
+/* End */
 }
 
 
@@ -1004,16 +1014,40 @@ form.email-signup-form input[type="email"] {
 
 article.pt-16.pb-24 {
 	padding-bottom: 6rem; }
+
+.stackCard {
+	margin-bottom: 60px; }
+	
+.stackCard__body {
+	flex-direction: column;
+	padding: 1.5rem;
+	align-items: flex-start; }
+	
+.stackCard__content {
+	max-width: 100%;
+	width: 100%;
+	padding-right: 0;
+	margin-bottom: 2rem; }
+	
+.stackCard__image {
+	max-width: 100%;
+	width: 100%;
+	margin-left: 0;
+	aspect-ratio: 16/9; }
+	
+.stackCard__body-content-header {
+	font-size: 32px;
+	line-height: 1.2; }
 }
 
 
 @media (min-width: 769px) {
-	.mobile-menu-toggle {
-		display: none; }
-	
-	.mobile-menu {
-		display: none; }
-	}
+.mobile-menu-toggle {
+	display: none; }
+
+.mobile-menu {
+	display: none; }
+}
 	
 
 
