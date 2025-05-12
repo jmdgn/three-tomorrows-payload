@@ -210,7 +210,6 @@ const CustomHomepage = (props) => {
       const offsetX = (centerX - clientX) * movementFactor;
       const offsetY = (centerY - clientY) * movementFactor;
       
-      // Remove scale from transform, only apply translation
       waterContainerRef.current.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
     }, 16);
 
@@ -238,11 +237,9 @@ const CustomHomepage = (props) => {
             opacity = 1 - normalizedProgress;
           }
     
-          // Update opacity instead of scale
           waterContainerRef.current.style.opacity = opacity;
           
-          // Still keep the same values in refs for other parts of the code that might use them
-          currentScaleRef.current = opacity; // Using the same ref but for opacity now
+          currentScaleRef.current = opacity;
           window._waterScale = opacity;
           lastScrollProgressRef.current = scrollProgress;
     
@@ -266,10 +263,8 @@ const CustomHomepage = (props) => {
             canvas.style.transition = 'border-radius 0.2s ease-out';
           }
     
-          // Handle mouse movement separately
           const lastMouseEvent = window._lastMouseEvent;
           if (lastMouseEvent) {
-            // Apply transform without scale
             const { clientX, clientY } = lastMouseEvent;
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;

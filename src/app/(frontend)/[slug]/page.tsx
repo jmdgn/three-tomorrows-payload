@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic'
 
 export async function generateStaticParams() {
   if (process.env.NODE_ENV === 'production' && process.env.PAYLOAD_BUILD !== 'true') {
-    return [] // Skip generating params during build if Payload isn't initialized
+    return []
   }
 
   const payload = await getPayload({ config: configPromise })
@@ -33,9 +33,7 @@ export async function generateStaticParams() {
     },
   })
 
-  const params = pages.docs
-    ?.filter((doc) => doc.slug !== 'home')
-    .map(({ slug }) => ({ slug }))
+  const params = pages.docs?.filter((doc) => doc.slug !== 'home').map(({ slug }) => ({ slug }))
 
   return params
 }
@@ -57,7 +55,6 @@ export default async function Page({ params: paramsPromise }: Args) {
     slug,
   })
 
-  // Remove this code once your website is seeded
   if (!page && slug === 'home') {
     page = homeStatic
   }
@@ -86,17 +83,24 @@ export default async function Page({ params: paramsPromise }: Args) {
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const { slug = 'home' } = await paramsPromise
 
-  // Safe fallback if Payload isn't available at build time
-  if (process.env.NODE_ENV === 'production' && process.env.PAYLOAD_BUILD !== 'true') {
-    return {
-      title: slug,
-      description: 'Page preview',
+  try {
+    const page = await queryPageBySlug({ slug })
+    if (page) {
+      return generateMeta({ doc: page })
     }
+  } catch (error) {
+    console.error(`Error generating metadata for ${slug}:`, error)
   }
 
-  const page = await queryPageBySlug({ slug })
+  const formattedTitle = slug
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 
-  return generateMeta({ doc: page })
+  return {
+    title: `${formattedTitle} | Three Tomorrows`,
+    description: 'Page preview',
+  }
 }
 
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {

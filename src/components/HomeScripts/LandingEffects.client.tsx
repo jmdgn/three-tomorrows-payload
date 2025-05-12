@@ -165,7 +165,7 @@ export function LandingEffects() {
         carouselEl.querySelectorAll('.carousel-item-clone').forEach((clone) => clone.remove())
 
         const isReverse = index === 1
-        const speed = isMobile ? (isReverse ? -4.2 : 4.2) : isReverse ? -0.8 : 0.8
+        const speed = isMobile ? (isReverse ? -2.2 : 2.2) : isReverse ? -0.8 : 0.8
         const cloneCount = 2
 
         for (let i = 0; i < cloneCount; i++) {
@@ -228,7 +228,7 @@ export function LandingEffects() {
           lastTimestamp = timestamp
 
           if (!isUserScrolling && !isHovering && !isDragging) {
-            const pixelsPerFrame = speed * (delta / 16.67) // Normalize to 60fps
+            const pixelsPerFrame = speed * (delta / 16.67)
             carouselEl.scrollLeft += pixelsPerFrame
             adjustScroll()
           }
@@ -252,7 +252,6 @@ export function LandingEffects() {
         }
 
         const resumeScrollAfterDelay = () => {
-          // Instead of resetting after delay, disable auto-scroll permanently
           isUserScrolling = true
         }
 

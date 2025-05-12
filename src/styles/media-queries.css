@@ -1012,6 +1012,9 @@ form.email-signup-form input[type="email"] {
 .my-16 {
 	padding: 1.5rem; }
 
+.my-16 .blockInner .titleText.center {
+	padding-bottom: 1rem; }
+
 article.pt-16.pb-24 {
 	padding-bottom: 6rem; }
 
@@ -1033,7 +1036,8 @@ article.pt-16.pb-24 {
 	max-width: 100%;
 	width: 100%;
 	margin-left: 0;
-	aspect-ratio: 16/9; }
+	aspect-ratio: 16/9;
+	border-radius: .5rem; }
 	
 .stackCard__body-content-header {
 	font-size: 32px;
