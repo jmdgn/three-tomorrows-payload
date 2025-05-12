@@ -30,18 +30,19 @@ export const CardStack: Block = {
           name: 'backgroundColor',
           type: 'text',
           label: 'Background Color',
-          defaultValue: '#8314F9',
+          defaultValue: '',
           admin: {
-            description: 'Enter a hex color code (e.g., #8314F9)',
+            description:
+              'Enter a hex color code (e.g., #8314F9). Leave empty for transparent background.',
           },
         },
         {
           name: 'textColor',
           type: 'text',
           label: 'Text Color',
-          defaultValue: '#FFFFFF',
+          defaultValue: '#191C1C',
           admin: {
-            description: 'Enter a hex color code (e.g., #FFFFFF)',
+            description: 'Enter a hex color code (e.g., #191C1C)',
           },
         },
         {

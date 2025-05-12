@@ -1857,7 +1857,7 @@ img.carousel-image {
 /* End */
 
 
-/* Internal Page Styles */
+/* Internal Page Styles - Universal */
 article.pt-16.pb-24 {
     position: relative;
     width: 100%;
@@ -1892,3 +1892,28 @@ article.pt-16.pb-24 {
     right: 0;
     left: 0;
     padding: 4rem 0; }
+/* End */
+
+
+/* GSAP Card Stack Styles */
+.stackCard.flex.items-center.justify-between.rounded-lg.p-8.my-4.relative.overflow-hidden {
+    border-radius: 1rem;
+    box-shadow: 2px 2px 24px 0px rgba(0, 0, 0, 0.15); }
+
+.stackCard__body.w-full.flex.items-center.justify-between {
+    position: relative;
+    display: flex;
+    padding: 4rem;
+    gap: 8rem; }
+
+.stackCard__content.flex-1.pr-8,
+.stackCard__image.ml-8.flex-shrink-0 {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 50%; }
+
+.stackCard__image.ml-8.flex-shrink-0 {
+    overflow: hidden;
+    border-radius: 1rem;
+    aspect-ratio: 5/4; }

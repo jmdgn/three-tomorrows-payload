@@ -13,7 +13,6 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
   const cardsContainerRef = useRef<HTMLDivElement>(null)
   const [gsapReady, setGsapReady] = useState(false)
 
-  // Load GSAP
   useEffect(() => {
     let mounted = true
 
@@ -35,9 +34,10 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
     }
   }, [])
 
-  // Setup animations
   useEffect(() => {
     if (!gsapReady || !cards || cards.length === 0) return
+
+    if (typeof window === 'undefined') return
 
     const { gsap, ScrollTrigger } = window
 
@@ -46,34 +46,25 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
       return
     }
 
-    // Small delay to ensure DOM is ready
     const timeoutId = setTimeout(() => {
-      // Get all card elements
       const cardElements = gsap.utils.toArray('.stackCard') as HTMLElement[]
 
       if (cardElements.length === 0) return
 
-      // Clear any existing ScrollTriggers for this component
       ScrollTrigger.getAll().forEach((trigger) => {
         if (trigger.vars?.id?.startsWith('cardstack-')) {
           trigger.kill()
         }
       })
 
-      // Calculate stick distance for better animation flow
-      const stickDistance = 0
-
-      // Set up ScrollTrigger for each card
       cardElements.forEach((card, index) => {
         const scale = 1 - (cards.length - index) * 0.025
 
-        // Set initial state
         gsap.set(card, {
           scale: 1,
           transformOrigin: '50% bottom',
         })
 
-        // Create scale animation
         const scaleAnimation = gsap.to(card, {
           scale: scale,
           transformOrigin: '50% bottom',
@@ -81,20 +72,18 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
           paused: true,
         })
 
-        // Create ScrollTrigger
         ScrollTrigger.create({
           id: `cardstack-${index}`,
           trigger: card,
           start: 'center center',
           end: () => {
-            // Find the last card's ScrollTrigger start position
             const lastCard = cardElements[cardElements.length - 1]
             const lastCardST = ScrollTrigger.create({
               trigger: lastCard,
               start: 'center center',
             })
-            const end = lastCardST.start + stickDistance
-            lastCardST.kill() // Clean up temporary trigger
+            const end = lastCardST.start + 0
+            lastCardST.kill()
             return end
           },
           pin: true,
@@ -105,7 +94,6 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
       })
     }, 100)
 
-    // Cleanup function
     return () => {
       clearTimeout(timeoutId)
       if (window.ScrollTrigger) {
@@ -140,8 +128,8 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
                   key={index}
                   className="stackCard flex items-center justify-between rounded-lg p-8 my-4 relative overflow-hidden"
                   style={{
-                    backgroundColor: card.backgroundColor || '#8314F9',
-                    color: card.textColor || '#FFFFFF',
+                    backgroundColor: card.backgroundColor || '#FBFCFD',
+                    color: card.textColor || '#191C1C',
                     minHeight: '300px',
                     willChange: 'transform',
                   }}
@@ -175,22 +163,9 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
       </div>
 
       <style jsx>{`
-        .stackCard {
-          box-shadow:
-            0 4px 6px -1px rgba(0, 0, 0, 0.1),
-            0 2px 4px -1px rgba(0, 0, 0, 0.06);
-          transition: box-shadow 0.3s ease;
-        }
-
-        .stackCard:hover {
-          box-shadow:
-            0 10px 15px -3px rgba(0, 0, 0, 0.1),
-            0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
         .stackCard__image {
           width: 300px;
-          height: 200px;
+          height: auto;
         }
 
         @media (max-width: 768px) {

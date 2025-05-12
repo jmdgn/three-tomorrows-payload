@@ -16,6 +16,7 @@ import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { TitleIntroductionBlock } from '../../blocks/Titles/config'
 import { CardStack } from '../../blocks/CardStack/config'
+import { ContactCTA } from '../../blocks/ContactCTA/config'
 
 import {
   MetaDescriptionField,
@@ -95,6 +96,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 FormBlock,
                 TitleIntroductionBlock,
                 CardStack,
+                ContactCTA,
               ],
               required: true,
               admin: {
