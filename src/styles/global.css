@@ -1896,6 +1896,79 @@ img.carousel-image {
     margin-block-end: 1em;
     text-indent: 0;
     text-align: center; }
+
+.form-block-contact-info {
+    width: 50%;
+    padding-right: 2rem; }
+
+.contact-persons-grid {
+    display: grid;
+    gap: 2rem; }
+
+.contact-person {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e5e7eb; }
+
+.contact-person:last-child {
+    border-bottom: none;
+    padding-bottom: 0; }
+
+.contact-person-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem; }
+
+.contact-person-image {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0; }
+
+.contact-person-info h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+    color: #111827; }
+
+.contact-person-social {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.25rem; }
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    transition: opacity 0.2s; }
+
+.social-icon:hover {
+    opacity: 0.7; }
+
+.contact-person-details {
+    margin-left: 64px; }
+
+.contact-detail {
+    margin-bottom: 0.75rem; }
+
+.contact-detail:last-child {
+    margin-bottom: 0; }
+
+.contact-detail p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0 0 0.25rem 0; }
+
+.contact-detail a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.875rem; }
+
+.contact-detail a:hover {
+    text-decoration: underline; }
 /* End */
 
 

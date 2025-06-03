@@ -38,6 +38,109 @@ export const FormBlock: Block = {
       },
     },
     {
+      name: 'leftContentType',
+      type: 'select',
+      defaultValue: 'intro',
+      options: [
+        {
+          label: 'Intro Content',
+          value: 'intro',
+        },
+        {
+          label: 'Contact Information',
+          value: 'contact',
+        },
+      ],
+      admin: {
+        condition: (_, { layout }) => layout === 'twoColumn',
+        description: 'Choose what to display on the left side of the form',
+      },
+    },
+    {
+      name: 'enableIntro',
+      type: 'checkbox',
+      label: 'Enable Intro Content',
+      admin: {
+        condition: (_, { leftContentType, layout }) =>
+          layout === 'standard' || (layout === 'twoColumn' && leftContentType === 'intro'),
+      },
+    },
+    {
+      name: 'introContent',
+      type: 'richText',
+      admin: {
+        condition: (_, { enableIntro, leftContentType, layout }) =>
+          Boolean(enableIntro) && (layout === 'standard' || leftContentType === 'intro'),
+      },
+      editor: lexicalEditor({
+        features: ({ rootFeatures }) => {
+          return [
+            ...rootFeatures,
+            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }),
+            AlignFeature({
+              alignments: ['left', 'center', 'right', 'justify'],
+            }),
+            FixedToolbarFeature(),
+            InlineToolbarFeature(),
+          ]
+        },
+      }),
+      label: 'Intro Content',
+    },
+    {
+      name: 'contactInfo',
+      type: 'group',
+      label: 'Contact Information',
+      admin: {
+        condition: (_, { leftContentType, layout }) =>
+          layout === 'twoColumn' && leftContentType === 'contact',
+      },
+      fields: [
+        {
+          name: 'heading',
+          type: 'text',
+          label: 'Heading',
+          defaultValue: 'Want to contact us directly?',
+          required: true,
+        },
+        {
+          name: 'contacts',
+          type: 'array',
+          label: 'Contact Persons',
+          minRows: 1,
+          maxRows: 2,
+          fields: [
+            {
+              name: 'person',
+              type: 'relationship',
+              relationTo: 'users',
+              label: 'Person',
+              required: true,
+              admin: {
+                description: 'Select a user to display their profile information',
+              },
+            },
+            {
+              name: 'email',
+              type: 'email',
+              label: 'Email Override',
+              admin: {
+                description: 'Override the email from the user profile (optional)',
+              },
+            },
+            {
+              name: 'phone',
+              type: 'text',
+              label: 'Phone Number',
+              admin: {
+                description: 'Phone number for this contact',
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
       name: 'backgroundType',
       type: 'select',
       defaultValue: 'none',
@@ -120,32 +223,6 @@ export const FormBlock: Block = {
         description: 'Add an overlay to the background to improve readability.',
         condition: (_, data) => data.backgroundType === 'image' || data.backgroundType === 'color',
       },
-    },
-    {
-      name: 'enableIntro',
-      type: 'checkbox',
-      label: 'Enable Intro Content',
-    },
-    {
-      name: 'introContent',
-      type: 'richText',
-      admin: {
-        condition: (_, { enableIntro }) => Boolean(enableIntro),
-      },
-      editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [
-            ...rootFeatures,
-            HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }),
-            AlignFeature({
-              alignments: ['left', 'center', 'right', 'justify'],
-            }),
-            FixedToolbarFeature(),
-            InlineToolbarFeature(),
-          ]
-        },
-      }),
-      label: 'Intro Content',
     },
   ],
   graphQL: {
