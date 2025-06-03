@@ -12,22 +12,22 @@ export const Email: React.FC<
   EmailField & {
     errors: Partial<FieldErrorsImpl>
     register: UseFormRegister<FieldValues>
+    placeholder?: string
   }
-> = ({ name, defaultValue, errors, label, register, required, width }) => {
+> = ({ name, defaultValue, errors, label, register, required, width, placeholder }) => {
   return (
     <Width width={width}>
       <Label htmlFor={name}>
         {label}
-
         {required && <span className="required">*</span>}
       </Label>
       <Input
         defaultValue={defaultValue}
         id={name}
-        type="text"
+        type="email"
+        placeholder={placeholder}
         {...register(name, { pattern: /^\S[^\s@]*@\S+$/, required })}
       />
-
       {errors[name] && <Error name={name} />}
     </Width>
   )

@@ -3,13 +3,18 @@
 import React from 'react';
 import AnimatedTitle from '@/components/HomeScripts/AnimatedTitle';
 
-const TitleIntroduction = ({ heading, subheading, centerAlignment }) => {
+const TitleIntroduction = ({ heading, headingColor, subheading, centerAlignment }) => {
   const alignmentClass = centerAlignment ? 'center' : '';
   
   return (
     <div className={`titleText ${alignmentClass}`}>
       <div className="titleContent-container">
-        <h4 className="xlarge animate-title">{heading || 'Heading'}</h4>
+        <h4 
+          className="xlarge animate-title" 
+          style={{ color: headingColor || '#171744' }}
+        >
+          {heading || 'Heading'}
+        </h4>
       </div>
       <div className="txtContent-container">
         <p className="xlarge">

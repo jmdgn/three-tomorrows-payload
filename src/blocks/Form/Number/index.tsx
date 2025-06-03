@@ -7,23 +7,25 @@ import React from 'react'
 
 import { Error } from '../Error'
 import { Width } from '../Width'
+
 export const Number: React.FC<
   TextField & {
     errors: Partial<FieldErrorsImpl>
     register: UseFormRegister<FieldValues>
+    placeholder?: string
   }
-> = ({ name, defaultValue, errors, label, register, required, width }) => {
+> = ({ name, defaultValue, errors, label, register, required, width, placeholder }) => {
   return (
     <Width width={width}>
       <Label htmlFor={name}>
         {label}
-
         {required && <span className="required">*</span>}
       </Label>
       <Input
         defaultValue={defaultValue}
         id={name}
         type="number"
+        placeholder={placeholder}
         {...register(name, { required })}
       />
       {errors[name] && <Error name={name} />}

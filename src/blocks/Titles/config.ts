@@ -14,6 +14,29 @@ export const TitleIntroductionBlock: Block = {
       defaultValue: 'Heading',
     },
     {
+      name: 'headingColor',
+      type: 'select',
+      label: 'Heading Color',
+      defaultValue: '#171744',
+      options: [
+        {
+          label: 'Dark Navy',
+          value: '#171744',
+        },
+        {
+          label: '3T Green',
+          value: '#3BE494',
+        },
+        {
+          label: 'White',
+          value: '#FFFFFF',
+        },
+      ],
+      admin: {
+        description: 'Choose the color for the heading text',
+      },
+    },
+    {
       name: 'subheading',
       type: 'text',
       required: true,
@@ -24,6 +47,6 @@ export const TitleIntroductionBlock: Block = {
       type: 'checkbox',
       label: 'Center Align',
       defaultValue: true,
-    }
+    },
   ],
 }
