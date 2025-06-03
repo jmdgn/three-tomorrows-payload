@@ -743,6 +743,9 @@ section.intro-section {
 .introState-inner {
 	max-width: 100%; }
 
+.service-carousel {
+	padding-top: 1rem; }
+
 .serviceContent-outer {
 	padding: 1.5rem; }
 
@@ -1095,6 +1098,9 @@ article.pt-16.pb-24 {
 h4 {
 	font-size: 28px;
     line-height: 32px; }
+
+.titleText.center {
+	padding-bottom: 4rem; }
 
 .water-container canvas {
 	transform: scale(1.05); }

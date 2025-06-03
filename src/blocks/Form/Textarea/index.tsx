@@ -20,11 +20,7 @@ export const Textarea: React.FC<
       <Label htmlFor={name}>
         {label}
 
-        {required && (
-          <span className="required">
-            *
-          </span>
-        )}
+        {required && <span className="required">*</span>}
       </Label>
 
       <TextAreaComponent
