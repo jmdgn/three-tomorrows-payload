@@ -326,6 +326,16 @@ header.blog .header-container .contactBtn-container {
 .stackCard__body {
 	padding: 2rem; }
 /* End */
+
+.mb-6.mb-0, .mb-6 {
+	flex: 0 0 100%; }
+
+.form-block-contact-info {
+	justify-content: normal; }
+
+.form-block-content-container {
+	max-width: 560px;
+	padding: 4rem 0; }
 }
 
 
@@ -592,6 +602,10 @@ section.intro-para {
 
 .mb-6.mb-0 {
 	flex: 0 0 100%; }
+
+.contact-persons-grid.grid.gap-8 {
+	flex-direction: column;
+	gap: 6rem; }
 
 }
 
@@ -1045,6 +1059,33 @@ article.pt-16.pb-24 {
 .stackCard__body-content-header {
 	font-size: 32px;
 	line-height: 1.2; }
+
+.form-block-container.form-block-two-column.container.flex.flex-col {
+	padding: 1rem; }
+
+.form-block-content {
+	flex-direction: column-reverse; }
+
+.form-block-contact-info,
+.form-block-form-column {
+	width: 100%;
+	padding: 2rem 0; }
+
+.form-block-content-container {
+	position: relative; }
+
+.form-block-content-container {
+	padding: 0; }
+
+.form-block-content-container h1,
+.form-block-content-container h2,
+.form-block-content-container h3,
+.form-block-content-container h4,
+.form-block-content-container h5 {
+	margin-bottom: 4rem; }
+
+.p-4 form {
+	padding: 2rem 0; }
 }
 
 

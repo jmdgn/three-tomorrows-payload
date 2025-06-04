@@ -1,67 +1,74 @@
-import { fetchPayloadData } from './fetchPayloadData'
-import { getPayload } from 'payload'
-import configPromise from '@payload-config'
+import { getServerSideURL } from '@/utilities/getURL'
+import type { Header } from '@/payload-types'
 
-const HEADER_QUERY = `
-  query {
-    Header {
-      navItems {
-        id
-        link {
-          type
-          label
-          url
-          newTab
-        }
-      }
-    }
-  }
-`
-
-export async function testHeaderAccess() {
+export async function testHeaderAccess(serverURL: string): Promise<boolean> {
   try {
-    const response = await fetchPayloadData({
-      query: `query { Header { __typename } }`
+    console.log('Testing header access...')
+
+    // Change from /api/globals/header to /api/header
+    const url = `${serverURL}/api/header`
+    console.log('Fetching from URL:', url)
+
+    const response = await fetch(url, {
+      method: 'HEAD',
+      headers: {
+        Accept: 'application/json',
+      },
     })
-    
-    return Boolean(response?.data?.Header)
+
+    if (!response.ok) {
+      console.error('Header test failed with status:', response.status)
+      console.error('Response headers:', Object.fromEntries(response.headers.entries()))
+      return false
+    }
+
+    console.log('Header test passed')
+    return true
   } catch (error) {
-    console.error('Error accessing Header collection:', error)
+    console.error('Header test error:', error)
     return false
   }
 }
 
-export async function fetchHeader() {
+export async function fetchHeader(): Promise<Header | null> {
   try {
-    console.log('Starting header data fetch');
-    
-    const payload = await getPayload({ config: configPromise });
-    
-    const headerData = await payload.findGlobal({
-      slug: 'header',
-      depth: 2,
-    });
-    
-    console.log('Header data fetched successfully');
-    
-    if (!headerData) {
-      console.log('Warning: No header data returned from findGlobal');
-      return null;
-    }
-    
-    if (!headerData.navItems) {
-      console.log('Warning: No navItems in header data');
-    } else {
-      console.log(`Found ${headerData.navItems.length} navItems in header`);
-      
-      if (headerData.navItems.length > 0) {
-        console.log('Sample navItem structure:', JSON.stringify(headerData.navItems[0], null, 2));
+    console.log('Fetching header data...')
+
+    const baseUrl = getServerSideURL()
+    const url = `${baseUrl}/api/globals/header`
+
+    console.log('Fetching header from URL:', url)
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    })
+
+    console.log('Header fetch response status:', response.status)
+
+    if (!response.ok) {
+      console.error('Header fetch failed with status:', response.status)
+      console.error('Response headers:', Object.fromEntries(response.headers.entries()))
+
+      try {
+        const errorText = await response.text()
+        console.error('Error response body:', errorText)
+      } catch (e) {
+        console.error('Could not read error response body:', e)
       }
+
+      return null
     }
-    
-    return headerData;
+
+    const data = await response.json()
+    console.log('Header data received:', data)
+
+    return data
   } catch (error) {
-    console.error('Error in fetchHeader:', error);
-    return null;
+    console.error('Error fetching header:', error)
+    return null
   }
 }

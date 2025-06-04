@@ -45,87 +45,171 @@ const ContactPerson: React.FC<{
   email?: string
   phone?: string
 }> = ({ person, email, phone }) => {
+  // Use the same logic as blog posts for getting author data
+  const getContactData = () => {
+    if (!person || typeof person !== 'object') {
+      return null
+    }
+
+    if (person.name) {
+      if (person.authorProfile) {
+        if (person.authorProfile.isAuthor) {
+          let photoUrl = null
+          if (person.authorProfile.photo) {
+            if (typeof person.authorProfile.photo === 'string') {
+              photoUrl = person.authorProfile.photo
+            } else if (
+              typeof person.authorProfile.photo === 'object' &&
+              person.authorProfile.photo.url
+            ) {
+              photoUrl = person.authorProfile.photo.url
+            }
+          }
+
+          const socialMedia = person.authorProfile.socialMedia || {}
+
+          return {
+            name: person.name,
+            biography: person.authorProfile.biography || null,
+            image: photoUrl,
+            linkedinUrl: socialMedia.linkedin || null,
+            twitterUrl: socialMedia.twitter ? `https://twitter.com/${socialMedia.twitter}` : null,
+            blueskyUrl: socialMedia.bluesky
+              ? `https://bsky.app/profile/${socialMedia.bluesky}`
+              : null,
+            websiteUrl: socialMedia.website || null,
+          }
+        }
+      }
+
+      return {
+        name: person.name,
+        biography: null,
+        image: null,
+        linkedinUrl: null,
+        twitterUrl: null,
+        blueskyUrl: null,
+        websiteUrl: null,
+      }
+    }
+
+    return null
+  }
+
+  const contactData = getContactData()
   const displayEmail = email || person.email
 
+  if (!contactData) {
+    return null
+  }
+
   return (
-    <div className="contact-person">
-      <div className="contact-person-header flex items-center gap-4 mb-4">
-        {person.profileImage && typeof person.profileImage === 'object' && (
-          <div className="contact-person-image w-12 h-12 rounded-full overflow-hidden">
-            <MediaComponent
-              resource={person.profileImage}
-              imgClassName="w-full h-full object-cover"
-              fill
+    <div className="profileAssets-container">
+      <div className="contactProfile-container">
+        <div className="articleProfile-image">
+          {contactData.image ? (
+            <img
+              className="profile"
+              src={contactData.image}
+              width="44"
+              height="44"
+              alt={`${contactData.name} profile`}
             />
+          ) : (
+            <div
+              className="profile-placeholder"
+              style={{
+                width: '44px',
+                height: '44px',
+                backgroundColor: '#f0f0f0',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                color: '#666',
+              }}
+            >
+              {contactData.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+
+        <div className="profileBio-container">
+          <div className="profileName">
+            <p>{contactData.name}</p>
           </div>
-        )}
-        <div className="contact-person-info">
-          <h4 className="font-semibold text-lg">{person.name || 'Contact Person'}</h4>
-          <div className="contact-person-social flex gap-2 mt-1">
-            {person.linkedinUrl && (
-              <Link
-                href={person.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-icon"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 18 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M16.3636 0H1.63636C0.732273 0 0 0.732273 0 1.63636V16.3636C0 17.2677 0.732273 18 1.63636 18H16.3636C17.2677 18 18 17.2677 18 16.3636V1.63636C18 0.732273 17.2677 0 16.3636 0ZM5.68964 14.7273H3.276V6.96109H5.68964V14.7273ZM4.45827 5.85082C3.68018 5.85082 3.051 5.22 3.051 4.44355C3.051 3.66709 3.681 3.03709 4.45827 3.03709C5.23391 3.03709 5.86473 3.66791 5.86473 4.44355C5.86473 5.22 5.23391 5.85082 4.45827 5.85082ZM14.7305 14.7273H12.3185V10.9505C12.3185 10.0497 12.3022 8.89118 11.0643 8.89118C9.80836 8.89118 9.61527 9.87218 9.61527 10.8851V14.7273H7.20327V6.96109H9.51873V8.02227H9.55145C9.87382 7.41191 10.6609 6.768 11.835 6.768C14.2789 6.768 14.7305 8.37655 14.7305 10.4678V14.7273Z"
-                    fill="#0A66C2"
+          <div className="socialLink-bio">
+            {contactData.linkedinUrl && (
+              <div className="socialLink">
+                <a target="_blank" href={contactData.linkedinUrl} rel="noopener noreferrer">
+                  <img
+                    className="socialIcon"
+                    src="/assets/images/blog/profile/linkedin-icon.svg"
+                    width="18"
+                    height="18"
+                    alt="LinkedIn Profile"
                   />
-                </svg>
-              </Link>
+                </a>
+              </div>
             )}
-            {person.twitterUrl && (
-              <Link
-                href={person.twitterUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-icon"
-              >
-                <svg
-                  width="20"
-                  height="18"
-                  viewBox="0 0 20 18"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M15.7512 0H18.818L12.1179 7.62462L20 18H13.8284L8.99458 11.7074L3.46359 18H0.394938L7.5613 9.84462L0 0H6.32828L10.6976 5.75169L15.7512 0ZM14.6748 16.1723H16.3742L5.4049 1.73169H3.58133L14.6748 16.1723Z"
-                    fill="black"
+            {contactData.twitterUrl && (
+              <div className="socialLink">
+                <a target="_blank" href={contactData.twitterUrl} rel="noopener noreferrer">
+                  <img
+                    className="socialIcon"
+                    src="/assets/images/blog/profile/twitter-icon.svg"
+                    width="20"
+                    height="18"
+                    alt="Twitter/X Profile"
                   />
-                </svg>
-              </Link>
+                </a>
+              </div>
+            )}
+            {contactData.blueskyUrl && (
+              <div className="socialLink">
+                <a target="_blank" href={contactData.blueskyUrl} rel="noopener noreferrer">
+                  <img
+                    className="socialIcon"
+                    src="/assets/images/blog/profile/bsky-icon.svg"
+                    width="18"
+                    height="18"
+                    alt="Bluesky Profile"
+                  />
+                </a>
+              </div>
+            )}
+            {contactData.websiteUrl && (
+              <div className="socialLink">
+                <a target="_blank" href={contactData.websiteUrl} rel="noopener noreferrer">
+                  <img
+                    className="socialIcon"
+                    src="/assets/images/blog/profile/website-icon.svg"
+                    width="18"
+                    height="18"
+                    alt="Personal Website"
+                  />
+                </a>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      <div className="contact-person-details space-y-2">
-        {displayEmail && (
-          <div className="contact-detail">
-            <p className="text-sm text-gray-600">Email:</p>
-            <a href={`mailto:${displayEmail}`} className="text-blue-600 hover:underline">
-              {displayEmail}
-            </a>
-          </div>
-        )}
-        {phone && (
-          <div className="contact-detail">
-            <p className="text-sm text-gray-600">Phone:</p>
-            <a href={`tel:${phone}`} className="text-blue-600 hover:underline">
-              {phone}
-            </a>
-          </div>
-        )}
-      </div>
+      {/* Contact information below */}
+      {displayEmail && (
+        <div className="emailDetails-contactPanel">
+          <p>Email:</p>
+          <a href={`mailto:${displayEmail}`}>{displayEmail}</a>
+        </div>
+      )}
+
+      {phone && (
+        <div className="phoneDetails-contactPanel">
+          <p>Phone:</p>
+          <a href={`tel:${phone}`}>{phone}</a>
+        </div>
+      )}
     </div>
   )
 }
@@ -135,6 +219,17 @@ export const FormBlock: React.FC<
     id?: string
   } & FormBlockType
 > = (props) => {
+  // Add debug logging
+  console.log('FormBlock props:', props)
+  console.log('Contact info:', props.contactInfo)
+  if (props.contactInfo?.contacts) {
+    console.log('Contacts array:', props.contactInfo.contacts)
+    props.contactInfo.contacts.forEach((contact, index) => {
+      console.log(`Contact ${index}:`, contact)
+      console.log(`Person data:`, contact.person)
+    })
+  }
+
   const {
     enableIntro,
     form: formFromProps,
@@ -338,23 +433,32 @@ export const FormBlock: React.FC<
   const ContactInfoComponent = () =>
     layout === 'twoColumn' && leftContentType === 'contact' && contactInfo && !hasSubmitted ? (
       <div className="form-block-contact-info lg:w-1/2 mb-8 lg:mb-0">
-        <h5 className="text-2xl font-bold mb-8">
-          {contactInfo.heading || 'Want to contact us directly?'}
-        </h5>
-        <div className="contact-persons-grid grid gap-8">
-          {contactInfo.contacts?.map((contact, index) => {
-            if (typeof contact.person === 'object') {
-              return (
-                <ContactPerson
-                  key={index}
-                  person={contact.person}
-                  email={contact.email}
-                  phone={contact.phone}
-                />
-              )
-            }
-            return null
-          })}
+        <div className="form-block-content-container">
+          <h5 className="text-2xl font-bold mb-8">
+            {contactInfo.heading || 'Want to contact us directly?'}
+          </h5>
+          <div className="contact-persons-grid grid gap-8">
+            {contactInfo.contacts?.map((contact, index) => {
+              console.log(`Rendering contact ${index}:`, contact) // Debug log
+              if (typeof contact.person === 'object') {
+                return (
+                  <ContactPerson
+                    key={index}
+                    person={contact.person}
+                    email={contact.email}
+                    phone={contact.phone}
+                  />
+                )
+              } else {
+                console.log(
+                  `Contact ${index} person is not an object:`,
+                  typeof contact.person,
+                  contact.person,
+                )
+                return null
+              }
+            })}
+          </div>
         </div>
       </div>
     ) : null

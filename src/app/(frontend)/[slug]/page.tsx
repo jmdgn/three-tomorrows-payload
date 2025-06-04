@@ -104,22 +104,79 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
 }
 
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
-  const { isEnabled: draft } = await draftMode()
+  try {
+    console.log('Querying page by slug:', slug)
 
-  const payload = await getPayload({ config: configPromise })
+    const { isEnabled: draft } = await draftMode()
+    console.log('Draft mode enabled:', draft)
 
-  const result = await payload.find({
-    collection: 'pages',
-    draft,
-    limit: 1,
-    pagination: false,
-    overrideAccess: draft,
-    where: {
-      slug: {
-        equals: slug,
+    const payload = await getPayload({ config: configPromise })
+    console.log('Payload instance obtained')
+
+    const result = await payload.find({
+      collection: 'pages',
+      draft,
+      limit: 1,
+      pagination: false,
+      overrideAccess: draft,
+      where: {
+        slug: {
+          equals: slug,
+        },
       },
-    },
-  })
+      depth: 3,
+    })
 
-  return result.docs?.[0] || null
+    console.log('Page query result:', result)
+    console.log('Found docs:', result.docs?.length)
+
+    if (result.docs?.[0]) {
+      const page = result.docs[0]
+      console.log('Page layout blocks:', page.layout?.length)
+
+      page.layout?.forEach((block, index) => {
+        console.log(`Block ${index}:`, block.blockType)
+        if (block.blockType === 'formBlock') {
+          console.log('Form block found:', block)
+          console.log('Form block contactInfo:', block.contactInfo)
+          if (block.contactInfo?.contacts) {
+            console.log('Contacts in form block:', block.contactInfo.contacts)
+            block.contactInfo.contacts.forEach((contact, contactIndex) => {
+              console.log(`Contact ${contactIndex}:`, contact)
+              console.log(`Contact person type:`, typeof contact.person)
+              console.log(`Contact person data:`, contact.person)
+            })
+          }
+        }
+      })
+
+      if (page.layout) {
+        for (const block of page.layout) {
+          if (block.blockType === 'formBlock' && block.contactInfo?.contacts) {
+            for (const contact of block.contactInfo.contacts) {
+              if (typeof contact.person === 'string') {
+                console.log('Manually populating person:', contact.person)
+                try {
+                  const populatedPerson = await payload.findByID({
+                    collection: 'users',
+                    id: contact.person,
+                    depth: 2,
+                  })
+                  console.log('Populated person data:', populatedPerson)
+                  contact.person = populatedPerson
+                } catch (error) {
+                  console.error('Error populating person:', error)
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return result.docs?.[0] || null
+  } catch (error) {
+    console.error('Error in queryPageBySlug:', error)
+    return null
+  }
 })

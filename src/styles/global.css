@@ -990,8 +990,7 @@ form .mb-4,
 form.form-block-form {
     flex-wrap: wrap;
     display: flex;
-    gap: 1.5rem;
-    margin-bottom: 3rem; }
+    gap: 1.5rem; }
 
 .mb-6.mb-0,
 .mb-6 {
@@ -1898,8 +1897,12 @@ img.carousel-image {
     text-align: center; }
 
 .form-block-contact-info {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: normal;
     width: 50%;
-    padding-right: 2rem; }
+    padding: 2rem; }
 
 .contact-persons-grid {
     display: grid;
@@ -1969,6 +1972,105 @@ img.carousel-image {
 
 .contact-detail a:hover {
     text-decoration: underline; }
+
+.contactProfile-container {
+    position: relative;
+    display: flex;
+    gap: 1rem;
+    align-items: center; }
+
+.form-block-content-container {
+    position: absolute;
+    width: 100%;
+    max-width: 500px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4rem 0; }
+
+.form-block-content-container h1,
+.form-block-content-container h2,
+.form-block-content-container h3,
+.form-block-content-container h4,
+.form-block-content-container h5 {
+    margin-bottom: 6rem; }
+
+.profileBio-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; }
+
+.contact-persons-grid.grid.gap-8 {
+    display: flex;
+    gap: 8rem; }
+
+.articleProfile-image {
+    position: relative;
+    border-radius: 100px;
+    overflow: hidden; }
+
+.profileName p {
+    color: #171744;
+    font-family: "Neue Montreal Medium", sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.28px;
+    margin: 0; }
+
+.socialLink-bio {
+    position: relative;
+    display: flex;
+    gap: 1rem; }
+
+.profileAssets-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3rem;
+    display: flex; }
+
+.emailDetails-contactPanel,
+.phoneDetails-contactPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; }
+
+.emailDetails-contactPanel p,
+.phoneDetails-contactPanel p {
+    margin: 0;
+    color: #878484;
+    font-size: 14px;
+    font-style: normal;
+    line-height: 100%;
+    letter-spacing: 0.35px; }
+
+.emailDetails-contactPanel a,
+.phoneDetails-contactPanel a {
+    color: #171744;
+    font-family: "Neue Montreal Medium";
+    font-size: 14px;
+    font-style: normal;
+    line-height: 100%;
+    letter-spacing: 0.35px;
+    position: relative;
+    text-decoration: none;
+    display: inline-block; }
+
+.emailDetails-contactPanel a::after,
+.phoneDetails-contactPanel a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: #171744;
+    transition: width 0.3s ease; }
+
+.emailDetails-contactPanel a:hover::after,
+.phoneDetails-contactPanel a:hover::after {
+    width: 100%; }
 /* End */
 
 
