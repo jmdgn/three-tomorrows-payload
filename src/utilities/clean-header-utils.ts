@@ -1,11 +1,16 @@
 import { getServerSideURL } from '@/utilities/getURL'
 import type { Header } from '@/payload-types'
 
-export async function testHeaderAccess(serverURL: string): Promise<boolean> {
+export async function testHeaderAccess(): Promise<boolean> {
   try {
     console.log('Testing header access...')
 
-    // Change from /api/globals/header to /api/header
+    const serverURL = getServerSideURL()
+    if (!serverURL) {
+      console.error('No server URL available for header test')
+      return false
+    }
+
     const url = `${serverURL}/api/header`
     console.log('Fetching from URL:', url)
 
@@ -14,6 +19,7 @@ export async function testHeaderAccess(serverURL: string): Promise<boolean> {
       headers: {
         Accept: 'application/json',
       },
+      signal: AbortSignal.timeout(5000),
     })
 
     if (!response.ok) {
@@ -35,8 +41,12 @@ export async function fetchHeader(): Promise<Header | null> {
     console.log('Fetching header data...')
 
     const baseUrl = getServerSideURL()
-    const url = `${baseUrl}/api/globals/header`
+    if (!baseUrl) {
+      console.error('No base URL available for header fetch')
+      return null
+    }
 
+    const url = `${baseUrl}/api/header`
     console.log('Fetching header from URL:', url)
 
     const response = await fetch(url, {
@@ -45,6 +55,7 @@ export async function fetchHeader(): Promise<Header | null> {
         'Content-Type': 'application/json',
       },
       cache: 'no-store',
+      signal: AbortSignal.timeout(10000),
     })
 
     console.log('Header fetch response status:', response.status)

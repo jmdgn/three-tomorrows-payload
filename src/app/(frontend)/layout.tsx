@@ -56,13 +56,22 @@ function adaptHeaderToHeaderData(header: Header | null): HeaderData | null {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   let headerData = null
 
-  try {
-    const canAccessHeader = await testHeaderAccess()
-    if (canAccessHeader) {
-      headerData = await fetchHeader()
+  const skipHeaderFetch =
+    process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE === 'phase-production-build'
+
+  if (!skipHeaderFetch) {
+    try {
+      const canAccessHeader = await testHeaderAccess()
+      if (canAccessHeader) {
+        headerData = await fetchHeader()
+      } else {
+        console.log('Header access test failed, skipping header fetch')
+      }
+    } catch (error) {
+      console.error('Error in header access/fetching:', error)
     }
-  } catch (error) {
-    console.error('Error in header access/fetching:', error)
+  } else {
+    console.log('Skipping header fetch during static build')
   }
 
   return (
