@@ -60,8 +60,8 @@ export const NewHeader: React.FC<Props> = ({ header = {} as HeaderType }) => {
                 <Image
                   className="main-logo"
                   src="/assets/logo/logo.svg"
-                  width={220}
-                  height={58}
+                  width={196}
+                  height={36}
                   alt="Three Tomorrows"
                   priority
                 />

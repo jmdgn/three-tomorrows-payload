@@ -104,8 +104,8 @@ export const BlogHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }) =
                 <Image
                   className="main-logo"
                   src="/assets/logo/logo.svg"
-                  width={220}
-                  height={58}
+                  width={196}
+                  height={36}
                   alt="Three Tomorrows"
                   priority
                 />
