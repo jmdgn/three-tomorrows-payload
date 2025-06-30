@@ -104,6 +104,15 @@ export const FormBlock: Block = {
           required: true,
         },
         {
+          name: 'description',
+          type: 'textarea',
+          label: 'Description',
+          admin: {
+            description: 'Optional description text that appears below the heading',
+            rows: 3,
+          },
+        },
+        {
           name: 'contacts',
           type: 'array',
           label: 'Contact Persons',

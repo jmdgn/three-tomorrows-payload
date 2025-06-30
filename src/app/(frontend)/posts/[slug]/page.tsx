@@ -307,7 +307,7 @@ export default async function Post({ params: paramsPromise }) {
 
               <div className="shareAssets-container">
                 {authorData && (
-                  <div className="profileAssets-container">
+                  <div className="profileAssets-container blogProfile">
                     <div className="articleProfile-image">
                       {authorData.image ? (
                         <img

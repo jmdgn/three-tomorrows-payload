@@ -209,8 +209,15 @@ const MobileServiceCarousel = ({ serviceItems, getImageSrc }) => {
                   </div>
                 </div>
                 <div className="serviceText-panelBottom">
-                  <h6>{service.title}</h6>
-                  <p>{service.description}</p>
+                  <div className="serviceText-container">
+                    <h4>{service.title}</h4>
+                    <p>{service.description}</p>
+                  </div>
+                  
+                  <a href={service.linkUrl || '/services'}>
+                    {service.linkText || 'More on this service'}
+                    <svg width="7" height="12" viewBox="0 0 7 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L6 6L1 11" stroke="white" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </a>
                 </div>
               </div>
             </div>

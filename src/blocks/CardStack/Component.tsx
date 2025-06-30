@@ -126,6 +126,9 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
                     }}
                   >
                     <div className="stackCard__body">
+                      <div className="stackCard__number">
+                        <p>{String(index + 1).padStart(2, '0')}</p>
+                      </div>
                       <div className="stackCard__content">
                         <h3 className="stackCard__body-content-header text-2xl md:text-3xl font-bold mb-4">
                           {card.title}

@@ -347,11 +347,10 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
     })
   }
 
-  // Update the toggleMobileMenu function to use lockBodyScroll
   const toggleMobileMenu = () => {
     const newMenuState = !mobileMenuOpen
     setMobileMenuOpen(newMenuState)
-    lockBodyScroll(newMenuState) // Lock/unlock based on menu state
+    lockBodyScroll(newMenuState)
   }
 
   const ctaLabel = data?.ctaLabel || "Let's Talk"
@@ -371,6 +370,14 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
                   src="/assets/logo/logo.svg"
                   width={196}
                   height={36}
+                  alt="Three Tomorrows"
+                  priority
+                />
+                <Image
+                  className="mobile-logo"
+                  src="/assets/logo/logo-mobile.svg"
+                  width={100}
+                  height={40}
                   alt="Three Tomorrows"
                   priority
                 />
@@ -501,7 +508,7 @@ export const DynamicHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }
                       href={`/posts/${latestPost.slug}`}
                       onClick={() => {
                         setMobileMenuOpen(false)
-                        lockBodyScroll(false) // Unlock when link clicked
+                        lockBodyScroll(false)
                       }}
                     >
                       <div className="latest-post-card">

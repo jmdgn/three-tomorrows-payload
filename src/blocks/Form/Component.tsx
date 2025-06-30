@@ -24,6 +24,7 @@ export type FormBlockType = {
   leftContentType?: 'intro' | 'contact'
   contactInfo?: {
     heading?: string
+    description?: string // Added custom description field
     contacts?: Array<{
       person: User | string
       email?: string
@@ -434,9 +435,15 @@ export const FormBlock: React.FC<
     layout === 'twoColumn' && leftContentType === 'contact' && contactInfo && !hasSubmitted ? (
       <div className="form-block-contact-info lg:w-1/2 mb-8 lg:mb-0">
         <div className="form-block-content-container">
-          <h5 className="text-2xl font-bold mb-8">
-            {contactInfo.heading || 'Want to contact us directly?'}
-          </h5>
+          <div className="contactDetails-titleContainer">
+            <h3>{contactInfo.heading || 'Get in contact with us'}</h3>
+            {contactInfo.description && (
+              <p className="contact-description mb-6 text-muted-foreground">
+                {contactInfo.description}
+              </p>
+            )}
+          </div>
+
           <div className="contact-persons-grid grid gap-8">
             {contactInfo.contacts?.map((contact, index) => {
               console.log(`Rendering contact ${index}:`, contact) // Debug log

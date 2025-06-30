@@ -17,6 +17,8 @@ import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 import { TitleIntroductionBlock } from '../../blocks/Titles/config'
 import { CardStack } from '../../blocks/CardStack/config'
 import { ContactCTA } from '../../blocks/ContactCTA/config'
+import { TabbedPanel } from '../../blocks/TabbedPanel/config'
+import { ExpertiseBlock } from '../../blocks/ExpertiseBlock/config'
 
 import {
   MetaDescriptionField,
@@ -34,9 +36,6 @@ export const Pages: CollectionConfig<'pages'> = {
     read: authenticatedOrPublished,
     update: authenticated,
   },
-  // This config controls what's populated by default when a page is referenced
-  // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
-  // Type safe if the collection slug generic is passed to `CollectionConfig` - `CollectionConfig<'pages'>
   defaultPopulate: {
     title: true,
     slug: true,
@@ -97,6 +96,8 @@ export const Pages: CollectionConfig<'pages'> = {
                 TitleIntroductionBlock,
                 CardStack,
                 ContactCTA,
+                TabbedPanel,
+                ExpertiseBlock,
               ],
               required: true,
               admin: {

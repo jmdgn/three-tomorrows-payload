@@ -57,6 +57,8 @@ const CustomHomepage = (props) => {
       breakTitle: 'Trend',
       description: 'Cutting through noise to identify the signals that matter most for your future. Helping you see beyond the horizon and prepare for multiple possible tomorrows.',
       image: 'assets/images/services/trend.png',
+      linkText: 'More on this service',
+      linkUrl: '/services'
     },
   ];
 
@@ -453,6 +455,7 @@ const CustomHomepage = (props) => {
         </div>
       </section>
       <main>
+      <section id="background" className="bkgnd"></section>
         <section id="section-first" className="intro-para">
           <div className="introStatement-outer">
             <div className="introState-inner">
@@ -494,25 +497,29 @@ const CustomHomepage = (props) => {
                 <div className="serviceGrid-container">
                   {serviceItems.map((service, index) => (
                     <div className="servicePanel-container" key={index}>
-                      <div className="serviceContent-panelTop">
-                        <div className="serviceFt-image">
-                          <img
-                            className="service-image"
-                            src={getImageSrc(service.image)}
-                            width={582}
-                            height={466}
-                            alt={`${service.breakTitle} ${service.title} Image`}
-                            loading="lazy"
-                            onError={(e) => {
-                              console.error('Image failed to load:', e.target.src);
-                              e.target.src = 'assets/images/services/trend.png'; // Fallback on error
-                            }}
-                          />
-                        </div>
+                      <div className="serviceText-panelTop">
+                        <h4>{service.title}</h4>
+                        <p>{service.description}</p>
                       </div>
                       <div className="serviceText-panelBottom">
-                        <h6>{service.title}</h6>
-                        <p>{service.description}</p>
+                        <a href={service.linkUrl || '/services'}>
+                          {service.linkText || 'More on this service'}
+                          <svg width="7" height="12" viewBox="0 0 7 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L6 6L1 11" stroke="white" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </a>
+                      </div>
+                      <div className="serviceFt-image">
+                        <img
+                          className="service-image"
+                          src={getImageSrc(service.image)}
+                          width={582}
+                          height={466}
+                          alt={`${service.breakTitle} ${service.title} Image`}
+                          loading="lazy"
+                          onError={(e) => {
+                            console.error('Image failed to load:', e.target.src);
+                            e.target.src = 'assets/images/services/trend.png';
+                          }}
+                        />
                       </div>
                     </div>
                   ))}
@@ -593,6 +600,13 @@ const CustomHomepage = (props) => {
               <div className="expertise-carousel">
                 <div className="expertiseSubtitle-firstRow">
                   <h6>{expertiseSection?.techExpertise?.heading || 'Emerging Technology Futures'}</h6>
+                  <div className="body-button" onClick={() => window.location.href = expertiseSection?.techExpertise?.ctaLink || servicesLinkUrl} role="button" tabIndex={0}>
+                    {expertiseSection?.techExpertise?.ctaText || 'Explore Tech Solutions'}
+                    <div className="ctaButton-iconContainer">
+                      <svg className="first" width="12" height="12" viewBox="0 0 12 12" fill="#000" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>
+                      <svg className="second" width="12" height="12" viewBox="0 0 12 12" fill="#FFF" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>
+                    </div>
+                  </div>
                 </div>
                 <div className="infinite-carousel-container">
                   <div className="infinite-carousel" id="tech-expertise-carousel">
@@ -626,6 +640,13 @@ const CustomHomepage = (props) => {
               <div className="expertise-carousel">
                 <div className="expertiseSubtitle-firstRow">
                   <h6>{expertiseSection?.sustainabilityExpertise?.heading || 'Strategic Sustainability & Social Impact'}</h6>
+                  <div className="body-button" onClick={() => window.location.href = expertiseSection?.socialExpertise?.ctaLink || servicesLinkUrl} role="button" tabIndex={0}>
+                    {expertiseSection?.socialExpertise?.ctaText || 'Explore Social Solutions'}
+                    <div className="ctaButton-iconContainer">
+                      <svg className="first" width="12" height="12" viewBox="0 0 12 12" fill="#000" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>
+                      <svg className="second" width="12" height="12" viewBox="0 0 12 12" fill="#FFF" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>
+                    </div>
+                  </div>
                 </div>
                 <div className="infinite-carousel-container">
                   <div className="infinite-carousel" id="sustainability-expertise-carousel">
@@ -667,12 +688,7 @@ const CustomHomepage = (props) => {
                     {contactSection?.description || "Let's talk about how we can implement strategy and transformation into your business to help you shape tomorrow."}
                   </AnimatedTitle>
                 </p>
-                <div 
-                  className="body-button" 
-                  onClick={() => window.location.href = contactLinkUrl}
-                  role="button"
-                  tabIndex={0}
-                >
+                <div className="body-button" onClick={() => window.location.href = contactLinkUrl} role="button" tabIndex={0} >
                   {contactSection?.ctaText || 'Talk To Us'}
                   <div className="ctaButton-iconContainer">
                     <svg className="first" width="12" height="12" viewBox="0 0 12 12" fill="#000" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>

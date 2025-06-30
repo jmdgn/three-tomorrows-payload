@@ -213,6 +213,16 @@ export const Homepage: CollectionConfig = {
               defaultValue: 'Emerging Technology Futures',
             },
             {
+              name: 'ctaText',
+              type: 'text',
+              defaultValue: 'Explore Tech Solutions',
+            },
+            {
+              name: 'ctaLink',
+              type: 'text',
+              defaultValue: '/services',
+            },
+            {
               name: 'items',
               type: 'array',
               fields: [
@@ -256,6 +266,16 @@ export const Homepage: CollectionConfig = {
               name: 'heading',
               type: 'text',
               defaultValue: 'Strategic Sustainability & Social Impact',
+            },
+            {
+              name: 'ctaText',
+              type: 'text',
+              defaultValue: 'Explore Social Solutions',
+            },
+            {
+              name: 'ctaLink',
+              type: 'text',
+              defaultValue: '/services',
             },
             {
               name: 'items',

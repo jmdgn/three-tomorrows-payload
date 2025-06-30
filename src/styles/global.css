@@ -236,6 +236,9 @@ p.xlarge {
     margin-block-end: 0.25em;
     text-indent: 16vw; }
 
+p.xlarge.internalPanel {
+    font-size: 72px; }
+
 p b {
     font-family: "Neue Montreal Medium";
     font-weight: normal; }
@@ -503,6 +506,12 @@ img.main-logo:hover {
     transform: scale(1.03);
     transition: all 0.4s linear; }
 
+.main-logo {
+    display: block; }
+    
+.mobile-logo {
+    display: none; }
+
 .menu-toggle-btn {
     background: none;
     border: none;
@@ -744,7 +753,7 @@ section.footer-panel {
     position: relative;
     width: 100%;
     height: 100%;
-    padding: 4rem 2rem 2rem 2rem;
+    padding: 4rem 2rem 1.5rem 2rem;
     z-index: 1; }
 
 .footerTop-container {
@@ -883,10 +892,12 @@ input[type="email"],
 select,
 textarea {
     width: 100%;
-    padding: 1rem 1.25rem;
-    background-color: #FFF;
-    border: 1px solid rgba(255,255,255,0);
-    border-radius: 6px;
+    padding: 1rem 0;
+    border-bottom: 1px solid #CCC;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+    background-color: rgba(255,255,255,0);
     font-family: "Neue Montreal";
     font-size: 14px;
     color: #1f1f1f;
@@ -906,7 +917,7 @@ select {
 input:focus,
 select:focus,
 textarea:focus {
-    border: 1px solid #191C1C; }
+    border-bottom: 1px solid #191C1C; }
 
 /* Labels */
 label {
@@ -971,6 +982,7 @@ textarea {
 /* Submit button */
 .p-4 form button[type="submit"] {
     width: 100%;
+    max-width: 220px;
     padding: 1rem;
     margin: 0;
     text-decoration: none;
@@ -979,7 +991,7 @@ textarea {
     font-family: "Neue Montreal Medium";
     font-size: 14px;
     letter-spacing: 0.25px;
-    border-radius: 8px;
+    border-radius: 100px;
     background: #2D33E0;
     transition: all 0.6s ease-out; }
 
@@ -988,9 +1000,11 @@ textarea {
 
 form .mb-4,
 form.form-block-form {
+    width: 100%;
     flex-wrap: wrap;
     display: flex;
-    gap: 1.5rem; }
+    justify-content: space-between;
+    gap: 3rem 1rem; }
 
 .mb-6.mb-0,
 .mb-6 {
@@ -1208,6 +1222,7 @@ section.intro-section {
     border-radius: 100px;
     background: #FFF;
     color: #191C1C;
+    border: 0.5px solid #CCC;
     font-family: "Neue Montreal Medium";
     font-size: 14px;
     font-style: normal;
@@ -1221,6 +1236,9 @@ section.intro-section {
     color: #FFF;
     box-shadow: 2px 2px 12px 0px rgba(0, 0, 0, 0.2);
     transition: all 0.3s linear; }
+
+.expertiseSubtitle-firstRow .body-button {
+    margin: 1rem 1.5rem; }
 
 .ctaButton-iconContainer {
     position: relative;
@@ -1364,7 +1382,8 @@ section.factoids-complete {
     display: flex;
     width: 100%;
     height: 100%;
-    margin-bottom: 20svh; }
+    margin-bottom: 20svh;
+    z-index: 1; }
 
 .text-container.left,
 .content-container.right {
@@ -1491,19 +1510,23 @@ section.factoids-complete {
     position: relative;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    grid-gap: 4rem;
+    grid-gap: 22px;
     width: 100%;
+    max-width: 1680px;
     margin: 0 auto; }
 
 .servicePanel-container {
     position: relative;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     width: 100%;
     height: fit-content;
-    overflow: visible;
-    border-radius: 12px;
+    max-height: 738px;
+    overflow: hidden;
+    border-radius: 32px;
     background: #FFF;
+    aspect-ratio: 9/16;
     box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
     transform: translateY(0px);
     transition: all 0.3s linear; }
@@ -1513,37 +1536,45 @@ section.factoids-complete {
     transform: translateY(-10px);
     transition: all 0.3s linear; }
 
-.serviceFt-image {
+.serviceText-panelTop,
+.serviceText-panelBottom {
     position: relative;
+    padding: 2.5rem 2rem;
+    z-index: 1; }
+
+.serviceText-panelTop h4,
+.serviceText-panelTop p,
+.serviceText-panelBottom a {
+    color: #FFF; }
+
+.serviceText-panelBottom a {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-family: "Neue Montreal Medium";
+    font-size: 14px;
+    line-height: 18px;
+    transition: all 0.3s linear; }
+
+.serviceText-panelBottom a:hover {
+    margin-left: 12px;
+    transition: all 0.3s linear; }
+
+.serviceFt-image {
+    position: absolute;
     width: 100%;
-    max-width: 576px;
-    height: auto;
-    margin: .5rem;
-    border-radius: 10px;
-    background: #F7F7F7;
-    overflow: hidden; }
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    z-index: 0; }
 
 img.service-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block; }
-
-.serviceText-panelBottom {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 1.5rem;
-    box-sizing: border-box; }
-
-.serviceText-panelBottom h6 {
-    font-family: 'Neue Montreal Medium'; }
-
-.serviceText-panelBottom p {
-    font-size: 14px;
-    line-height: 22px;
-    color: #878484; }
 
 .service-carousel-container {
     position: relative;
@@ -1687,7 +1718,7 @@ img.service-image {
 .stickyContent-title {
     position: relative;
     width: 100%;
-    max-width: 1400px;
+    max-width: 1200px;
     height: fit-content;
     padding: 20svh 0;
     text-align: center;
@@ -1768,7 +1799,9 @@ img.service-image {
     position: relative;
     display: flex;
     width: 100%;
-    height: 100%; }
+    height: 100%;
+    justify-content: space-between;
+    align-items: center; }
 
 .expertiseSubtitle-firstRow h6 {
     font-family: "Neue Montreal Medium";
@@ -1885,7 +1918,7 @@ img.carousel-image {
 
 .contactPanel-home {
     position: relative;
-    width: 80%;
+    width: 65%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1902,7 +1935,7 @@ img.carousel-image {
     flex-direction: column;
     justify-content: normal;
     width: 50%;
-    padding: 2rem; }
+    padding: 0; }
 
 .contact-persons-grid {
     display: grid;
@@ -1982,7 +2015,7 @@ img.carousel-image {
 .form-block-content-container {
     position: absolute;
     width: 100%;
-    max-width: 500px;
+    max-width: 100%;
     left: 50%;
     transform: translateX(-50%);
     padding: 4rem 0; }
@@ -1999,6 +2032,15 @@ img.carousel-image {
     display: flex;
     flex-direction: column;
     gap: 8px; }
+
+.contactDetails-titleContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 6rem; }
+
+.contactDetails-titleContainer h3 {
+    margin-bottom: 0; }
 
 .contact-persons-grid.grid.gap-8 {
     display: flex;
@@ -2103,7 +2145,6 @@ article.pt-16.pb-24 {
 .p-4 form {
     position: relative;
     width: 100%;
-    max-width: 960px;
     margin-left: auto;
     margin-right: auto;
     right: 0;
@@ -2131,7 +2172,8 @@ article.pt-16.pb-24 {
     position: relative;
     overflow: hidden;
     isolation: isolate;
-    border-radius: 1rem; }
+    border-radius: 1rem;
+    padding: 0 2rem; }
     
 .form-block-bg-overlay {
     position: absolute;
@@ -2188,16 +2230,14 @@ article.pt-16.pb-24 {
     max-width: 100%; }
   
 .stackCard {
-    border-radius: 30px;
     position: relative;
     width: 100%;
     max-width: 100%;
+    border-top: 1px solid #CCC;
     box-sizing: border-box;
     transform-origin: 50% -160% !important;
     margin-bottom: 80px;
     will-change: transform;
-    border-radius: 1rem;
-    box-shadow: 4px 4px 32px 0px rgba(0, 0, 0, 0.05);
     padding: 0;
     overflow: hidden; }
 
@@ -2218,26 +2258,38 @@ article.pt-16.pb-24 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4rem;
+    padding: 4rem 0;
     box-sizing: border-box;
     max-width: 100%;
     margin: 0; }
+
+.stackCard__number {
+    flex: 1;
+    padding: 2rem 0;
+    max-width: 20%;
+    height: inherit;
+    box-sizing: border-box; }
   
 .stackCard__content {
     flex: 1;
-    padding-right: 2rem;
-    max-width: 60%;
+    padding: 2rem;
+    max-width: 50%;
+    height: inherit;
+    border-left: 1px solid #CCC;
     box-sizing: border-box; }
+
+.stackCard__content p {
+    max-width: 960px; }
     
 .stackCard__image {
     width: 100%;
-    max-width: 50%;
+    max-width: 30%;
     height: auto;
     margin-left: 2rem;
     flex-shrink: 0;
     overflow: hidden;
     border-radius: 1rem;
-    aspect-ratio: 5/4;
+    aspect-ratio: 5 / 4;
     box-sizing: border-box; }
 
 .stackCard__image img {
@@ -2273,3 +2325,174 @@ article.pt-16.pb-24 {
     overflow: hidden;
     border-radius: 1rem;
     aspect-ratio: 5/4; }
+
+/* Tabbed Content Block Styles */
+.tabbed-panel-section {
+    position: relative;
+    width: 100%;
+    overflow: visible; }
+  
+.tabbed-panel-height-wrapper {
+    position: relative;
+    width: 100%; }
+  
+.tabbed-panel-bg-transition {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: fit-content;
+    background-color: #191C1C;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 0; }
+  
+.tabbed-panel-viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; }
+  
+.tabbed-panel-scroll-content {
+    display: flex;
+    flex-direction: column; }
+  
+.panel-container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 0;
+    box-sizing: border-box; }
+  
+.panel-container.panel-dark {
+    z-index: 2; }
+  
+.panel-container.panel-light {
+    z-index: 4; }
+  
+.tabbed-panel-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    box-sizing: border-box; }
+
+.tabbed-panel-wrapper.panel-1 {
+    background: #141414;
+    border: 1px solid #3C3C3C; }
+
+.tabbed-panel-wrapper.panel-1 .tabbed-panel-tabs .tabs-container .tab-button.tab-active::after {
+    background-color: #FFF; }
+
+.tabbed-panel-wrapper.panel-1 .tabbed-panel-tabs .tabs-container .tab-button {
+    color: #86868B; }
+
+.tabbed-panel-wrapper.panel-1 .tabbed-panel-tabs .tabs-container .tab-button.tab-active,
+.tabbed-panel-wrapper.panel-1 .tabbed-panel-content .content-wrapper .content-text h2 {
+    color: #FFF; }
+
+.tabbed-panel-wrapper.panel-1 .tabbed-panel-content .content-wrapper .content-text p {
+    color: #CCC; }
+  
+.tabbed-panel-header {
+    padding: 2rem; }
+
+.tabbed-panel-wrapper.panel-1 .tabbed-panel-tabs {
+    border-top: 1px solid #3C3C3C;
+    border-bottom: 1px solid #3C3C3C; }
+  
+.tabbed-panel-tabs {
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    margin: 0; }
+
+.tabbed-panel-content {
+    padding: 2rem; }
+
+.tabbed-panel-tabs .tabs-container {
+    display: flex;
+    gap: 3rem;
+    margin: 0 2rem;
+    padding: .5rem 0; }
+
+.tab-button {
+    width: 25%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #191C1C;
+    position: relative; }
+
+.tabbed-panel-wrapper.panel-1 h4.tabbed-panel-title {
+    color: #CCC; }
+
+.tabbed-panel-wrapper.panel-2 h4.tabbed-panel-title {
+    color: #3BE494; }
+
+.tabbed-panel-title,
+.tab-button.tab-active {
+    color: #191C1C; }
+  
+.tab-button.tab-active::after {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #000000; }
+
+.tab-button.tab-inactive {
+    opacity: 0.6; }
+  
+.tabbed-panel-content .content-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 24px; }
+
+.content-text { 
+    position: relative;
+    width: 60%; }
+
+.content-image {
+    position: relative;
+    display: flex;
+    width: 40%;
+    justify-content: right; }
+
+.content-title {
+    margin: 0 0 24px;
+    font-size: 3.625rem;
+    line-height: 3.625rem;
+    color: #171744; }
+
+.content-text p {
+    color: #6A6A6A; }
+  
+.content-image .image-wrapper {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+
+.panel-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover; }
+
+.my-16:has(.tabbed-panel-section[data-full-width="true"]) {
+    padding: 0 !important;
+    margin: 0 !important; }

@@ -1,24 +1,15 @@
 const { THREE, OrbitControls, RGBELoader } = window
 
-let camera, scene, renderer, controls, sphere
+let camera, scene, renderer, controls
 let isInitialized = false
 let hdrLoaded = false
-let moons = []
-let moonMaterial
-
-let scrollProgress = 0
+let spheres = [] // Array to hold all 3 pearl spheres
 
 let mouseX = 0.5
 let mouseY = 0.5
 let targetX = 0.5
 let targetY = 0.5
-const mouseSensitivity = 30
-
-window.addEventListener('scroll', () => {
-  const scrollY = window.scrollY
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-  scrollProgress = Math.min(scrollY / maxScroll, 1)
-})
+const mouseSensitivity = 15 // Reduced for subtle movement
 
 window.addEventListener('mousemove', (e) => {
   targetX = e.clientX / window.innerWidth
@@ -47,8 +38,7 @@ function init() {
   renderer.setClearColor(0x000000, 0)
   container.appendChild(renderer.domElement)
 
-  createBasicSphere()
-  createOrbitingMoons()
+  createPearlSpheres()
   setupBasicLighting()
   setupControls()
 
@@ -56,25 +46,41 @@ function init() {
     hdrLoaded = true
     updateMaterials()
     setupFinalLighting()
-    if (moonMaterial) moonMaterial.envMap = scene.environment
   })
 
   window.addEventListener('resize', onWindowResize)
   isInitialized = true
 }
 
-function createBasicSphere() {
-  const geometry = new THREE.SphereGeometry(6.4, 32, 32)
-  const material = new THREE.MeshBasicMaterial({
-    color: 0xf1f1f1,
-    transparent: true,
-    opacity: 0.8,
-  })
+function createPearlSpheres() {
+  // Create 3 pearl spheres positioned across screen thirds with different sizes
+  const spherePositions = [
+    { x: -55, y: -20, z: -5, size: 4.6 }, // Left
+    { x: 0, y: 40, z: 0, size: 6.0 }, // Center
+    { x: 45, y: 15, z: -8, size: 5.2 }, // Right
+  ]
 
-  sphere = new THREE.Mesh(geometry, material)
-  sphere.position.set(0, 18, 0)
-  scene.add(sphere)
-  window.sphere = sphere
+  spherePositions.forEach((pos, index) => {
+    const geometry = new THREE.SphereGeometry(pos.size, 32, 32)
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xf1f1f1,
+      transparent: true,
+      opacity: 0.8,
+    })
+
+    const sphere = new THREE.Mesh(geometry, material)
+    sphere.position.set(pos.x, pos.y, pos.z)
+    scene.add(sphere)
+    spheres.push({
+      mesh: sphere,
+      basePosition: new THREE.Vector3(pos.x, pos.y, pos.z),
+      size: pos.size,
+      index: index,
+      // NEW: Add velocity for idle movement and a vector to track the drift
+      velocity: new THREE.Vector3((Math.random() - 0.5) * 0.1, (Math.random() - 0.5) * 0.1, 0),
+      drift: new THREE.Vector3(0, 0, 0),
+    })
+  })
 }
 
 function setupBasicLighting() {
@@ -119,24 +125,24 @@ async function loadHDR() {
 }
 
 function updateMaterials() {
-  const sphereGeometry = new THREE.SphereGeometry(6.4, 64, 64)
-  const sphereMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0xf1f1f1,
-    roughness: 0.2,
-    metalness: 0.2,
-    transmission: 0.95,
-    thickness: 1.0,
-    reflectivity: 0.2,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.1,
-  })
+  spheres.forEach((sphereObj) => {
+    const sphereGeometry = new THREE.SphereGeometry(sphereObj.size, 64, 64)
+    const sphereMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0xf1f1f1,
+      roughness: 0.2,
+      metalness: 0.2,
+      transmission: 0.95,
+      thickness: 1.0,
+      reflectivity: 0.2,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.1,
+    })
 
-  new THREE.TextureLoader().load('assets/images/home/swirl-texture.jpg', (texture) => {
-    sphereMaterial.map = texture
+    // Using a simple color instead of a texture that needs to be loaded
     sphereMaterial.needsUpdate = true
 
-    sphere.geometry = sphereGeometry
-    sphere.material = sphereMaterial
+    sphereObj.mesh.geometry = sphereGeometry
+    sphereObj.mesh.material = sphereMaterial
   })
 }
 
@@ -144,26 +150,6 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
-}
-
-function createOrbitingMoons() {
-  const geometry = new THREE.SphereGeometry(0.5, 64, 64)
-
-  moonMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0x111111,
-    metalness: 1.0,
-    roughness: 0.1,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.05,
-    envMapIntensity: 2.0,
-  })
-
-  moons = []
-  for (let i = 0; i < 3; i++) {
-    const moon = new THREE.Mesh(geometry, moonMaterial)
-    scene.add(moon)
-    moons.push(moon)
-  }
 }
 
 function animate() {
@@ -174,47 +160,83 @@ function animate() {
     return
   }
 
+  // Smooth mouse tracking
   mouseX += (targetX - mouseX) * 0.05
   mouseY += (targetY - mouseY) * 0.05
 
-  if (sphere) {
+  if (spheres.length > 0) {
     const time = performance.now() * 0.0005
 
-    const mouseXOffset = (mouseX - 0.5) * mouseSensitivity
-    const mouseYOffset = (0.5 - mouseY) * mouseSensitivity
-    const mouseZOffset = (mouseX - 0.5) * (mouseY - 0.5) * mouseSensitivity * 0.5
+    spheres.forEach((sphereObj, index) => {
+      const sphere = sphereObj.mesh
+      const basePos = sphereObj.basePosition
+      const timeOffset = index * Math.PI * 0.7
 
-    sphere.position.x = mouseXOffset
-    sphere.position.y = Math.sin(time) * 2 + 18 + mouseYOffset
-    sphere.position.z = mouseZOffset
+      // --- NEW: IDLE MOVEMENT AND BOUNDARY CHECK ---
 
-    sphere.rotation.x = time * 0.3 + mouseY * 0.2
-    sphere.rotation.z = time * 0.31 + mouseX * 0.2
+      // Update the drift offset with the current velocity
+      sphereObj.drift.add(sphereObj.velocity)
 
-    const scaleFactor = 1 + 0.2 * Math.sin(time * 0.5)
-    sphere.scale.set(scaleFactor, scaleFactor, scaleFactor)
+      // Add a tiny bit of random motion to the velocity to make it less predictable
+      sphereObj.velocity.x += (Math.random() - 0.5) * 0.0005
+      sphereObj.velocity.y += (Math.random() - 0.5) * 0.0005
+
+      // Create a temporary test position (base + drift) to see if it's out of bounds
+      const testPosition = new THREE.Vector3().addVectors(basePos, sphereObj.drift)
+
+      // Project this test position to the screen
+      const projectedPosition = testPosition.clone().project(camera)
+
+      // Check if the projected position is outside the viewport boundaries (with a margin)
+      // If it is, reverse the velocity on that axis to "bounce" it back.
+      if (projectedPosition.x > 0.9 || projectedPosition.x < -0.9) {
+        sphereObj.velocity.x *= -1
+      }
+      if (projectedPosition.y > 0.9 || projectedPosition.y < -0.9) {
+        sphereObj.velocity.y *= -1
+      }
+
+      // Keep velocity in a reasonable range to prevent wild movements
+      sphereObj.velocity.clampLength(0, 0.1)
+
+      // --- END NEW LOGIC ---
+
+      // Calculate mouse offset (opposite direction for parallax effect)
+      const mouseXOffset = (0.5 - mouseX) * mouseSensitivity
+      const mouseYOffset = (mouseY - 0.5) * mouseSensitivity
+      const mouseZOffset = (0.5 - mouseX) * (0.5 - mouseY) * mouseSensitivity * 0.5
+
+      // Add some time-based variation for each sphere for extra subtlety
+      const timeVariationX = Math.sin(time + timeOffset) * 0.5
+      const timeVariationY = Math.cos(time * 0.7 + timeOffset) * 0.3
+
+      // Combine all movements: base position + mouse response + our new drift + time variations
+      sphere.position.x = basePos.x + mouseXOffset + timeVariationX + sphereObj.drift.x
+      sphere.position.y = basePos.y + mouseYOffset + timeVariationY + sphereObj.drift.y
+      sphere.position.z = basePos.z + mouseZOffset + sphereObj.drift.z
+
+      // Different rotation patterns for each sphere
+      sphere.rotation.x = time * 0.3 + mouseY * 0.2 + timeOffset
+      sphere.rotation.z = time * 0.31 + mouseX * 0.2 + timeOffset
+
+      // Varied scale patterns with subtle breathing
+      const scaleFactor = 1 + 0.05 * Math.sin(time * 0.5 + timeOffset)
+      sphere.scale.set(scaleFactor, scaleFactor, scaleFactor)
+    })
 
     if (hdrLoaded) {
       controls.update()
-
-      const orbitRadius = 12
-      moons.forEach((moon, idx) => {
-        const angle = time * (0.5 + idx * 0.2)
-        moon.position.set(
-          sphere.position.x + Math.cos(angle) * orbitRadius,
-          sphere.position.y,
-          sphere.position.z + Math.sin(angle) * orbitRadius,
-        )
-      })
     }
   }
 
   renderer.render(scene, camera)
 }
 
-window.initSphereScene = function () {
-  console.log('Initializing sphere scene...')
+// Ensure the scene is initialized when the page is ready
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
   init()
+} else {
+  document.addEventListener('DOMContentLoaded', init)
 }
 
 animate()

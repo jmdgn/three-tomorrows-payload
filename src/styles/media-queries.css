@@ -12,10 +12,7 @@
 
 @media only screen and (max-width:1920px) {
 /* Universal Styles */
-p.xlarge {
-	font-size: 86px; }
 /* End */
-
 
 /* Introduction Panel */
 section.intro-para {
@@ -25,13 +22,7 @@ section.intro-para {
 	bottom: 2rem; }
 /* End */
 
-
 /* Services Section Styles */
-.serviceCard {
-	padding: 3rem 3rem 2rem 3rem; }
-
-.serviceGrid-container {
-	grid-gap: 3rem; }
 /* End */
 
 
@@ -102,8 +93,6 @@ ul.menu-ribbon a li {
 
 
 /* Services Section Styles */
-.serviceGrid-container {
-	gap: 2.5rem; }
 /* End */
 
 
@@ -120,6 +109,9 @@ h1 {
 
 p.xlarge {
 	font-size: 76px; }
+
+p.xlarge.internalPanel {
+	font-size: 66px; }
 /* End: Universal Styles */
 
 
@@ -148,7 +140,6 @@ p.body-intro {
 	font-size: 320%; }
 /* End */
 
-
 .infinite-carousel .carousel-item {
 	min-width: 42%; }
 
@@ -160,6 +151,16 @@ p.body-intro {
 	width: 90%; }
 /* End: Contact Home Styles */
 
+
+/* Internal Page Styles */
+.titleText.center {
+	padding-bottom: 6rem; }
+
+.form-block-with-bg {
+	padding: 0; }
+
+.form-block-content {
+	gap: 2rem; }
 
 /* Footer Styles */
 .footerContent-outer {
@@ -191,6 +192,10 @@ section.intro-para {
 
 .infinite-carousel .carousel-item.square {
 	max-width: 320px; }
+/* End */
+
+.stackCard__body {
+	align-items: normal; }
 }
 
 
@@ -277,9 +282,6 @@ h5 {
 .factCard-container h2 {
 	font-size: 300%; }
 
-.serviceGrid-container {
-	gap: 2rem; }
-
 /* Blog Page Styles */
 header.blog .header-container .logo-container {
 	width: 20%; }
@@ -336,6 +338,9 @@ header.blog .header-container .contactBtn-container {
 .form-block-content-container {
 	max-width: 560px;
 	padding: 4rem 0; }
+
+.section-content {
+	max-width: 420px; }
 }
 
 
@@ -379,9 +384,6 @@ section.intro-para {
 
 .serviceFt-image {
 	max-width: 300px; }
-
-.serviceText-panelBottom {
-	width: 60%; }
 
 .serviceCard p {
 	font-size: 14px;
@@ -557,9 +559,6 @@ section.intro-para {
 .serviceFt-image {
 	max-width: 250px; }
 
-.serviceText-panelBottom {
-	width: 100%; }
-
 .factAssets-container {
 	transform: translate(-50%, -50%) scale(1.4) rotate(45deg); }
 
@@ -696,9 +695,11 @@ p.body-intro.mobile {
 	width: 50%;
 	padding-top: 6px; }
 
-img.main-logo {
-	width: 180px;
-	height: auto; }
+.main-logo {
+	display: none; }
+	
+.mobile-logo {
+	display: block; }
 
 .contactBtn-container {
 	width: 50%; }
@@ -819,10 +820,17 @@ section.service-panel {
 .expertise-title .titleText.center {
 	margin: 12rem 1.5rem 0 1.5rem; }
 
+.expertiseSubtitle-firstRow {
+    align-items: flex-start;
+    flex-direction: column; }
+
 .expertiseSubtitle-firstRow h6 {
 	padding: .5rem 1rem;
-	width: 100%;
+	width: fit-content;
 	font-size: 20px; }
+
+.expertiseSubtitle-firstRow .body-button {
+	margin: .5rem 1rem; }
 
 .infinite-carousel .carousel-item {
 	min-width: 80%; }
@@ -936,32 +944,48 @@ img.article-image {
 	margin: 0;
 	height: 100%; }
 
-.serviceText-panelBottom {
-	padding: 1.5rem .75rem .5rem .75rem; }
-
 .carousel-slide {
 	padding: 0 4px; }
 	  
 .serviceCard {
+	position: relative;
 	width: 100%;
     margin: 0;
     box-sizing: border-box;
     height: 100%;
     background: #FFF;
     border-radius: 12px;
-	padding: .5rem; }
+	padding: 0;
+	aspect-ratio: 1 / 1; }
+
+.serviceContent-panelTop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%; }
 
 .serviceCard:hover {
 	box-shadow: 2px 2px 16px 0px rgba(0, 0, 0, 0.15); }
 	  
 .serviceFt-image {
-	max-width: fit-content;
+	max-width: 100%;
 	margin: 0; }
-	  
-.serviceText-panelBottom h3 {
-	font-size: 36px;
-	line-height: 36px;
-	margin-bottom: 0; }
+
+.serviceText-panelTop,
+.serviceText-panelBottom {
+	padding: 2.5rem 1.5rem;
+    height: -webkit-fill-available;
+    display: flex;
+    flex-direction: column;
+	justify-content: space-between; }
+
+.serviceText-panelBottom h4,
+.serviceText-panelBottom p {
+	color: #FFF; }
+
+.serviceText-panelBottom p {
+	margin-bottom: 4rem;
+}
 	  
 .carousel-dots {
 	display: flex;
@@ -1040,14 +1064,20 @@ article.pt-16.pb-24 {
 	
 .stackCard__body {
 	flex-direction: column;
-	padding: 1.5rem;
+	padding: 0;
 	align-items: flex-start; }
 	
 .stackCard__content {
 	max-width: 100%;
 	width: 100%;
 	padding-right: 0;
-	margin-bottom: 2rem; }
+	padding: 0;
+	margin-bottom: 2rem;
+	border-left: none; }
+
+.stackCard__number {
+	padding: 1rem 0;
+	max-width: 100%; }
 	
 .stackCard__image {
 	max-width: 100%;
@@ -1061,10 +1091,10 @@ article.pt-16.pb-24 {
 	line-height: 1.2; }
 
 .form-block-container.form-block-two-column.container.flex.flex-col {
-	padding: 1rem; }
+	padding: 0; }
 
 .form-block-content {
-	flex-direction: column-reverse; }
+	flex-direction: column; }
 
 .form-block-contact-info,
 .form-block-form-column {
@@ -1082,7 +1112,13 @@ article.pt-16.pb-24 {
 .form-block-content-container h3,
 .form-block-content-container h4,
 .form-block-content-container h5 {
-	margin-bottom: 4rem; }
+	margin-bottom: 0; }
+
+.contactDetails-titleContainer {
+	padding-bottom: 4rem; }
+
+.profileAssets-container {
+	gap: 1rem; }
 
 .p-4 form {
 	padding: 2rem 0; }
@@ -1121,7 +1157,9 @@ article.pt-16.pb-24 {
 	
 .contactBtn-container {
 	display: flex;
-	align-items: center; }
+	align-items: center;
+	padding-top: 6px;
+	gap: .5rem; }
 
 .contactCta.header {
 	padding: 8px 20px; }
@@ -1159,7 +1197,8 @@ p.body-intro {
 	line-height: 20px;
 	font-family: "Neue Montreal"; }
 
-p.xlarge {
+p.xlarge,
+p.xlarge.internalPanel {
 	font-size: 38px;
 	line-height: 1.2; }
 
@@ -1185,10 +1224,6 @@ p.xlarge {
 
 .contactContent-outer {
 	padding: 1rem; }
-	
-.serviceText-panelBottom h3 {
-	font-size: 32px;
-	line-height: 32px; }
 
 .bottomLine-left {
 	max-width: 10%; }

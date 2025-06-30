@@ -287,8 +287,7 @@ export function useAnimationBottom() {
         const rect = section.getBoundingClientRect()
         const windowHeight = window.innerHeight
         const windowWidth = window.innerWidth
-
-        const enterStart = windowHeight * 1.6
+        const enterStart = windowHeight * 0.8
         const enterEnd = windowHeight * 0.1
 
         let enterProgress = (enterStart - rect.top) / (enterStart - enterEnd)
@@ -316,7 +315,6 @@ export function useAnimationBottom() {
         if (anchorBtnContainer) {
           if (enterProgress >= 1 && exitProgress > 0.05) {
             anchorBtnContainer.style.opacity = '0'
-
             anchorBtnContainer.style.pointerEvents = 'none'
           } else {
             anchorBtnContainer.style.opacity = '1'

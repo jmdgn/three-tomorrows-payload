@@ -9,6 +9,8 @@ import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { CardStackBlock } from '@/blocks/CardStack'
 import { ContactCTABlock } from '@/blocks/ContactCTA'
+import { TabbedPanelBlock } from '@/blocks/TabbedPanel'
+import { ExpertiseBlock } from '@/blocks/ExpertiseBlock'
 
 const blockComponents = {
   titleIntroduction: TitleIntroduction,
@@ -19,7 +21,12 @@ const blockComponents = {
   mediaBlock: MediaBlock,
   cardStack: CardStackBlock,
   contactCTA: ContactCTABlock,
+  tabbedPanel: TabbedPanelBlock,
+  expertiseBlock: ExpertiseBlock,
 }
+
+// Define blocks that need full viewport width
+const fullWidthBlocks = ['expertiseBlock']
 
 export const RenderBlocks: React.FC<{
   blocks: Page['layout'][0][]
@@ -40,6 +47,16 @@ export const RenderBlocks: React.FC<{
             const Block = blockComponents[blockType]
 
             if (Block) {
+              // Check if this block needs full viewport width
+              if (fullWidthBlocks.includes(blockType)) {
+                return (
+                  <div key={index} className="expertise-block-wrapper">
+                    <Block {...block} />
+                  </div>
+                )
+              }
+
+              // Standard block rendering with margins
               return (
                 <div className="my-16" key={index}>
                   <div className="blockInner">

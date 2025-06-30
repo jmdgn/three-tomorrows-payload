@@ -109,6 +109,14 @@ export const BlogHeaderNav: React.FC<{ data: HeaderData | null }> = ({ data }) =
                   alt="Three Tomorrows"
                   priority
                 />
+                <Image
+                  className="mobile-logo"
+                  src="/assets/logo/logo-mobile.svg"
+                  width={100}
+                  height={40}
+                  alt="Three Tomorrows"
+                  priority
+                />
               </Link>
             </div>
           </div>

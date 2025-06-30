@@ -766,17 +766,12 @@ export function LandingEffects() {
           const introParaRect = introPara.getBoundingClientRect()
           const factoidsRect = factoidsSection.getBoundingClientRect()
 
-          // EXACTLY matching the original code's fade in condition:
-          // "if (introParaRect.bottom <= viewportHeight * 0.8)"
           if (introParaRect.bottom <= viewportHeight * 0.8) {
             sphereContainer.style.opacity = '1'
           } else {
             sphereContainer.style.opacity = '0'
           }
-
-          // EXACTLY matching the original code's fade out condition:
-          // "if (approachSnippetRect.bottom <= viewportHeight * 0.7)"
-          if (factoidsRect.bottom <= viewportHeight * 0.7) {
+          if (factoidsRect.bottom <= viewportHeight * 2.5) {
             sphereContainer.style.opacity = '0'
           }
         })

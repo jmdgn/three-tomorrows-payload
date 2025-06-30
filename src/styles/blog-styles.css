@@ -244,9 +244,10 @@ article.blog-post {
     height: 100%;
     justify-content: space-between; }
 
-.profileAssets-container {
+.profileAssets-container.blogProfile {
     position: relative;
     display: flex;
+    flex-direction: row;
     gap: 1rem;
     align-items: center; }
 
