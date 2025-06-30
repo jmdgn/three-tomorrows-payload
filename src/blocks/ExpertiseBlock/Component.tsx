@@ -206,8 +206,6 @@ export const ExpertiseBlock: React.FC<ExpertiseBlockProps> = ({
           background-position: 50% 25%;
           background-repeat: no-repeat;
         }
-
-        /* --- Hero Content --- */
         .hero-content {
           position: relative;
           width: 100%;
@@ -217,23 +215,24 @@ export const ExpertiseBlock: React.FC<ExpertiseBlockProps> = ({
         }
         .expertise-section {
           width: 50%;
-          height: 100%;
+          height: -webkit-fill-available;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 1rem;
-          text-align: center;
-          transition: opacity 0.3s ease-in-out;
+          margin: 1rem;
+          text-align: left;
+          transition: all 0.3s ease-in-out;
         }
         .hero-animation-wrapper:hover .expertise-section:not(:hover) {
           opacity: 0.5;
         }
         .section-content {
-          max-width: 580px;
+          max-width: 520px;
           color: #fff;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-start;
         }
         .section-title {
           margin-bottom: 1rem;
@@ -243,8 +242,6 @@ export const ExpertiseBlock: React.FC<ExpertiseBlockProps> = ({
           color: rgba(255, 255, 255, 0.8);
           line-height: 1.6;
         }
-
-        /* --- CTA Button Styles --- */
         .cta-button {
           width: fit-content;
           display: flex;
@@ -278,7 +275,7 @@ export const ExpertiseBlock: React.FC<ExpertiseBlockProps> = ({
         }
         .expertise-panel {
           width: 100svw;
-          min-height: 100vh;
+          min-height: 100svh;
           height: auto;
           display: flex;
           align-items: flex-start;
@@ -287,13 +284,22 @@ export const ExpertiseBlock: React.FC<ExpertiseBlockProps> = ({
           flex-shrink: 0;
           padding: 5rem 0;
         }
+        .expertise-section.emerging:hover,
+        .expertise-section.sustainability:hover {
+          border-radius: 1.2rem;
+          background: rgba(255, 255, 255, 0.1);
+          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+          backdrop-filter: blur(5px);
+          -webkit-backdrop-filter: blur(5px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          transition: all 0.3s linear;
+        }
         .expertise-panel.emerging {
           z-index: 1;
         }
         .expertise-panel.sustainability {
           z-index: 2;
         }
-
         .panel-content {
           width: 100%;
           height: auto;
@@ -314,7 +320,6 @@ export const ExpertiseBlock: React.FC<ExpertiseBlockProps> = ({
         .panel-header h3 {
           margin: 0;
         }
-
         .panel-header-icon {
           width: 80px;
           height: 80px;
@@ -329,7 +334,6 @@ export const ExpertiseBlock: React.FC<ExpertiseBlockProps> = ({
           background: #000;
           flex-shrink: 0;
         }
-
         .panel-body {
           flex: 1;
           display: flex;
@@ -459,12 +463,19 @@ export const ExpertiseBlock: React.FC<ExpertiseBlockProps> = ({
           }
           .hero-content {
             flex-direction: column;
+            height: 85%;
           }
           .hero-animation-wrapper {
             border-radius: 1rem;
           }
           .expertise-section {
             width: fit-content;
+          }
+          .section-title {
+            margin-bottom: 0.5rem;
+          }
+          .section-subtitle {
+            font-size: 14px;
           }
           .cta-button {
             opacity: 1;

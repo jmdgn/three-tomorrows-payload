@@ -16,7 +16,8 @@ body {
     min-height: 100svh;
     background-color: inherit;
     color: inherit;
-    font-family: "Neue Montreal", Helvetica, Arial, sans-serif; }
+    font-family: "Neue Montreal", Helvetica, Arial, sans-serif;
+    overscroll-behavior: none; }
 
 main {
     position: relative;

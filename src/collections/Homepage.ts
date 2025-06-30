@@ -220,7 +220,7 @@ export const Homepage: CollectionConfig = {
             {
               name: 'ctaLink',
               type: 'text',
-              defaultValue: '/services',
+              defaultValue: '/our-services',
             },
             {
               name: 'items',

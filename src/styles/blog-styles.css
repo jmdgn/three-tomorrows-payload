@@ -32,7 +32,8 @@
     position: relative;
     display: flex;
     width: 100%;
-    gap: 2rem; }
+    gap: 2rem;
+    flex-direction: column; }
 
 .col-span-4 {
     position: relative;
@@ -41,17 +42,19 @@
 article.blogArticle-preview {
     position: relative;
     display: flex;
-    flex-direction: column;
-    gap: 1rem; }
+    gap: 6rem;
+    padding: 4rem 0;
+    border-top: 1px solid #ccc; }
 
 .relative.w-full {
     position: relative;
     width: 100%;
-    max-width: 100%;
-    aspect-ratio: 5/4;
+    max-width: 50%;
+    aspect-ratio: 16/9;
     height: 100%;
     overflow: hidden;
-    border-radius: 8px; }
+    border-radius: 1rem;
+    box-shadow: 2px 2px 16px 0px rgba(0,0,0,0.1); }
 
 .p-4 {
     position: relative;
@@ -67,22 +70,21 @@ article.blogArticle-preview {
 
 .relative.w-full picture img {
     position: absolute;
-    width: auto;
-    height: 100%;
+    width: 100%;
+    height: auto;
     top: 0;
-    left: 50%;
-    transform: translate(-50%, 0) scale(1.0);
+    left: 0;
     transition: all 0.3s linear; }
 
 .relative.w-full picture img:hover {
-    transform: translate(-50%, 0) scale(1.05);
+    transform: scale(1.05);
     transition: all 0.3s linear; }
 
 .prose h5 {
-    font-family: "Neue Montreal Medium";
-    font-size: 20px;
+    font-family: "Neue Montreal";
+    font-size: 2rem;
     font-style: normal;
-    line-height: 28px;
+    line-height: 36px;
     letter-spacing: 0.8px;
     margin: 0; }
 
@@ -641,21 +643,23 @@ header.blog .header-container .contactBtn-container {
     width: 30%; }
 }
 
+@media only screen and (max-width: 1024px) {
+article.blogArticle-preview {
+    gap: 2rem; }
+
+.relative.w-full {
+    max-width: 40%; }
+}
+
 @media only screen and (max-width: 1023px) {
 .articleDetails-nav {
     display: none; }
     
 header.blog .header-container .contactBtn-container {
     width: fit-content; }
-
-.grid.articleLanding {
-    flex-direction: column; }
 }
 
 @media only screen and (max-width: 880px) {
-.grid.articleLanding {
-    gap: 4rem; }
-
 .article-inner {
     margin: 14vh 0 2rem 0;
     padding: 1.5rem; }
@@ -663,6 +667,14 @@ header.blog .header-container .contactBtn-container {
 .blogFrame-container {
     max-width: 100%;
     padding: 0; }
+
+article.blogArticle-preview {
+    flex-direction: column;
+    padding: 2rem 0;
+    gap: 1rem; }
+
+.relative.w-full {
+    max-width: 100%; }
     
 .share-buttons.active {
     right: 0; }
@@ -685,13 +697,6 @@ button.copyLink p {
 .mb-16 .prose,
 .pt24-inner .container .postGrid-inner {
     padding: 1rem; }
-
-.relative.w-full {
-    aspect-ratio: 16/9; }
-
-.relative.w-full picture img {
-    width: 100%;
-    height: auto; }
 }
 
 /* Rich Text Styles */

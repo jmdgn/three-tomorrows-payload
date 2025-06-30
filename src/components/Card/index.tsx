@@ -84,15 +84,6 @@ export const Card: React.FC<{
         )}
       </div>
       <div className="p-4">
-        {titleToUse && (
-          <div className="prose">
-            <h5>
-              <Link className="not-prose" href={href} ref={link.ref}>
-                {titleToUse}
-              </Link>
-            </h5>
-          </div>
-        )}
         {publishedAt && (
           <div className="mt-2">
             <p className="text-sm text-gray-600">
@@ -104,30 +95,39 @@ export const Card: React.FC<{
             </p>
           </div>
         )}
+
+        {titleToUse && (
+          <div className="prose">
+            <h5>
+              <Link className="not-prose" href={href} ref={link.ref}>
+                {titleToUse}
+              </Link>
+            </h5>
+          </div>
+        )}
+
         {showCategories && hasCategories && (
           <div className="ct-full mb-4">
-            {showCategories && hasCategories && (
-              <div className="categoryTag">
-                {categories?.map((category, index) => {
-                  if (typeof category === 'object') {
-                    const { title: titleFromCategory } = category
+            <div className="categoryTag">
+              {categories?.map((category, index) => {
+                if (typeof category === 'object') {
+                  const { title: titleFromCategory } = category
 
-                    const categoryTitle = titleFromCategory || 'Untitled category'
+                  const categoryTitle = titleFromCategory || 'Untitled category'
 
-                    const isLast = index === categories.length - 1
+                  const isLast = index === categories.length - 1
 
-                    return (
-                      <Fragment key={index}>
-                        {categoryTitle}
-                        {!isLast && <Fragment>, &nbsp;</Fragment>}
-                      </Fragment>
-                    )
-                  }
+                  return (
+                    <Fragment key={index}>
+                      {categoryTitle}
+                      {!isLast && <Fragment>, &nbsp;</Fragment>}
+                    </Fragment>
+                  )
+                }
 
-                  return null
-                })}
-              </div>
-            )}
+                return null
+              })}
+            </div>
           </div>
         )}
       </div>
