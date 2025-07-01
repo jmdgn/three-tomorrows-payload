@@ -60,7 +60,7 @@ article.blogArticle-preview {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem; }
+    gap: 4rem; }
 
 .ct-full.mb-4 {
     position: relative;
@@ -644,7 +644,8 @@ header.blog .header-container .contactBtn-container {
 }
 
 @media only screen and (max-width: 1024px) {
-article.blogArticle-preview {
+article.blogArticle-preview,
+.p-4 {
     gap: 2rem; }
 
 .relative.w-full {

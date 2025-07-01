@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react'
 
 import type { Page } from '@/payload-types'
-import TitleIntroduction from '../blocks/Titles/TitleIntroduction'
+
+import TitleIntroduction from '@/blocks/Titles/TitleIntroduction'
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
@@ -11,6 +12,7 @@ import { CardStackBlock } from '@/blocks/CardStack'
 import { ContactCTABlock } from '@/blocks/ContactCTA'
 import { TabbedPanelBlock } from '@/blocks/TabbedPanel'
 import { ExpertiseBlock } from '@/blocks/ExpertiseBlock'
+import { AboutIntroBlock } from '@/blocks/AboutIntroBlock'
 
 const blockComponents = {
   titleIntroduction: TitleIntroduction,
@@ -23,10 +25,10 @@ const blockComponents = {
   contactCTA: ContactCTABlock,
   tabbedPanel: TabbedPanelBlock,
   expertiseBlock: ExpertiseBlock,
+  aboutIntroBlock: AboutIntroBlock,
 }
 
-// Define blocks that need full viewport width
-const fullWidthBlocks = ['expertiseBlock']
+const fullWidthBlocks = ['expertiseBlock', 'aboutIntroBlock']
 
 export const RenderBlocks: React.FC<{
   blocks: Page['layout'][0][]
@@ -41,22 +43,18 @@ export const RenderBlocks: React.FC<{
         {blocks.map((block, index) => {
           const { blockType } = block
 
-          console.log('Rendering block:', blockType, block)
-
           if (blockType && blockType in blockComponents) {
             const Block = blockComponents[blockType]
 
             if (Block) {
-              // Check if this block needs full viewport width
               if (fullWidthBlocks.includes(blockType)) {
                 return (
-                  <div key={index} className="expertise-block-wrapper">
+                  <div key={index}>
                     <Block {...block} />
                   </div>
                 )
               }
 
-              // Standard block rendering with margins
               return (
                 <div className="my-16" key={index}>
                   <div className="blockInner">

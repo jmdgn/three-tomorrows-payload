@@ -79,7 +79,7 @@ h1 {
     font-family: "NaNHoloX Condensed Black";
     font-size: clamp(50px, 20vw, 180px);
     font-style: normal;
-    font-weight: 900;
+    font-weight: 500;
     line-height: 0.85;
     text-transform: uppercase;
     margin-block-start: 0;

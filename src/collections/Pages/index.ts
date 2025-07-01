@@ -19,6 +19,7 @@ import { CardStack } from '../../blocks/CardStack/config'
 import { ContactCTA } from '../../blocks/ContactCTA/config'
 import { TabbedPanel } from '../../blocks/TabbedPanel/config'
 import { ExpertiseBlock } from '../../blocks/ExpertiseBlock/config'
+import { AboutIntroBlock } from '../../blocks/AboutIntroBlock/config'
 
 import {
   MetaDescriptionField,
@@ -88,16 +89,17 @@ export const Pages: CollectionConfig<'pages'> = {
               name: 'layout',
               type: 'blocks',
               blocks: [
-                CallToAction,
-                Content,
-                MediaBlock,
+                AboutIntroBlock,
                 Archive,
-                FormBlock,
-                TitleIntroductionBlock,
+                CallToAction,
                 CardStack,
                 ContactCTA,
-                TabbedPanel,
+                Content,
                 ExpertiseBlock,
+                FormBlock,
+                MediaBlock,
+                TabbedPanel,
+                TitleIntroductionBlock,
               ],
               required: true,
               admin: {
