@@ -20,6 +20,7 @@ import { ContactCTA } from '../../blocks/ContactCTA/config'
 import { TabbedPanel } from '../../blocks/TabbedPanel/config'
 import { ExpertiseBlock } from '../../blocks/ExpertiseBlock/config'
 import { AboutIntroBlock } from '../../blocks/AboutIntroBlock/config'
+import { HeaderSectionConfig } from '../../blocks/HeaderSection'
 
 import {
   MetaDescriptionField,
@@ -97,6 +98,8 @@ export const Pages: CollectionConfig<'pages'> = {
                 Content,
                 ExpertiseBlock,
                 FormBlock,
+                // Add the new HeaderSection block to the list
+                HeaderSectionConfig,
                 MediaBlock,
                 TabbedPanel,
                 TitleIntroductionBlock,

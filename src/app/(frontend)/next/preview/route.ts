@@ -24,7 +24,8 @@ export async function GET(
   const slug = searchParams.get('slug')
   const previewSecret = searchParams.get('previewSecret')
 
-  if (previewSecret !== process.env.PREVIEW_SECRET) {
+  // Use the same environment variable name as in generatePreviewPath.ts
+  if (previewSecret !== process.env.PAYLOAD_PUBLIC_DRAFT_SECRET) {
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
 
@@ -54,8 +55,6 @@ export async function GET(
     draft.disable()
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
-
-  // You can add additional checks here to see if the user is allowed to preview this page
 
   draft.enable()
 

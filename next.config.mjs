@@ -1,14 +1,18 @@
 import redirects from './redirects.js'
+import { withPayload } from '@payloadcms/next/withPayload'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-const { withPayload } = await import('@payloadcms/next/withPayload.js')
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
 
-// Railway environment variables
-const RAILWAY_STATIC_URL = process.env.RAILWAY_STATIC_URL
-const RAILWAY_PUBLIC_URL = process.env.RAILWAY_PUBLIC_URL
-const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
-
-// Determine the correct server URL with Railway support
-let serverUrl = RAILWAY_STATIC_URL || RAILWAY_PUBLIC_URL || NEXT_PUBLIC_SERVER_URL
+// --- THIS IS THE CORRECTED LOGIC ---
+// It now prioritizes your custom domain over Railway's defaults.
+let serverUrl =
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+  process.env.RAILWAY_PUBLIC_URL ||
+  process.env.RAILWAY_STATIC_URL ||
+  'http://localhost:3000'
 
 if (serverUrl && !serverUrl.startsWith('http://') && !serverUrl.startsWith('https://')) {
   serverUrl = `https://${serverUrl}`
@@ -34,25 +38,6 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.amazonaws.com',
       },
-      ...[serverUrl]
-        .filter(Boolean)
-        .map((item) => {
-          try {
-            const url = new URL(item)
-            if (!url.hostname) {
-              console.warn(`Missing hostname in URL: ${item}`)
-              return null
-            }
-            return {
-              hostname: url.hostname,
-              protocol: url.protocol.replace(':', ''),
-            }
-          } catch (error) {
-            console.warn(`Invalid URL in NEXT_PUBLIC_SERVER_URL: ${item}`)
-            return null
-          }
-        })
-        .filter(Boolean),
     ],
   },
   reactStrictMode: true,
@@ -63,14 +48,12 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: 'standalone',
   env: {
     PORT: process.env.PORT || '3000',
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
     DATABASE_URI: process.env.DATABASE_URI,
     MONGODB_URI: process.env.MONGODB_URI || process.env.DATABASE_URI,
     NEXT_PUBLIC_SERVER_URL: serverUrl,
-    PAYLOAD_PUBLIC_SERVER_URL: serverUrl,
   },
   experimental: {
     esmExternals: true,
@@ -92,11 +75,11 @@ const nextConfig = {
 
     return config
   },
+  output: 'standalone',
 }
 
 export default withPayload(nextConfig, {
-  devBundleServerPackages: false,
-  payloadConfig: {
-    env: process.env,
-  },
+  configPath: path.resolve(dirname, './payload/payload.config.ts'),
+  payloadPath: path.resolve(process.cwd(), './payload/payload.ts'),
+  autoInit: process.env.NODE_ENV !== 'production',
 })

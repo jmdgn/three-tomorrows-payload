@@ -27,6 +27,13 @@ export const CardStack: Block = {
           label: 'Card Content',
         },
         {
+          name: 'icon',
+          label: 'Card Icon (80x80)',
+          type: 'upload',
+          relationTo: 'media',
+          required: false,
+        },
+        {
           name: 'backgroundColor',
           type: 'text',
           label: 'Background Color',

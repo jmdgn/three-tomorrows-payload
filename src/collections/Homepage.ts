@@ -87,11 +87,6 @@ export const Homepage: CollectionConfig = {
           type: 'array',
           fields: [
             {
-              name: 'number',
-              type: 'text',
-              defaultValue: '01',
-            },
-            {
               name: 'title',
               type: 'text',
               defaultValue: 'Intelligence',
@@ -121,32 +116,59 @@ export const Homepage: CollectionConfig = {
           ],
           defaultValue: [
             {
-              number: '01',
               title: 'Intelligence',
               breakTitle: 'Trend',
               description:
                 'Cutting through noise to identify the signals that matter most for your future. Helping you see beyond the horizon and prepare for multiple possible tomorrows.',
             },
             {
-              number: '02',
               title: 'Workshops',
               breakTitle: 'Foresight',
               description:
                 "Collaborative sessions that build your team's capacity to think differently about change and identify strategic opportunities within emerging trends.",
             },
             {
-              number: '03',
               title: 'Planning',
               breakTitle: 'Strategic',
               description:
                 'Facilitation of strategy development processes that align teams, clarify purpose and create actionable roadmaps - independent of or informed by trend analysis.',
             },
             {
-              number: '04',
               title: 'Support',
               breakTitle: 'Implementation',
               description:
                 'Converting insights and strategy into clear action plans that leverage your organisational strengths while building internal capability.',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'clientsSection',
+      type: 'group',
+      fields: [
+        {
+          name: 'title',
+          type: 'text',
+          required: true,
+          defaultValue: 'Our Valued Clients',
+        },
+        {
+          name: 'clients',
+          type: 'array',
+          label: 'Client Logos',
+          minRows: 4,
+          maxRows: 4,
+          required: true,
+          fields: [
+            {
+              name: 'image',
+              type: 'upload',
+              relationTo: 'media',
+              required: true,
+              filterOptions: {
+                mimeType: { contains: 'image' },
+              },
             },
           ],
         },
@@ -213,16 +235,6 @@ export const Homepage: CollectionConfig = {
               defaultValue: 'Emerging Technology Futures',
             },
             {
-              name: 'ctaText',
-              type: 'text',
-              defaultValue: 'Explore Tech Solutions',
-            },
-            {
-              name: 'ctaLink',
-              type: 'text',
-              defaultValue: '/our-services',
-            },
-            {
               name: 'items',
               type: 'array',
               fields: [
@@ -231,28 +243,37 @@ export const Homepage: CollectionConfig = {
                   type: 'text',
                 },
                 {
-                  name: 'isImage',
-                  type: 'checkbox',
-                  defaultValue: false,
-                },
-                {
-                  name: 'image',
-                  type: 'upload',
-                  relationTo: 'media',
+                  name: 'hoverText',
+                  type: 'text',
+                  label: 'Hover Text',
                   admin: {
-                    condition: (data, siblingData) => siblingData.isImage,
-                  },
-                  filterOptions: {
-                    mimeType: { contains: 'image' },
+                    description: 'Text that appears when hovering over the card',
                   },
                 },
               ],
               defaultValue: [
-                { text: 'AI Integration', isImage: false },
-                { text: 'Web3 & Blockchain', isImage: false },
+                {
+                  text: 'AI Integration',
+                  isImage: false,
+                  hoverText:
+                    'Seamlessly integrate artificial intelligence into your business operations.',
+                },
+                {
+                  text: 'Web3 & Blockchain',
+                  isImage: false,
+                  hoverText: 'Navigate the decentralized future with confidence and clarity.',
+                },
                 { isImage: true },
-                { text: 'Digital Transformation', isImage: false },
-                { text: 'Tech Evaluation', isImage: false },
+                {
+                  text: 'Digital Transformation',
+                  isImage: false,
+                  hoverText: 'Transform your business for the digital age with proven strategies.',
+                },
+                {
+                  text: 'Tech Evaluation',
+                  isImage: false,
+                  hoverText: 'Make informed technology decisions based on rigorous analysis.',
+                },
                 { isImage: true },
               ],
             },
@@ -268,16 +289,6 @@ export const Homepage: CollectionConfig = {
               defaultValue: 'Strategic Sustainability & Social Impact',
             },
             {
-              name: 'ctaText',
-              type: 'text',
-              defaultValue: 'Explore Social Solutions',
-            },
-            {
-              name: 'ctaLink',
-              type: 'text',
-              defaultValue: '/services',
-            },
-            {
               name: 'items',
               type: 'array',
               fields: [
@@ -286,28 +297,38 @@ export const Homepage: CollectionConfig = {
                   type: 'text',
                 },
                 {
-                  name: 'isImage',
-                  type: 'checkbox',
-                  defaultValue: false,
-                },
-                {
-                  name: 'image',
-                  type: 'upload',
-                  relationTo: 'media',
+                  name: 'hoverText',
+                  type: 'text',
+                  label: 'Hover Text',
                   admin: {
-                    condition: (data, siblingData) => siblingData.isImage,
-                  },
-                  filterOptions: {
-                    mimeType: { contains: 'image' },
+                    description: 'Text that appears when hovering over the card',
                   },
                 },
               ],
               defaultValue: [
-                { text: 'Shared Value Creation', isImage: false },
-                { text: 'Sustainability Integration', isImage: false },
+                {
+                  text: 'Shared Value Creation',
+                  isImage: false,
+                  hoverText:
+                    'Create business value while addressing social and environmental challenges.',
+                },
+                {
+                  text: 'Sustainability Integration',
+                  isImage: false,
+                  hoverText: 'Embed sustainability into your core business strategy.',
+                },
                 { isImage: true },
-                { text: 'Social Impact', isImage: false },
-                { text: 'ESG Strategy', isImage: false },
+                {
+                  text: 'Social Impact',
+                  isImage: false,
+                  hoverText: 'Measure and maximize your positive impact on society.',
+                },
+                {
+                  text: 'ESG Strategy',
+                  isImage: false,
+                  hoverText:
+                    'Develop comprehensive environmental, social, and governance strategies.',
+                },
                 { isImage: true },
               ],
             },

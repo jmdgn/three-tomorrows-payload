@@ -1,6 +1,8 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { HomepageScripts, HomepageSceneContainer } from '@/components/HomeScripts/HomepageScripts.tsx'
 import { LandingScripts } from '@/components/HomeScripts/LandingScripts.tsx'
 import { LandingEffects } from '@/components/HomeScripts/LandingEffects.client.tsx'
@@ -10,6 +12,7 @@ import BackgroundTransition from "@/components/HomeScripts/BackgroundTransition"
 import AnimatedTitle from '@/components/HomeScripts/AnimatedTitle';
 import { getMediaUrl } from '../utilities/media-utils';
 import MobileServiceCarousel from '@/components/MobileServiceCarousel';
+import FactoidAnimation from './FactoidAnimation';
 
 function throttle(func, limit) {
   let inThrottle;
@@ -22,11 +25,76 @@ function throttle(func, limit) {
   };
 }
 
+gsap.registerPlugin(ScrollTrigger);
+
+const ClientGridAnimator = ({ clientItems, getImageSrc }) => {
+  const gridRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const delayInMilliseconds = 500;
+
+            setTimeout(() => {
+              const columns = Array.from(gridRef.current.querySelectorAll('.client-column'));
+              columns.forEach((column, index) => {
+                column.style.transitionDelay = `${index * 150}ms`;
+                column.classList.add('is-visible');
+              });
+            }, delayInMilliseconds);
+
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+
+    if (gridRef.current) {
+      observer.observe(gridRef.current);
+    }
+
+    return () => {
+      if (gridRef.current) {
+        observer.disconnect();
+      }
+    };
+  }, [clientItems]);
+
+  const handleImageError = (e) => {
+    console.error('Client logo failed to load:', e.target.src);
+    e.target.src = 'https://placehold.co/640x360/f0f0f0/ccc?text=Logo';
+  };
+
+  return (
+    <div className="clientGrid-container" ref={gridRef}>
+      {clientItems.map((client, index) => (
+        <div className="client-column" key={index}>
+          <div className="client-logo-aspect-ratio">
+            <img
+              src={getImageSrc(client.image)}
+              alt={`Client Logo ${index + 1}`}
+              loading="lazy"
+              decoding="async"
+              onError={handleImageError}
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const CustomHomepage = (props) => {
   const {
     heroSection = {},
     introSection = {},
     servicesSection = {},
+    clientsSection = {},
     factoidsSection = {},
     expertiseSection = {},
     contactSection = {},
@@ -62,16 +130,32 @@ const CustomHomepage = (props) => {
     },
   ];
 
+  const clientsTitle = clientsSection?.title || 'Our Valued Clients';
+  const clientItems = clientsSection?.clients || [
+    { image: 'assets/images/clients/placeholder-logo-1.png' },
+    { image: 'assets/images/clients/placeholder-logo-2.png' },
+    { image: 'assets/images/clients/placeholder-logo-3.png' },
+    { image: 'assets/images/clients/placeholder-logo-4.png' },
+  ];
+
   const factoidItems = factoidsSection?.factoids || [
     { text: '70% of small businesses will transition to new ownership in the next decade' },
   ];
 
   const techExpertiseItems = expertiseSection?.techExpertise?.items || [
-    { text: 'AI Integration', isImage: false },
+    { 
+      text: 'AI Integration', 
+      isImage: false,
+      hoverText: 'Seamlessly integrate artificial intelligence into your business operations.' 
+    },
   ];
-
+  
   const sustainabilityExpertiseItems = expertiseSection?.sustainabilityExpertise?.items || [
-    { text: 'Shared Value Creation', isImage: false },
+    { 
+      text: 'Shared Value Creation', 
+      isImage: false,
+      hoverText: 'Create business value while addressing social and environmental challenges.'
+    },
   ];
 
   useEffect(() => {
@@ -418,7 +502,6 @@ const CustomHomepage = (props) => {
   return (
     <div className="homeBody">
       <>
-      <StaticGradientBackground />
       <HomepageScripts />
       <LandingScripts />
       <LandingEffects />
@@ -527,61 +610,24 @@ const CustomHomepage = (props) => {
               )}
             </div>
           </div>
-        </section>
-        <section id="section-third" className="factoids-complete">
-          <div className="factsContent-outer">
-            <div className="factoidBkgnd-sticky">
-              <div className="factAssets-container" />
-            </div>
-            
-            <div className="factoidContent-full">
-              <div className="factText-container">
-                
-                <div className="stickyContent-title">
-                  <h1>{factoidsSection?.heading || 'We are entering an unprecedented age of change'}</h1>
+          
+          <div className="clientContent-outer">
+            <div className="clientContent-inner">
+              <div className="titleText center">
+                <div className="titleContent-container">
+                  <h4 className="xlarge animate-title">{clientsTitle}</h4>
                 </div>
-                
-                <div className="factoidTitle-group">
-                  {factoidItems.map((factoid, index) => (
-                    <div className="factoidSingle-container" key={index}>
-                      <div className="factCard-container">
-                        <h2>{factoid.text}</h2>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="anchorBtn-container">
-                  <div className="prompt-button" onClick={() => {
-                    const expertisePanel = document.getElementById('section-fourth');
-                    if (expertisePanel) {
-                      const headerHeight = document.querySelector("header")?.offsetHeight || 0;
-                      const offset = window.innerHeight * 0;
-                      const targetPosition = expertisePanel.offsetTop - headerHeight + offset;
-                      window.scrollTo({
-                        top: targetPosition,
-                        behavior: "smooth"
-                      });
-                    }
-                  }}>{factoidsSection?.skipButtonText || 'Skip Industry Facts'}</div>
-                  <div className="prompt-buttonIcon" onClick={() => {
-                    const expertisePanel = document.getElementById('section-second');
-                    if (expertisePanel) {
-                      const headerHeight = document.querySelector("header")?.offsetHeight || 0.8;
-                      const offset = window.innerHeight * 0.8;
-                      const targetPosition = expertisePanel.offsetTop - headerHeight + offset;
-                      window.scrollTo({
-                        top: targetPosition,
-                        behavior: "smooth"
-                      });
-                    }
-                  }}></div>
-                </div>
-
               </div>
+              <ClientGridAnimator clientItems={clientItems} getImageSrc={getImageSrc} />
             </div>
           </div>
         </section>
+        
+        <FactoidAnimation 
+            factoidsSection={factoidsSection} 
+            factoidItems={factoidItems} 
+        />
+        
         <section id="section-fourth" className="expertise-panel">
           <div className="expertiseContent-outer">
             <div className="expertiseContent-inner">
@@ -596,80 +642,60 @@ const CustomHomepage = (props) => {
                   </div>
                 </div>
               </div>
-
-              <div className="expertise-carousel">
-                <div className="expertiseSubtitle-firstRow">
-                  <h6>{expertiseSection?.techExpertise?.heading || 'Emerging Technology Futures'}</h6>
-                  <div className="body-button" onClick={() => window.location.href = expertiseSection?.techExpertise?.ctaLink || servicesLinkUrl} role="button" tabIndex={0}>
-                    {expertiseSection?.techExpertise?.ctaText || 'Explore Tech Solutions'}
-                    <div className="ctaButton-iconContainer">
-                      <svg className="first" width="12" height="12" viewBox="0 0 12 12" fill="#000" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>
-                      <svg className="second" width="12" height="12" viewBox="0 0 12 12" fill="#FFF" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="infinite-carousel-container">
-                  <div className="infinite-carousel" id="tech-expertise-carousel">
-                    {techExpertiseItems.map((item, index) => (
-                      <div className={`carousel-item ${item.isImage ? 'square' : ''}`} key={index}>
-                        <div className={`tech-card ${item.isImage ? 'square' : ''}`}>
-                          {item.isImage ? (
-                            <img
-                              className="carousel-image"
-                              src={getImageSrc(item.image)}
-                              width={1024}
-                              height={1024}
-                              alt="Expertise Display"
-                              loading="lazy"
-                              onError={(e) => {
-                                console.error('Image failed to load:', e.target.src);
-                                e.target.src = 'assets/images/expertise/block.png';
-                                e.target.style.opacity = '1';
-                              }}
-                            />
-                          ) : (
-                            <h3 className="thin">{item.text}</h3>
-                          )}
+                
+              <div className="expertise-grid">
+                <div className="expertise-column">
+                  <h4>{expertiseSection?.techExpertise?.heading || 'Emerging Technology Futures'}</h4>
+                  <div className="expertise-items">
+                    {techExpertiseItems.filter(item => !item.isImage).map((item, index) => (
+                      <a 
+                        href={item.link || '#'} 
+                        className="expertise-panel" 
+                        key={index}
+                        onClick={(e) => {
+                          if (!item.link || item.link === '#') {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        <div className="expertise-content">
+                          <h5>{item.text}</h5>
+                          <p>{item.hoverText || ''}</p>
                         </div>
-                      </div>
+                        <div className="expertise-arrow">
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0.292893 14.2929C-0.097631 14.6834 -0.097631 15.3166 0.292893 15.7071C0.683418 16.0976 1.31658 16.0976 1.70711 15.7071L0.292893 14.2929ZM16 1C16 0.447715 15.5523 -9.44832e-09 15 -9.44832e-09L6 -9.44832e-09C5.44772 -9.44832e-09 5 0.447715 5 1C5 1.55228 5.44772 2 6 2H14L14 10C14 10.5523 14.4477 11 15 11C15.5523 11 16 10.5523 16 10L16 1ZM1 15L1.70711 15.7071L15.7071 1.70711L15 1L14.2929 0.292893L0.292893 14.2929L1 15Z" fill="#191C1C"/>
+                          </svg>
+                        </div>
+                      </a>
                     ))}
                   </div>
                 </div>
-              </div>
 
-              <div className="expertise-carousel">
-                <div className="expertiseSubtitle-firstRow">
-                  <h6>{expertiseSection?.sustainabilityExpertise?.heading || 'Strategic Sustainability & Social Impact'}</h6>
-                  <div className="body-button" onClick={() => window.location.href = expertiseSection?.socialExpertise?.ctaLink || servicesLinkUrl} role="button" tabIndex={0}>
-                    {expertiseSection?.socialExpertise?.ctaText || 'Explore Social Solutions'}
-                    <div className="ctaButton-iconContainer">
-                      <svg className="first" width="12" height="12" viewBox="0 0 12 12" fill="#000" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>
-                      <svg className="second" width="12" height="12" viewBox="0 0 12 12" fill="#FFF" xmlns="http://www.w3.org/2000/svg"><path d="M0.46967 10.5703C0.176777 10.8631 0.176777 11.338 0.46967 11.6309C0.762563 11.9238 1.23744 11.9238 1.53033 11.6309L0.46967 10.5703ZM11.75 1.10059C11.75 0.686372 11.4142 0.350586 11 0.350586L4.25 0.350587C3.83579 0.350587 3.5 0.686373 3.5 1.10059C3.5 1.5148 3.83579 1.85059 4.25 1.85059L10.25 1.85059L10.25 7.85058C10.25 8.2648 10.5858 8.60058 11 8.60058C11.4142 8.60058 11.75 8.2648 11.75 7.85058L11.75 1.10059ZM1.53033 11.6309L11.5303 1.63092L10.4697 0.570256L0.46967 10.5703L1.53033 11.6309Z"></path></svg>
-                    </div>
-                  </div>
-                </div>
-                <div className="infinite-carousel-container">
-                  <div className="infinite-carousel" id="sustainability-expertise-carousel">
-                    {sustainabilityExpertiseItems.map((item, index) => (
-                      <div className={`carousel-item ${item.isImage ? 'square' : ''}`} key={index}>
-                        <div className={`tech-card ${item.isImage ? 'square' : ''}`}>
-                          {item.isImage ? (
-                            <img
-                              className="carousel-image"
-                              src={getImageSrc(item.image)}
-                              width={1024}
-                              height={1024}
-                              alt="Expertise Display"
-                              onError={(e) => {
-                                console.error('Image failed to load:', e.target.src);
-                                e.target.src = 'assets/images/expertise/block.png';
-                              }}
-                            />
-                          ) : (
-                            <h3 className="thin">{item.text}</h3>
-                          )}
+                <div className="expertise-column">
+                  <h4>{expertiseSection?.sustainabilityExpertise?.heading || 'Strategic Sustainability & Social Impact'}</h4>
+                  <div className="expertise-items">
+                    {sustainabilityExpertiseItems.filter(item => !item.isImage).map((item, index) => (
+                      <a 
+                        href={item.link || '#'} 
+                        className="expertise-panel" 
+                        key={index}
+                        onClick={(e) => {
+                          if (!item.link || item.link === '#') {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        <div className="expertise-content">
+                          <h5>{item.text}</h5>
+                          <p>{item.hoverText || ''}</p>
                         </div>
-                      </div>
+                        <div className="expertise-arrow">
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0.292893 14.2929C-0.097631 14.6834 -0.097631 15.3166 0.292893 15.7071C0.683418 16.0976 1.31658 16.0976 1.70711 15.7071L0.292893 14.2929ZM16 1C16 0.447715 15.5523 -9.44832e-09 15 -9.44832e-09L6 -9.44832e-09C5.44772 -9.44832e-09 5 0.447715 5 1C5 1.55228 5.44772 2 6 2H14L14 10C14 10.5523 14.4477 11 15 11C15.5523 11 16 10.5523 16 10L16 1ZM1 15L1.70711 15.7071L15.7071 1.70711L15 1L14.2929 0.292893L0.292893 14.2929L1 15Z" fill="#191C1C"/>
+                          </svg>
+                        </div>
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -678,6 +704,7 @@ const CustomHomepage = (props) => {
             </div>
           </div>
         </section>
+        
         <section id="section-fifth" className="contactForm-panel">
           <div className="contactContent-outer">
             <div className="contactContent-inner">

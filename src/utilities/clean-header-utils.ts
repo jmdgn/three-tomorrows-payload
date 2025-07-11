@@ -1,6 +1,16 @@
 import { getServerSideURL } from '@/utilities/getURL'
 import type { Header } from '@/payload-types'
 
+function ensureProtocol(url: string): string {
+  if (!url) return 'http://localhost:3000'
+
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+
+  return `https://${url}`
+}
+
 export async function testHeaderAccess(): Promise<boolean> {
   try {
     console.log('Testing header access...')
@@ -11,7 +21,8 @@ export async function testHeaderAccess(): Promise<boolean> {
       return false
     }
 
-    const url = `${serverURL}/api/header`
+    const baseUrl = ensureProtocol(serverURL)
+    const url = `${baseUrl}/api/header`
     console.log('Fetching from URL:', url)
 
     const response = await fetch(url, {
@@ -46,7 +57,7 @@ export async function fetchHeader(): Promise<Header | null> {
       return null
     }
 
-    const url = `${baseUrl}/api/header`
+    const url = `${ensureProtocol(baseUrl)}/api/header`
     console.log('Fetching header from URL:', url)
 
     const response = await fetch(url, {

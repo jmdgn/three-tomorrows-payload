@@ -111,6 +111,42 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
 
   return (
     <>
+      <style jsx>{`
+        .card-header {
+          display: flex;
+          align-items: center;
+          gap: 2rem;
+          margin-bottom: 2rem;
+        }
+        .card-header-icon {
+          width: 80px;
+          height: 80px;
+          border-radius: 12px;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+        .card-header-icon-placeholder {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          background: #e0e0e0;
+          flex-shrink: 0;
+        }
+        .card-title {
+          margin: 0;
+        }
+        @media (max-width: 768px) {
+          .card-header-icon,
+          .card-header-icon-placeholder {
+            width: 48px;
+            height: 48px;
+          }
+          .card-header {
+            gap: 0.75rem;
+          }
+        }
+      `}</style>
+
       <section ref={sectionRef} className="cardStacking py-16">
         <div className={containerClass}>
           <div className="row justify-content-center">
@@ -130,9 +166,16 @@ export const CardStackBlock: React.FC<CardStackBlockProps> = ({
                         <p>{String(index + 1).padStart(2, '0')}</p>
                       </div>
                       <div className="stackCard__content">
-                        <h3 className="stackCard__body-content-header text-2xl md:text-3xl font-bold mb-4">
-                          {card.title}
-                        </h3>
+                        <div className="card-header">
+                          {card.icon?.url ? (
+                            <img src={card.icon.url} alt="" className="card-header-icon" />
+                          ) : (
+                            <div className="card-header-icon-placeholder"></div>
+                          )}
+                          <h3 className="card-title stackCard__body-content-header text-2xl md:text-3xl font-bold">
+                            {card.title}
+                          </h3>
+                        </div>
                         {card.content && (
                           <p className="stackCard__body-content-text text-base md:text-lg">
                             {card.content}

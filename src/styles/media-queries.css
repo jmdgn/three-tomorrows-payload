@@ -44,11 +44,6 @@ section.intro-para {
 
 
 /* Our Expertise Section Styles */
-.infinite-carousel .carousel-item {
-	min-width: 40%; }
-
-.infinite-carousel .carousel-item.square {
-	max-height: 360px; }
 /* End */
 
 
@@ -140,12 +135,6 @@ p.body-intro {
 	font-size: 320%; }
 /* End */
 
-.infinite-carousel .carousel-item {
-	min-width: 42%; }
-
-.infinite-carousel .carousel-item.square {
-	width: 100%; }
-
 /* Contact Home Styles */
 .contactPanel-home {
 	width: 90%; }
@@ -154,7 +143,7 @@ p.body-intro {
 
 /* Internal Page Styles */
 .titleText.center {
-	padding-bottom: 6rem; }
+	padding-bottom: 8rem; }
 
 .form-block-with-bg {
 	padding: 0; }
@@ -187,11 +176,12 @@ section.intro-para {
 	height: 100svh; }
 /* End: Introduction Panel */
 
-.serviceFt-image {
-	max-width: 350px; }
+.servicePanel-container {
+	border-radius: 24px;
+	aspect-ratio: 4/5; }
 
-.infinite-carousel .carousel-item.square {
-	max-width: 320px; }
+.factoid-sticky-container .anchorBtn-container {
+	bottom: 1rem; }
 /* End */
 
 .stackCard__body {
@@ -264,6 +254,9 @@ h1 {
 h5 {
 	font-size: 28px;
 	line-height: 38px; }
+
+p.xlarge {
+	font-size: 68px; }
 /* End */
 
 
@@ -276,11 +269,15 @@ h5 {
 	border-radius: 1.5rem; }
 /* End */
 
-.factCard-container {
-	max-width: 960px; }
+.serviceContent-inner {
+	margin: 12rem 0 10rem 0; }
 
-.factCard-container h2 {
-	font-size: 300%; }
+.servicePanel-container {
+	border-radius: 20px;
+	aspect-ratio: 2/3; }
+
+.expertise-grid {
+	gap: 2rem; }
 
 /* Blog Page Styles */
 header.blog .header-container .logo-container {
@@ -307,14 +304,6 @@ header.blog .header-container .contactBtn-container {
     width: fit-content;
     justify-content: right; }
 /* End */
-
-
-.infinite-carousel .carousel-item {
-	min-width: 48%; }
-
-.infinite-carousel .carousel-item.square {
-	max-height: 280px;
-	max-width: 280px; }
 
 .tech-card h3.thin {
 	font-size: 36px;
@@ -381,9 +370,6 @@ section.intro-para {
 /* Services Section Styles */
 .serviceCard {
 	padding: 1.5rem; }
-
-.serviceFt-image {
-	max-width: 300px; }
 
 .serviceCard p {
 	font-size: 14px;
@@ -516,10 +502,6 @@ section.intro-para {
 
 
 /* Our Expertise Section Styles */
-.infinite-carousel .carousel-item.square {
-	max-height: 360px;
-	max-width: 360px; }
-
 .tech-card h3.thin {
 	font-size: 36px;
 	line-height: 36px; }
@@ -556,17 +538,14 @@ section.intro-para {
 .serviceContent-inner {
 	margin: 10rem 0; }
 
-.serviceFt-image {
-	max-width: 250px; }
+.serviceGrid-container {
+	grid-template-columns: repeat(2, 1fr); }
+
+.servicePanel-container {
+	aspect-ratio: 1/1; }
 
 .factAssets-container {
 	transform: translate(-50%, -50%) scale(1.4) rotate(45deg); }
-
-.infinite-carousel .carousel-item {
-	padding: 0 .75rem; }
-
-.infinite-carousel .carousel-item.square {
-	margin: 0 .75rem; }
 
 .blogContent-outer {
 	padding: 1rem 2rem; }
@@ -621,13 +600,9 @@ header.blog .header-container .contactBtn-container {
 
 
 @media only screen and (max-width: 1024px) and (max-height: 1366px) {
-section.service-panel {
-	margin-bottom: 20svh; }
-
 video.bg-video {
 	width: auto;
 	height: 100%; }
-
 }
 
 
@@ -721,6 +696,16 @@ p.body-intro.mobile {
 section.intro-section {
 	height: 100svh; }
 
+.clientContent-outer {
+	padding: 1rem; }
+
+.client-column {
+	width: calc(50% - 12px); }
+
+.client-column:not(:last-child)::after {
+	width: 0px;
+	background-color: rgba(0,0,0,0); }
+
 .heroTitle-container {
 	max-width: 100%;
     padding: 0;
@@ -752,8 +737,8 @@ section.intro-section {
 	padding: 12px 20px; }
 
 .introStatement-outer {
-	margin: 1rem;
-	padding: 0; }
+	margin: 0;
+	padding: 1rem; }
 
 .introState-inner {
 	max-width: 100%; }
@@ -788,34 +773,6 @@ section.service-panel {
 
 #sphere-container {
 	z-index: 1; }
-	
-.factoidBkgnd-sticky {
-	z-index: 0; }
-	
-.factoidContent-full {
-	z-index: 2; }
-
-.factAssets-container {
-	transform: translate(-50%, -50%) scale(1.4) rotate(0deg); }
-
-.factCard-container h2 {
-	font-size: 5svh; }
-
-.factoidContent-full {
-	top: -60svh; }
-
-.factoidSingle-container:first-child {
-	margin: 40svh 0 30svh 0; }
-
-.factoidSingle-container {
-	margin: 30svh 0; }
-
-.stickyContent-title {
-	max-width: 100%; }
-
-.stickyContent-title span {
-	font-size: 52px;
-	line-height: 52px; }
 
 .expertise-title .titleText.center {
 	margin: 12rem 1.5rem 0 1.5rem; }
@@ -832,11 +789,15 @@ section.service-panel {
 .expertiseSubtitle-firstRow .body-button {
 	margin: .5rem 1rem; }
 
-.infinite-carousel .carousel-item {
-	min-width: 80%; }
-
 .expertiseContent-inner {
 	padding-bottom: 10rem; }
+
+.expertise-grid {
+	flex-direction: column; }
+
+.expertise-column {
+	width: fit-content;
+	padding: 1rem; }
 
 .socialHeader-panel {
 	display: block;
@@ -1213,10 +1174,6 @@ p.xlarge.internalPanel {
 
 .expertiseContent-inner {
 	padding-bottom: 4rem; }
-
-.infinite-carousel .carousel-item.square {
-	max-height: 220px;
-	max-width: 220px; }
 
 .tech-card h3.thin {
 	font-size: 28px;

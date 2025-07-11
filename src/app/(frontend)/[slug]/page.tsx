@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers' // <<< 1. ADD THIS LINE
 
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
@@ -51,8 +52,13 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   let page: RequiredDataFromCollectionSlug<'pages'> | null
 
+  // <<< 4. ADD THIS LINE to get cookies
+  const cookieStore = cookies()
+
   page = await queryPageBySlug({
     slug,
+    // <<< 5. ADD THIS LINE to pass cookies
+    cookie: cookieStore.toString(),
   })
 
   if (!page && slug === 'home') {
@@ -84,7 +90,13 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const { slug = 'home' } = await paramsPromise
 
   try {
-    const page = await queryPageBySlug({ slug })
+    // <<< 6. ADD THIS LINE to get cookies
+    const cookieStore = cookies()
+    const page = await queryPageBySlug({
+      slug,
+      // <<< 7. ADD THIS LINE to pass cookies
+      cookie: cookieStore.toString(),
+    })
     if (page) {
       return generateMeta({ doc: page })
     }
@@ -103,7 +115,8 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   }
 }
 
-const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
+// <<< 2. MODIFY THIS LINE to accept the cookie string
+const queryPageBySlug = cache(async ({ slug, cookie }: { slug: string; cookie?: string }) => {
   try {
     console.log('Querying page by slug:', slug)
 
@@ -118,7 +131,17 @@ const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {
       draft,
       limit: 1,
       pagination: false,
-      overrideAccess: draft,
+      overrideAccess: false, // Set to false to allow user-based auth
+      // <<< 3. ADD THIS BLOCK to pass credentials
+      ...(cookie
+        ? {
+            req: {
+              headers: {
+                cookie,
+              },
+            },
+          }
+        : {}),
       where: {
         slug: {
           equals: slug,

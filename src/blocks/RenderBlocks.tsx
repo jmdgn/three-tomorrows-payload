@@ -13,6 +13,7 @@ import { ContactCTABlock } from '@/blocks/ContactCTA'
 import { TabbedPanelBlock } from '@/blocks/TabbedPanel'
 import { ExpertiseBlock } from '@/blocks/ExpertiseBlock'
 import { AboutIntroBlock } from '@/blocks/AboutIntroBlock'
+import { HeaderSectionBlock } from '@/blocks/HeaderSection'
 
 const blockComponents = {
   titleIntroduction: TitleIntroduction,
@@ -26,6 +27,7 @@ const blockComponents = {
   tabbedPanel: TabbedPanelBlock,
   expertiseBlock: ExpertiseBlock,
   aboutIntroBlock: AboutIntroBlock,
+  headerSection: HeaderSectionBlock,
 }
 
 const fullWidthBlocks = ['expertiseBlock', 'aboutIntroBlock']

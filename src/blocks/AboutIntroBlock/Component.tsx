@@ -190,7 +190,7 @@ export const AboutIntroBlock: React.FC<AboutIntroBlockProps> = ({ heroContent })
           z-index: 2;
           text-align: center;
           padding: 2rem;
-          max-width: 1000px;
+          max-width: 1200px;
           display: flex;
           flex-direction: column;
           gap: 2rem;
