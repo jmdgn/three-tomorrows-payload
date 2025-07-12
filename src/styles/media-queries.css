@@ -30,16 +30,8 @@ section.intro-para {
 .stickyContent-title {
 	max-width: 1000px; }
 
-.stickyContent-title span {
-    font-size: 100px;
-    line-height: 80px; }
-
 .factCard-container {
 	max-width: 1080px; }
-
-.factCard-container h2 {
-	font-size: 380%;
-	line-height: 110%; }
 /* End */
 
 
@@ -491,10 +483,6 @@ section.intro-para {
 
 
 /* Factoid Section Styles */
-.stickyContent-title span {
-    font-size: 80px;
-    line-height: 60px; }
-
 .factCard-container {
 	max-width: 680px; }
 /* End */
