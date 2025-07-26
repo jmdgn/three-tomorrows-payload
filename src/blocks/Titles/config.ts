@@ -48,5 +48,14 @@ export const TitleIntroductionBlock: Block = {
       label: 'Center Align',
       defaultValue: true,
     },
+    {
+      name: 'enableTextIndent',
+      type: 'checkbox',
+      label: 'Enable Text Indent',
+      defaultValue: true,
+      admin: {
+        description: 'Add tab spacing to the first line of the subheading text',
+      },
+    },
   ],
 }

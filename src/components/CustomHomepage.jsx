@@ -100,6 +100,10 @@ const CustomHomepage = (props) => {
     contactSection = {},
   } = props;
 
+  // Read the new toggle values from props, defaulting to `true`.
+  const displayClientsSection = clientsSection?.displaySection ?? true;
+  const displayExpertiseSection = expertiseSection?.displaySection ?? true;
+
   const heroHeading = heroSection?.heading || 'Disruption By Design';
   const heroSubheading = heroSection?.subheading || 'Strategy Consultancy';
   const heroDescription = heroSection?.description || "Disruption isn't just inevitable—it's necessary. Today's business models aren't future-fit in a world transformed by technology, values, and changing expectations.";
@@ -611,99 +615,105 @@ const CustomHomepage = (props) => {
             </div>
           </div>
           
-          <div className="clientContent-outer">
-            <div className="clientContent-inner">
-              <div className="titleText center">
-                <div className="titleContent-container">
-                  <h4 className="xlarge animate-title">{clientsTitle}</h4>
+          {displayClientsSection && (
+            <div className="clientContent-outer">
+              <div className="clientContent-inner">
+                <div className="titleText center">
+                  <div className="titleContent-container">
+                    <h4 className="xlarge animate-title">{clientsTitle}</h4>
+                  </div>
                 </div>
+                <ClientGridAnimator clientItems={clientItems} getImageSrc={getImageSrc} />
               </div>
-              <ClientGridAnimator clientItems={clientItems} getImageSrc={getImageSrc} />
             </div>
-          </div>
+          )}
         </section>
         
         <FactoidAnimation 
             factoidsSection={factoidsSection} 
-            factoidItems={factoidItems} 
+            factoidItems={factoidItems}
+            skipButtonTarget={displayExpertiseSection ? "#section-fourth" : "#section-fifth"}
+            skipButtonText={displayExpertiseSection ? "Skip Industry Facts" : "Skip to Contact"}
         />
         
-        <section id="section-fourth" className="expertise-panel">
-          <div className="expertiseContent-outer">
-            <div className="expertiseContent-inner">
-              
-              <div className="expertise-title">
-                <div className="titleText center">
-                  <div className="titleContent-container">
-                    <h4>{expertiseSection?.heading || 'Specialised Expertise Areas'}</h4>
-                  </div>
-                  <div className="txtContent-container">
-                    <p className="xlarge"><AnimatedTitle staggerDelay={0.02} duration={0.6}>{expertiseSection?.subheading || 'Beyond our core strategic approach, we offer specialised expertise in two transformative domains:'}</AnimatedTitle></p>
-                  </div>
-                </div>
-              </div>
+        {displayExpertiseSection && (
+          <section id="section-fourth" className="expertise-panel">
+            <div className="expertiseContent-outer">
+              <div className="expertiseContent-inner">
                 
-              <div className="expertise-grid">
-                <div className="expertise-column">
-                  <h4>{expertiseSection?.techExpertise?.heading || 'Emerging Technology Futures'}</h4>
-                  <div className="expertise-items">
-                    {techExpertiseItems.filter(item => !item.isImage).map((item, index) => (
-                      <a 
-                        href={item.link || '#'} 
-                        className="expertise-panel" 
-                        key={index}
-                        onClick={(e) => {
-                          if (!item.link || item.link === '#') {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <div className="expertise-content">
-                          <h5>{item.text}</h5>
-                          <p>{item.hoverText || ''}</p>
-                        </div>
-                        <div className="expertise-arrow">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0.292893 14.2929C-0.097631 14.6834 -0.097631 15.3166 0.292893 15.7071C0.683418 16.0976 1.31658 16.0976 1.70711 15.7071L0.292893 14.2929ZM16 1C16 0.447715 15.5523 -9.44832e-09 15 -9.44832e-09L6 -9.44832e-09C5.44772 -9.44832e-09 5 0.447715 5 1C5 1.55228 5.44772 2 6 2H14L14 10C14 10.5523 14.4477 11 15 11C15.5523 11 16 10.5523 16 10L16 1ZM1 15L1.70711 15.7071L15.7071 1.70711L15 1L14.2929 0.292893L0.292893 14.2929L1 15Z" fill="#191C1C"/>
-                          </svg>
-                        </div>
-                      </a>
-                    ))}
+                <div className="expertise-title">
+                  <div className="titleText center">
+                    <div className="titleContent-container">
+                      <h4>{expertiseSection?.heading || 'Specialised Expertise Areas'}</h4>
+                    </div>
+                    <div className="txtContent-container">
+                      <p className="xlarge"><AnimatedTitle staggerDelay={0.02} duration={0.6}>{expertiseSection?.subheading || 'Beyond our core strategic approach, we offer specialised expertise in two transformative domains:'}</AnimatedTitle></p>
+                    </div>
+                  </div>
+                </div>
+                  
+                <div className="expertise-grid">
+                  <div className="expertise-column">
+                    <h4>{expertiseSection?.techExpertise?.heading || 'Emerging Technology Futures'}</h4>
+                    <div className="expertise-items">
+                      {techExpertiseItems.filter(item => !item.isImage).map((item, index) => (
+                        <a 
+                          href={item.link || '#'} 
+                          className="expertise-panel" 
+                          key={index}
+                          onClick={(e) => {
+                            if (!item.link || item.link === '#') {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          <div className="expertise-content">
+                            <h5>{item.text}</h5>
+                            <p>{item.hoverText || ''}</p>
+                          </div>
+                          <div className="expertise-arrow">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M0.292893 14.2929C-0.097631 14.6834 -0.097631 15.3166 0.292893 15.7071C0.683418 16.0976 1.31658 16.0976 1.70711 15.7071L0.292893 14.2929ZM16 1C16 0.447715 15.5523 -9.44832e-09 15 -9.44832e-09L6 -9.44832e-09C5.44772 -9.44832e-09 5 0.447715 5 1C5 1.55228 5.44772 2 6 2H14L14 10C14 10.5523 14.4477 11 15 11C15.5523 11 16 10.5523 16 10L16 1ZM1 15L1.70711 15.7071L15.7071 1.70711L15 1L14.2929 0.292893L0.292893 14.2929L1 15Z" fill="#191C1C"/>
+                            </svg>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="expertise-column">
+                    <h4>{expertiseSection?.sustainabilityExpertise?.heading || 'Strategic Sustainability & Social Impact'}</h4>
+                    <div className="expertise-items">
+                      {sustainabilityExpertiseItems.filter(item => !item.isImage).map((item, index) => (
+                        <a 
+                          href={item.link || '#'} 
+                          className="expertise-panel" 
+                          key={index}
+                          onClick={(e) => {
+                            if (!item.link || item.link === '#') {
+                              e.preventDefault();
+                            }
+                          }}
+                        >
+                          <div className="expertise-content">
+                            <h5>{item.text}</h5>
+                            <p>{item.hoverText || ''}</p>
+                          </div>
+                          <div className="expertise-arrow">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M0.292893 14.2929C-0.097631 14.6834 -0.097631 15.3166 0.292893 15.7071C0.683418 16.0976 1.31658 16.0976 1.70711 15.7071L0.292893 14.2929ZM16 1C16 0.447715 15.5523 -9.44832e-09 15 -9.44832e-09L6 -9.44832e-09C5.44772 -9.44832e-09 5 0.447715 5 1C5 1.55228 5.44772 2 6 2H14L14 10C14 10.5523 14.4477 11 15 11C15.5523 11 16 10.5523 16 10L16 1ZM1 15L1.70711 15.7071L15.7071 1.70711L15 1L14.2929 0.292893L0.292893 14.2929L1 15Z" fill="#191C1C"/>
+                            </svg>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="expertise-column">
-                  <h4>{expertiseSection?.sustainabilityExpertise?.heading || 'Strategic Sustainability & Social Impact'}</h4>
-                  <div className="expertise-items">
-                    {sustainabilityExpertiseItems.filter(item => !item.isImage).map((item, index) => (
-                      <a 
-                        href={item.link || '#'} 
-                        className="expertise-panel" 
-                        key={index}
-                        onClick={(e) => {
-                          if (!item.link || item.link === '#') {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <div className="expertise-content">
-                          <h5>{item.text}</h5>
-                          <p>{item.hoverText || ''}</p>
-                        </div>
-                        <div className="expertise-arrow">
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M0.292893 14.2929C-0.097631 14.6834 -0.097631 15.3166 0.292893 15.7071C0.683418 16.0976 1.31658 16.0976 1.70711 15.7071L0.292893 14.2929ZM16 1C16 0.447715 15.5523 -9.44832e-09 15 -9.44832e-09L6 -9.44832e-09C5.44772 -9.44832e-09 5 0.447715 5 1C5 1.55228 5.44772 2 6 2H14L14 10C14 10.5523 14.4477 11 15 11C15.5523 11 16 10.5523 16 10L16 1ZM1 15L1.70711 15.7071L15.7071 1.70711L15 1L14.2929 0.292893L0.292893 14.2929L1 15Z" fill="#191C1C"/>
-                          </svg>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </div>
               </div>
-
             </div>
-          </div>
-        </section>
+          </section>
+        )}
         
         <section id="section-fifth" className="contactForm-panel">
           <div className="contactContent-outer">

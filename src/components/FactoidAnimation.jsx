@@ -30,7 +30,12 @@ const getResponsiveDimensions = (conditions) => {
 };
 
 
-const FactoidAnimation = ({ factoidsSection, factoidItems }) => {
+const FactoidAnimation = ({ 
+  factoidsSection, 
+  factoidItems, 
+  skipButtonTarget = "#section-fourth", 
+  skipButtonText = "Skip Industry Facts" 
+}) => {
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
   const cardsWrapperRef = useRef(null);
@@ -163,6 +168,36 @@ const FactoidAnimation = ({ factoidsSection, factoidItems }) => {
     return () => observer.disconnect();
   }, []);
 
+  // Helper function to handle the skip button click
+  const handleSkipClick = () => {
+    // Remove the # from the target if it exists, since getElementById doesn't need it
+    const targetId = skipButtonTarget.replace('#', '');
+    const targetSection = document.getElementById(targetId);
+    
+    if (targetSection) {
+      // Use similar logic to the existing scroll functions in your code
+      const headerHeight = document.querySelector("header")?.offsetHeight || 0;
+      
+      // Calculate the end of the factoids section first
+      const section = sectionRef.current;
+      const factoidsSectionScrollDistance = factoidItems.length * 400;
+      const sectionTop = section.offsetTop;
+      const endOfFactoidsSection = sectionTop + factoidsSectionScrollDistance;
+      
+      // Get target section position and add some offset to land properly in the section
+      const targetSectionTop = targetSection.offsetTop;
+      const offset = 100; // Buffer to ensure we land in the section, not just at its edge
+      
+      // Choose the greater of the two: end of factoids or target section position
+      const targetPosition = Math.max(endOfFactoidsSection + offset, targetSectionTop - headerHeight + offset);
+      
+      window.scrollTo({
+        top: targetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
   return (
     <section id="section-third" className="factoids-complete" ref={sectionRef}>
       <div className="factoid-sticky-container">
@@ -183,18 +218,9 @@ const FactoidAnimation = ({ factoidsSection, factoidItems }) => {
         <div 
           className="anchorBtn-container"
         >
-            <div className="prompt-button" onClick={() => {
-                const expertisePanel = document.getElementById('section-fourth');
-                if (expertisePanel) {
-                    const headerHeight = document.querySelector("header")?.offsetHeight || 0;
-                    const offset = window.innerHeight * 0;
-                    const targetPosition = expertisePanel.offsetTop - headerHeight + offset;
-                    window.scrollTo({
-                        top: targetPosition,
-                        behavior: "smooth"
-                    });
-                }
-            }}>{factoidsSection?.skipButtonText || 'Skip Industry Facts'}</div>
+            <div className="prompt-button" onClick={handleSkipClick}>
+                {skipButtonText}
+            </div>
             <div className="prompt-buttonIcon" onClick={() => {
                 const expertisePanel = document.getElementById('section-second');
                 if (expertisePanel) {

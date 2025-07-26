@@ -352,14 +352,14 @@ export function LandingEffects() {
 
             const end = Math.min(batch + batchSize, indices.length)
             for (let i = batch; i < end; i++) {
-              const randomDelay = Math.random() * 180
+              const randomDelay = Math.random() * 100
 
               setTimeout(() => {
                 if (!isMounted) return
                 words[indices[i]].classList.add('fade-in')
               }, randomDelay)
             }
-          }, batch * 75)
+          }, batch * 40)
 
           timeouts.push(timeoutId)
         }
@@ -389,7 +389,7 @@ export function LandingEffects() {
                 const timeoutId = setTimeout(() => {
                   if (!isMounted) return
                   fadeInWordsRandomly(wordElements)
-                }, 500)
+                }, 300)
 
                 timeouts.push(timeoutId)
               }

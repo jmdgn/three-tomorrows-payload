@@ -172,6 +172,17 @@ export const Homepage: CollectionConfig = {
             },
           ],
         },
+        // --- ✅ CHANGE 1: ADDED THIS TOGGLE ---
+        {
+          name: 'displaySection',
+          label: 'Display Clients Section',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: {
+            position: 'sidebar',
+            description: 'Check this box to show the Clients section on the homepage.',
+          },
+        },
       ],
     },
     {
@@ -214,6 +225,17 @@ export const Homepage: CollectionConfig = {
       name: 'expertiseSection',
       type: 'group',
       fields: [
+        // --- ✅ CHANGE 2: ADDED THIS TOGGLE ---
+        {
+          name: 'displaySection',
+          label: 'Display Expertise Section',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: {
+            position: 'sidebar',
+            description: 'Check this box to show the Expertise section on the homepage.',
+          },
+        },
         {
           name: 'heading',
           type: 'text',

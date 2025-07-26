@@ -21,6 +21,11 @@ import { TabbedPanel } from '../../blocks/TabbedPanel/config'
 import { ExpertiseBlock } from '../../blocks/ExpertiseBlock/config'
 import { AboutIntroBlock } from '../../blocks/AboutIntroBlock/config'
 import { HeaderSectionConfig } from '../../blocks/HeaderSection'
+import { ExpertiseGridConfig } from '../../blocks/ExpertiseGrid'
+import { OurServicesIntroConfig } from '../../blocks/OurServicesIntro'
+import { AuroraFeatureConfig } from '../../blocks/AuroraFeature'
+import { AccordionBlockConfig } from '../../blocks/AccordionBlock'
+import { ServiceLinkPanelsBlockConfig } from '../../blocks/ServiceLinkPanelsBlock'
 
 import {
   MetaDescriptionField,
@@ -41,9 +46,11 @@ export const Pages: CollectionConfig<'pages'> = {
   defaultPopulate: {
     title: true,
     slug: true,
+    parent: true,
+    fullPath: true,
   },
   admin: {
-    defaultColumns: ['title', 'slug', 'updatedAt'],
+    defaultColumns: ['title', 'slug', 'parent', 'fullPath', 'updatedAt'],
     livePreview: {
       url: ({ data, req }) => {
         const path = generatePreviewPath({
@@ -70,6 +77,45 @@ export const Pages: CollectionConfig<'pages'> = {
       required: true,
     },
     {
+      name: 'parent',
+      type: 'relationship',
+      relationTo: 'pages',
+      admin: {
+        description: 'Select a parent page to create a hierarchy',
+        position: 'sidebar',
+      },
+      validate: (val, { data, operation }) => {
+        if (operation === 'update' && val === data.id) {
+          return 'A page cannot be its own parent'
+        }
+        return true
+      },
+    },
+    {
+      name: 'backgroundColor',
+      type: 'select',
+      label: 'Page Background Color',
+      defaultValue: '#FBFCFD',
+      options: [
+        {
+          label: 'Light Grey',
+          value: '#FBFCFD',
+        },
+        {
+          label: 'Green',
+          value: '#3BE494',
+        },
+        {
+          label: 'Navy',
+          value: '#171744',
+        },
+      ],
+      admin: {
+        description: 'Choose the background color for this page',
+        position: 'sidebar',
+      },
+    },
+    {
       type: 'tabs',
       tabs: [
         {
@@ -90,17 +136,21 @@ export const Pages: CollectionConfig<'pages'> = {
               name: 'layout',
               type: 'blocks',
               blocks: [
+                AccordionBlockConfig,
                 AboutIntroBlock,
                 Archive,
+                AuroraFeatureConfig,
                 CallToAction,
                 CardStack,
                 ContactCTA,
                 Content,
                 ExpertiseBlock,
+                ExpertiseGridConfig,
                 FormBlock,
-                // Add the new HeaderSection block to the list
                 HeaderSectionConfig,
                 MediaBlock,
+                OurServicesIntroConfig,
+                ServiceLinkPanelsBlockConfig, // 2. Add the new block to the list
                 TabbedPanel,
                 TitleIntroductionBlock,
               ],
@@ -144,6 +194,42 @@ export const Pages: CollectionConfig<'pages'> = {
       type: 'date',
       admin: {
         position: 'sidebar',
+      },
+    },
+    {
+      name: 'fullPath',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        description: 'Auto-generated full URL path',
+        position: 'sidebar',
+      },
+      hooks: {
+        beforeChange: [
+          async ({ data, req: { payload } }) => {
+            let path = data.slug || ''
+            let currentParent = data.parent
+
+            while (currentParent) {
+              try {
+                const parent = await payload.findByID({
+                  collection: 'pages',
+                  id: currentParent,
+                })
+                if (parent && parent.slug) {
+                  path = `${parent.slug}/${path}`
+                  currentParent = parent.parent
+                } else {
+                  break
+                }
+              } catch (error) {
+                break
+              }
+            }
+
+            return path
+          },
+        ],
       },
     },
     ...slugField(),

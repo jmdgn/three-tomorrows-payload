@@ -3,8 +3,10 @@
 import React from 'react';
 import AnimatedTitle from '@/components/HomeScripts/AnimatedTitle';
 
-const TitleIntroduction = ({ heading, headingColor, subheading, centerAlignment }) => {
+const TitleIntroduction = ({ heading, headingColor, subheading, centerAlignment, enableTextIndent }) => {
   const alignmentClass = centerAlignment ? 'center' : '';
+  const indentClass = enableTextIndent ? '' : 'no-indent';
+  const containerAlignmentClass = centerAlignment ? '' : 'left-align';
   
   return (
     <div className={`titleText ${alignmentClass}`}>
@@ -16,8 +18,8 @@ const TitleIntroduction = ({ heading, headingColor, subheading, centerAlignment 
           {heading || 'Heading'}
         </h4>
       </div>
-      <div className="txtContent-container">
-        <p className="xlarge">
+      <div className={`txtContent-container ${containerAlignmentClass}`}>
+        <p className={`xlarge ${indentClass}`}>
           <AnimatedTitle staggerDelay={0.02} duration={0.6}>
             {subheading || 'Description Subhead'}
           </AnimatedTitle>

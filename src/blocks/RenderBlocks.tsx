@@ -2,20 +2,26 @@ import React, { Fragment } from 'react'
 
 import type { Page } from '@/payload-types'
 
-import TitleIntroduction from '@/blocks/Titles/TitleIntroduction'
+import { AboutIntroBlock } from '@/blocks/AboutIntroBlock'
+import { AccordionBlock } from '@/blocks/AccordionBlock'
 import { ArchiveBlock } from '@/blocks/ArchiveBlock/Component'
+import { AuroraFeatureBlock } from '@/blocks/AuroraFeature'
 import { CallToActionBlock } from '@/blocks/CallToAction/Component'
-import { ContentBlock } from '@/blocks/Content/Component'
-import { FormBlock } from '@/blocks/Form/Component'
-import { MediaBlock } from '@/blocks/MediaBlock/Component'
 import { CardStackBlock } from '@/blocks/CardStack'
 import { ContactCTABlock } from '@/blocks/ContactCTA'
-import { TabbedPanelBlock } from '@/blocks/TabbedPanel'
+import { ContentBlock } from '@/blocks/Content/Component'
 import { ExpertiseBlock } from '@/blocks/ExpertiseBlock'
-import { AboutIntroBlock } from '@/blocks/AboutIntroBlock'
+import { ExpertiseGridBlock } from '@/blocks/ExpertiseGrid'
+import { FormBlock } from '@/blocks/Form/Component'
 import { HeaderSectionBlock } from '@/blocks/HeaderSection'
+import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { OurServicesIntroBlock } from '@/blocks/OurServicesIntro'
+import { ServiceLinkPanelsBlock } from '@/blocks/ServiceLinkPanelsBlock'
+import { TabbedPanelBlock } from '@/blocks/TabbedPanel'
+import TitleIntroduction from '@/blocks/Titles/TitleIntroduction'
 
 const blockComponents = {
+  accordionBlock: AccordionBlock,
   titleIntroduction: TitleIntroduction,
   archive: ArchiveBlock,
   content: ContentBlock,
@@ -28,9 +34,13 @@ const blockComponents = {
   expertiseBlock: ExpertiseBlock,
   aboutIntroBlock: AboutIntroBlock,
   headerSection: HeaderSectionBlock,
+  expertiseGrid: ExpertiseGridBlock,
+  ourServicesIntro: OurServicesIntroBlock,
+  auroraFeature: AuroraFeatureBlock,
+  serviceLinkPanels: ServiceLinkPanelsBlock,
 }
 
-const fullWidthBlocks = ['expertiseBlock', 'aboutIntroBlock']
+const fullWidthBlocks = ['expertiseBlock', 'aboutIntroBlock', 'auroraFeature']
 
 export const RenderBlocks: React.FC<{
   blocks: Page['layout'][0][]
@@ -52,6 +62,7 @@ export const RenderBlocks: React.FC<{
               if (fullWidthBlocks.includes(blockType)) {
                 return (
                   <div key={index}>
+                    {/* @ts-expect-error */}
                     <Block {...block} />
                   </div>
                 )
@@ -60,6 +71,7 @@ export const RenderBlocks: React.FC<{
               return (
                 <div className="my-16" key={index}>
                   <div className="blockInner">
+                    {/* @ts-expect-error */}
                     <Block {...block} disableInnerContainer />
                   </div>
                 </div>

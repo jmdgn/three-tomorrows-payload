@@ -22,7 +22,10 @@ section.intro-para {
 	bottom: 2rem; }
 /* End */
 
+
 /* Services Section Styles */
+.services-intro-right {
+	padding-top: 2rem; }
 /* End */
 
 
@@ -80,6 +83,8 @@ ul.menu-ribbon a li {
 
 
 /* Services Section Styles */
+.services-intro-grid {
+	gap: 8rem; }
 /* End */
 
 
@@ -99,6 +104,9 @@ p.xlarge {
 
 p.xlarge.internalPanel {
 	font-size: 66px; }
+
+.pt-16-inner {
+	margin-top: 12rem; }
 /* End: Universal Styles */
 
 
@@ -127,6 +135,7 @@ p.body-intro {
 	font-size: 320%; }
 /* End */
 
+
 /* Contact Home Styles */
 .contactPanel-home {
 	width: 90%; }
@@ -142,11 +151,20 @@ p.body-intro {
 
 .form-block-content {
 	gap: 2rem; }
+/* End */
 
 /* Footer Styles */
 .footerContent-outer {
 	padding: 4rem 2rem 1rem 2rem }
 /* End: Footer Styles */
+
+/* Custom Block Systems */
+.services-intro-left {
+	width: 55%; }
+
+.services-intro-right {
+	width: 45%; }
+/* End */
 }
 
 
@@ -572,6 +590,18 @@ section.intro-para {
 .contact-persons-grid.grid.gap-8 {
 	flex-direction: column;
 	gap: 6rem; }
+
+.services-intro-grid {
+	flex-direction: column;
+	gap: 4rem; }
+
+.services-intro-left,
+.services-intro-right {
+	width: 100%; }
+
+.services-intro-section,
+.aurora-feature-section {
+	padding-bottom: 8rem; }
 
 }
 
@@ -1098,6 +1128,9 @@ article.pt-16.pb-24 {
 	align-items: center;
 	width: 100%; }
 
+.my-16 {
+	padding: 1rem; }
+
 .factText-container {
 	padding: 0 1rem; }
 
@@ -1112,6 +1145,22 @@ article.pt-16.pb-24 {
 
 .contactCta.header {
 	padding: 8px 20px; }
+
+.services-intro-left .titleText {
+	gap: 0; }
+
+.services-intro-grid {
+	gap: 2rem; }
+
+a.expertise-panel {
+	gap: 1rem; }
+
+.services-intro-section,
+.aurora-feature-section {
+	padding-bottom: 2rem; }
+
+.aurora-feature-section {
+	padding: 0 1rem; }
 }
 
 
@@ -1148,7 +1197,7 @@ p.body-intro {
 
 p.xlarge,
 p.xlarge.internalPanel {
-	font-size: 38px;
+	font-size: 32px;
 	line-height: 1.2; }
 
 .service-carousel-container {
