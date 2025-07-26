@@ -121,13 +121,14 @@ export const OurServicesIntro: Block = {
               },
             },
             {
-              name: 'pageSlug',
-              type: 'text',
-              label: 'Page Slug',
+              name: 'reference',
+              type: 'relationship',
+              label: 'Document to link to',
+              relationTo: ['pages'], // Adjust this to match your collection slugs
               required: true,
+              maxDepth: 2,
               admin: {
                 condition: (_, siblingData) => siblingData?.type === 'reference',
-                description: 'Enter the slug of the page (e.g., "trend-intelligence")',
               },
             },
             {
