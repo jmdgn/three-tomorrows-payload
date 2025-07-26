@@ -80,31 +80,99 @@ export const OurServicesIntro: Block = {
         },
         {
           name: 'link',
-          type: 'text',
-          label: 'Link URL',
+          type: 'group',
+          label: 'Link',
           admin: {
-            description: 'Optional link URL (leave empty to disable link)',
+            description: 'Configure the link for this service item',
           },
+          fields: [
+            {
+              name: 'type',
+              type: 'radio',
+              label: 'Link Type',
+              options: [
+                {
+                  label: 'Internal Link',
+                  value: 'reference',
+                },
+                {
+                  label: 'Custom URL',
+                  value: 'custom',
+                },
+                {
+                  label: 'No Link',
+                  value: 'none',
+                },
+              ],
+              defaultValue: 'none',
+              admin: {
+                layout: 'horizontal',
+              },
+            },
+            {
+              name: 'newTab',
+              type: 'checkbox',
+              label: 'Open in new tab',
+              admin: {
+                style: {
+                  alignSelf: 'flex-end',
+                },
+                condition: (_, siblingData) => siblingData?.type !== 'none',
+              },
+            },
+            {
+              name: 'reference',
+              type: 'relationship',
+              label: 'Document to link to',
+              relationTo: ['pages'], // Adjust this to match your collection slugs
+              required: true,
+              maxDepth: 1,
+              admin: {
+                condition: (_, siblingData) => siblingData?.type === 'reference',
+              },
+            },
+            {
+              name: 'url',
+              type: 'text',
+              label: 'Custom URL',
+              required: true,
+              admin: {
+                condition: (_, siblingData) => siblingData?.type === 'custom',
+              },
+            },
+          ],
         },
       ],
       defaultValue: [
         {
           text: 'Trend Intelligence',
           hoverText: 'Strategic AI integration that transforms operations and accelerates growth.',
+          link: {
+            type: 'none',
+          },
         },
         {
           text: 'Strategic Planning',
           hoverText:
             'We help businesses navigate Web3 with clarity, purpose, and technical precision.',
+          link: {
+            type: 'none',
+          },
         },
         {
           text: 'Shared Value Consulting',
           hoverText:
             'We drive digital transformation that aligns technology with business ambition.',
+          link: {
+            type: 'none',
+          },
         },
         {
           text: 'Digital Consulting',
           hoverText: 'Independent, insight-led tech assessments to guide smarter decisions.',
+          link: {
+            type: 'none',
+          },
         },
       ],
     },
