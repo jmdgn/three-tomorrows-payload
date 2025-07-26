@@ -126,7 +126,7 @@ export const OurServicesIntro: Block = {
               label: 'Document to link to',
               relationTo: ['pages'], // Adjust this to match your collection slugs
               required: true,
-              maxDepth: 1,
+              maxDepth: 2,
               admin: {
                 condition: (_, siblingData) => siblingData?.type === 'reference',
               },

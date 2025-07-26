@@ -10,8 +10,13 @@ const getHref = (link: any): string => {
   if (!link || link.type === 'none') return '#'
 
   if (link.type === 'reference' && link.reference) {
-    const page = link.reference as Page
-    return page.fullPath || `/${page.slug}`
+    if (typeof link.reference === 'object' && link.reference !== null) {
+      const page = link.reference as Page
+      return page.fullPath || `/${page.slug}`
+    } else if (typeof link.reference === 'string') {
+      console.warn('Page reference not populated. Check maxDepth in relationship field.')
+      return '#'
+    }
   }
 
   if (link.type === 'custom' && link.url) {
@@ -67,7 +72,6 @@ export const OurServicesIntroBlock: React.FC<OurServicesIntroBlockProps> = ({
                     const hasLink = href !== '#'
                     const isExternal = isExternalLink(href)
 
-                    // If no link, render as div
                     if (!hasLink) {
                       return (
                         <div className="expertise-panel" key={index}>
@@ -93,7 +97,6 @@ export const OurServicesIntroBlock: React.FC<OurServicesIntroBlockProps> = ({
                       )
                     }
 
-                    // If external link or custom URL, use regular anchor tag
                     if (isExternal || item.link?.type === 'custom') {
                       return (
                         <a
@@ -125,7 +128,6 @@ export const OurServicesIntroBlock: React.FC<OurServicesIntroBlockProps> = ({
                       )
                     }
 
-                    // For internal links, use Next.js Link component
                     return (
                       <Link
                         href={href}
