@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const BackgroundTransition = () => {
+const BackgroundTransition = ({ displayClientsSection = true, displayExpertiseSection = true }) => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -72,23 +72,26 @@ const BackgroundTransition = () => {
       const contactPanel = document.querySelector(".contactForm-panel");
       const expertiseSection = document.querySelector("#section-fourth.expertise-panel");
 
-      if (!overlay || !expertiseSection || !contactPanel) {
+      if (!overlay || !contactPanel) {
         animationFrameId = requestAnimationFrame(updateBackground);
         return;
       }
 
       const viewportHeight = window.innerHeight;
       
-      const expertiseRect = expertiseSection.getBoundingClientRect();
-      const transitionStart = viewportHeight * 0.8;
-      const transitionEnd = viewportHeight * 0.2;
-      
-      let greenProgress = (transitionStart - expertiseRect.top) / (transitionStart - transitionEnd);
-      greenProgress = clamp(greenProgress, 0, 1);
+      let greenProgress = 0;
+      let contactProgress = 0;
+
+      if (displayExpertiseSection && expertiseSection) {
+        const expertiseRect = expertiseSection.getBoundingClientRect();
+        const transitionStart = viewportHeight * 0.8;
+        const transitionEnd = viewportHeight * 0.2;
+        greenProgress = (transitionStart - expertiseRect.top) / (transitionStart - transitionEnd);
+        greenProgress = clamp(greenProgress, 0, 1);
+      }
 
       const contactRect = contactPanel.getBoundingClientRect();
       const contactInView = contactRect.top < viewportHeight;
-      let contactProgress = 0;
 
       if (contactInView) {
         const contactStart = viewportHeight * 1.2;
@@ -100,49 +103,67 @@ const BackgroundTransition = () => {
       let topColor, bottomColor;
 
       if (contactProgress > 0) {
-        topColor = interpolateColor(specialColor, contactTop, contactProgress);
-        bottomColor = interpolateColor(specialColor, contactBottom, contactProgress);
-      } else {
+        if (displayExpertiseSection && greenProgress > 0) {
+          topColor = interpolateColor(specialColor, contactTop, contactProgress);
+          bottomColor = interpolateColor(specialColor, contactBottom, contactProgress);
+        } else {
+          topColor = interpolateColor(startGradientTop, contactTop, contactProgress);
+          bottomColor = interpolateColor(startGradientBottom, contactBottom, contactProgress);
+        }
+      } else if (displayExpertiseSection && greenProgress > 0) {
         topColor = interpolateColor(startGradientTop, specialColor, greenProgress);
         bottomColor = interpolateColor(startGradientBottom, specialColor, greenProgress);
+      } else {
+        topColor = startGradientTop;
+        bottomColor = startGradientBottom;
       }
       
       let finalBackground = `linear-gradient(180deg, ${topColor} 0%, ${bottomColor} 100%)`;
       overlay.style.background = finalBackground;
       
-      // ✅ START: Updated dot visibility logic
       const backgroundSection = document.querySelector("#background.bkgnd");
       const sectionFirst = document.querySelector("#section-first.intro-para");
+      const sectionSecond = document.querySelector("#section-second.service-panel");
       const sectionThird = document.querySelector("#section-third.factoids-complete");
       const sectionFifth = document.querySelector("#section-fifth.contactForm-panel");
 
-      if (backgroundSection && sectionFirst && sectionThird && sectionFifth) {
+      if (backgroundSection && sectionFirst && sectionSecond && sectionFifth) {
         const firstRect = sectionFirst.getBoundingClientRect();
-        const thirdRect = sectionThird.getBoundingClientRect();
+        const secondRect = sectionSecond.getBoundingClientRect();
+        const thirdRect = sectionThird ? sectionThird.getBoundingClientRect() : null;
         const fifthRect = sectionFifth.getBoundingClientRect();
         const vh = window.innerHeight;
 
         let dotOpacity = 0;
 
-        // Rule 1: Fade in after the initial hero section
         const initialFadeProgress = (vh - firstRect.bottom) / (vh * 0.5);
         dotOpacity = clamp(initialFadeProgress, 0, 1);
 
-        // Rule 2: Fade out when section-third enters the viewport
-        if (thirdRect.top < vh) {
+        if (thirdRect && thirdRect.top < vh) {
           const fadeOutProgress = (vh - thirdRect.top) / (vh * 0.2);
           dotOpacity = Math.min(dotOpacity, 1 - clamp(fadeOutProgress, 0, 1));
+        } else {
+          const serviceProgress = (vh - secondRect.top) / (secondRect.height + vh);
+          if (serviceProgress > 0.6) {
+            const fadeOutProgress = (serviceProgress - 0.6) / 0.4;
+            dotOpacity = Math.min(dotOpacity, 1 - clamp(fadeOutProgress, 0, 1));
+          }
         }
 
-        // Rule 3: Fade back in when section-fifth enters the viewport
         if (fifthRect.top < vh) {
           const fadeInProgress = (vh - fifthRect.top) / (vh * 0.2);
           dotOpacity = Math.max(dotOpacity, clamp(fadeInProgress, 0, 1));
         }
 
+        if (!displayClientsSection && !displayExpertiseSection) {
+          const serviceBottomProgress = (vh - secondRect.bottom) / (vh * 0.3);
+          if (serviceBottomProgress < 0) {
+            dotOpacity = Math.max(dotOpacity, 0.8);
+          }
+        }
+
         backgroundSection.style.opacity = dotOpacity.toString();
       }
-      // ✅ END: Updated dot visibility logic
       
       animationFrameId = requestAnimationFrame(updateBackground);
     };
@@ -158,7 +179,7 @@ const BackgroundTransition = () => {
         styleTag.parentNode.removeChild(styleTag);
       }
     };
-  }, []);
+  }, [displayClientsSection, displayExpertiseSection]);
 
   return null;
 };

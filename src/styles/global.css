@@ -1336,29 +1336,50 @@ svg.second {
 
 #sphere-container {
     position: fixed;
-    top: 50%;
-    left: 50%;
+    top: 0;
+    left: 0;
     transform: translate(-50%, -50%);
     opacity: 0;
-    width: 100vw; 
+    width: 100svw; 
     height: 100svh;
-    filter: blur(1px);
-    transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.4s ease-in-out;
+    transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
     will-change: transform; }
 
-.terrain-feature {
-    position: absolute;
-    width: 100vw;
-    height: 100svh;
-    top: 100svh;
-    left: 0; }
+#sphere-container.sphere-fade-in {
+    animation: sphereFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+    
+#sphere-container.sphere-fade-out {
+    animation: sphereFadeOut 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+    
+@keyframes sphereFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
-.terrain-feature canvas {
-    position: absolute;
-    bottom: 0;
-    top: 0;
-    transform: scale(1.4);
-    transition: top 0.2s linear; }
+@keyframes sphereFadeOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.9);
+    }
+}
+
+#sphere-container.sphere-fade-out {
+    filter: blur(2px); }
+  
+#sphere-container.sphere-fade-in {
+    filter: blur(0); }
+
 /* End */
 
 
@@ -1544,7 +1565,7 @@ section.service-panel {
     overflow: hidden;
     border-radius: 24px;
     background: #FFF;
-    aspect-ratio: 2/3;
+    aspect-ratio: 4 / 5;
     box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0);
     transform: translateY(0px);
     transition: all 0.3s linear; }
@@ -1562,10 +1583,10 @@ section.service-panel {
 
 .serviceText-panelTop h4,
 .serviceText-panelTop p,
-.serviceText-panelBottom a {
+.serviceText-panelBottom span {
     color: #FFF; }
 
-.serviceText-panelBottom a {
+.serviceText-panelBottom span {
     width: fit-content;
     display: flex;
     align-items: center;
@@ -1576,7 +1597,7 @@ section.service-panel {
     line-height: 18px;
     transition: all 0.3s linear; }
 
-.serviceText-panelBottom a:hover {
+.servicePanel-container:hover .service-link-text {
     margin-left: 12px;
     transition: all 0.3s linear; }
 

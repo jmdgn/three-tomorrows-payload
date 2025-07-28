@@ -113,6 +113,24 @@ export const Homepage: CollectionConfig = {
                 mimeType: { contains: 'image' },
               },
             },
+            {
+              name: 'linkUrl',
+              type: 'text',
+              label: 'Link URL',
+              defaultValue: '/services',
+              admin: {
+                description: 'The URL this service card should link to when clicked',
+              },
+            },
+            {
+              name: 'linkText',
+              type: 'text',
+              label: 'Link Text',
+              defaultValue: 'More on this service',
+              admin: {
+                description: 'The text displayed for the service link',
+              },
+            },
           ],
           defaultValue: [
             {
@@ -120,24 +138,32 @@ export const Homepage: CollectionConfig = {
               breakTitle: 'Trend',
               description:
                 'Cutting through noise to identify the signals that matter most for your future. Helping you see beyond the horizon and prepare for multiple possible tomorrows.',
+              linkUrl: '/services',
+              linkText: 'More on this service',
             },
             {
               title: 'Workshops',
               breakTitle: 'Foresight',
               description:
                 "Collaborative sessions that build your team's capacity to think differently about change and identify strategic opportunities within emerging trends.",
+              linkUrl: '/services',
+              linkText: 'More on this service',
             },
             {
               title: 'Planning',
               breakTitle: 'Strategic',
               description:
                 'Facilitation of strategy development processes that align teams, clarify purpose and create actionable roadmaps - independent of or informed by trend analysis.',
+              linkUrl: '/services',
+              linkText: 'More on this service',
             },
             {
               title: 'Support',
               breakTitle: 'Implementation',
               description:
                 'Converting insights and strategy into clear action plans that leverage your organisational strengths while building internal capability.',
+              linkUrl: '/services',
+              linkText: 'More on this service',
             },
           ],
         },
@@ -172,7 +198,6 @@ export const Homepage: CollectionConfig = {
             },
           ],
         },
-        // --- ✅ CHANGE 1: ADDED THIS TOGGLE ---
         {
           name: 'displaySection',
           label: 'Display Clients Section',
@@ -225,7 +250,6 @@ export const Homepage: CollectionConfig = {
       name: 'expertiseSection',
       type: 'group',
       fields: [
-        // --- ✅ CHANGE 2: ADDED THIS TOGGLE ---
         {
           name: 'displaySection',
           label: 'Display Expertise Section',

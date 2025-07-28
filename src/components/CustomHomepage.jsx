@@ -276,6 +276,132 @@ const CustomHomepage = (props) => {
     };
   }, []);
 
+  // Enhanced sphere handling functions
+  const initializeSphereConfiguration = () => {
+    const sphereContainer = document.getElementById('sphere-container')
+    if (!sphereContainer) return null
+
+    // Initial setup based on configuration
+    sphereContainer.style.opacity = '0'
+    sphereContainer.style.transition = 'opacity 0.4s ease-in-out'
+    
+    // Add configuration-specific classes
+    if (!displayClientsSection) {
+      document.body.classList.add('no-clients-section')
+    }
+    if (!displayExpertiseSection) {
+      document.body.classList.add('no-expertise-section')
+    }
+    
+    // REMOVED: The problematic CSS filter is no longer applied here.
+    const updateSphereForViewport = () => {
+      const vw = window.innerWidth;
+      // No longer applying filter styles that cause blow-outs.
+      sphereContainer.style.filter = 'none';
+    }
+    
+    updateSphereForViewport()
+    window.addEventListener('resize', updateSphereForViewport)
+    
+    return () => {
+      window.removeEventListener('resize', updateSphereForViewport)
+    }
+  }
+
+  const setupEnhancedSphereVisibility = () => {
+    const sphereContainer = document.getElementById('sphere-container')
+    const introStateInner = document.querySelector('.introState-inner')
+    const sectionSecond = document.querySelector('#section-second')
+  
+    if (!sphereContainer || !introStateInner || !sectionSecond) return null
+  
+    const updateBodyClasses = () => {
+      const body = document.body
+      
+      body.classList.remove('no-clients-section', 'no-expertise-section')
+      
+      if (!displayClientsSection) {
+        body.classList.add('no-clients-section')
+      }
+      if (!displayExpertiseSection) {
+        body.classList.add('no-expertise-section')
+      }
+    }
+
+    const handleSphereVisibility = () => {
+      requestAnimationFrame(() => {
+        const viewportHeight = window.innerHeight
+        const viewportMiddle = viewportHeight / 2
+        const introStateRect = introStateInner.getBoundingClientRect()
+        const sectionSecondRect = sectionSecond.getBoundingClientRect()
+        const introProgress = (viewportHeight - introStateRect.top) / viewportHeight
+        const sectionBottomPosition = sectionSecondRect.bottom
+        const shouldFadeOutAtMiddle = sectionBottomPosition <= viewportMiddle
+        
+        let shouldShowSpheres = false
+        
+        if (introProgress > 0.3 && !shouldFadeOutAtMiddle) {
+          shouldShowSpheres = true
+        }
+        
+        if (shouldFadeOutAtMiddle) {
+          shouldShowSpheres = false
+        }
+        
+        if (shouldShowSpheres && !sphereContainer.classList.contains('sphere-container-visible')) {
+          sphereContainer.classList.remove('sphere-container-hidden', 'sphere-fade-out')
+          sphereContainer.classList.add('sphere-container-visible', 'sphere-fade-in')
+          sphereContainer.style.opacity = '1'
+        } else if (!shouldShowSpheres && !sphereContainer.classList.contains('sphere-container-hidden')) {
+          sphereContainer.classList.remove('sphere-container-visible', 'sphere-fade-in')
+          sphereContainer.classList.add('sphere-container-hidden', 'sphere-fade-out')
+          
+          setTimeout(() => {
+            sphereContainer.style.opacity = '0'
+          }, 600)
+        }
+      })
+    }
+
+    updateBodyClasses()
+    
+    const throttledScrollHandler = throttle(handleSphereVisibility, 16)
+    window.addEventListener('scroll', throttledScrollHandler)
+
+    handleSphereVisibility()
+
+    return () => {
+      window.removeEventListener('scroll', throttledScrollHandler)
+    }
+  }
+
+  const manageSphereAnimationStates = () => {
+    // Ensure the global spheres array from sphereScene.js is available
+    if (typeof window !== 'undefined' && window.spheres && window.spheres.length > 0) {
+      
+      // Determine the appropriate drift limit based on which content sections are visible
+      let maxDrift;
+      if (!displayClientsSection && !displayExpertiseSection) {
+        // Both sections hidden: Most restricted movement
+        maxDrift = 4.0;
+      } else if (!displayClientsSection || !displayExpertiseSection) {
+        // One section hidden: Moderately restricted movement
+        maxDrift = 6.0;
+      } else {
+        // Both sections visible: Standard, wider movement
+        maxDrift = 8.0;
+      }
+
+      // Apply the calculated maxDrift to each sphere
+      window.spheres.forEach(sphereObj => {
+        if (sphereObj) {
+          sphereObj.maxDrift = maxDrift;
+        }
+      });
+    }
+  };
+
+
   useEffect(() => {
     let isMounted = true;
     
@@ -382,19 +508,12 @@ const CustomHomepage = (props) => {
       { target: window, event: 'scroll', handler: handleScroll }
     ];
     
-    const setupSphereContainer = () => {
-      const sphereContainer = document.getElementById('sphere-container');
-      if (sphereContainer) {
-        sphereContainer.style.opacity = '0';
-        sphereContainer.style.transition = 'opacity 0.4s ease-in-out';
-        
-        if (window.scrollY < 100) {
-          sphereContainer.style.opacity = '0';
-        }
-      }
-    };
+    // Enhanced sphere handling
+    const cleanupSphereConfig = initializeSphereConfiguration()
+    const cleanupSphereVisibility = setupEnhancedSphereVisibility()
     
-    setupSphereContainer();
+    // UPDATED: Call sphere state management periodically to update animation properties.
+    const sphereStateInterval = setInterval(manageSphereAnimationStates, 500)
     
     handleScroll();
 
@@ -408,8 +527,13 @@ const CustomHomepage = (props) => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
+
+      // Enhanced sphere cleanup
+      if (cleanupSphereConfig) cleanupSphereConfig()
+      if (cleanupSphereVisibility) cleanupSphereVisibility()
+      clearInterval(sphereStateInterval)
     };
-  }, []);
+  }, [displayClientsSection, displayExpertiseSection]); // Add dependencies
 
   useEffect(() => {
     const optimizeImages = () => {
@@ -583,16 +707,23 @@ const CustomHomepage = (props) => {
                 /* Desktop Grid View - Original Layout */
                 <div className="serviceGrid-container">
                   {serviceItems.map((service, index) => (
-                    <div className="servicePanel-container" key={index}>
+                    <a 
+                      href={service.linkUrl || '/services'} 
+                      className="servicePanel-container" 
+                      key={index}
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
                       <div className="serviceText-panelTop">
                         <h4>{service.title}</h4>
                         <p>{service.description}</p>
                       </div>
                       <div className="serviceText-panelBottom">
-                        <a href={service.linkUrl || '/services'}>
+                        <span className="service-link-text">
                           {service.linkText || 'More on this service'}
-                          <svg width="7" height="12" viewBox="0 0 7 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L6 6L1 11" stroke="white" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                        </a>
+                          <svg width="7" height="12" viewBox="0 0 7 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L6 6L1 11" stroke="white" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </span>
                       </div>
                       <div className="serviceFt-image">
                         <img
@@ -608,7 +739,7 @@ const CustomHomepage = (props) => {
                           }}
                         />
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               )}
@@ -633,7 +764,7 @@ const CustomHomepage = (props) => {
             factoidsSection={factoidsSection} 
             factoidItems={factoidItems}
             skipButtonTarget={displayExpertiseSection ? "#section-fourth" : "#section-fifth"}
-            skipButtonText={displayExpertiseSection ? "Skip Industry Facts" : "Skip to Contact"}
+            skipButtonText={displayExpertiseSection ? "Skip Industry Facts" : "Skip Industry Facts"}
         />
         
         {displayExpertiseSection && (

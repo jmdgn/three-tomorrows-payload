@@ -443,7 +443,7 @@ export function LandingEffects() {
         })
       }
 
-      const throttledScrollHandler = throttle(handleScroll, 16) // 60fps
+      const throttledScrollHandler = throttle(handleScroll, 16)
       window.addEventListener('scroll', throttledScrollHandler)
       eventListeners.push({ element: window, event: 'scroll', handler: throttledScrollHandler })
 
